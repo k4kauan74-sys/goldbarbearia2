@@ -1,59 +1,91 @@
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Circle } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background selection:bg-primary/30">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative h-screen flex flex-col justify-center items-center overflow-hidden bg-gradient-to-b from-primary/10 via-background to-background">
-        {/* Ambient Blurs (Dourado Leve) */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary rounded-full blur-orb opacity-15 animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/40 rounded-full blur-orb opacity-10 animate-float" style={{ animationDelay: '2s' }} />
+      <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden pt-20">
+        {/* Ambient Blurs */}
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/20 rounded-full blur-[120px] animate-float" />
+        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-secondary/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '2s' }} />
 
-        <div className="container relative z-10 px-4 flex flex-col items-center">
-          <div className="mb-12">
-            <h1 className="text-[12vw] md:text-[18vw] font-anton tracking-tighter leading-[0.8] text-white flex flex-col items-center">
-              <span>GOLD</span>
-              <span className="text-outline">BARBEARIA</span>
+        <div className="container relative z-10 px-4 flex flex-col items-center text-center">
+          <div className="mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <h1 className="text-[15vw] md:text-[10rem] font-serif leading-[0.85] text-white flex flex-col items-center">
+              <span>ESTILO</span>
+              <span className="text-shimmer">SUPREMO</span>
             </h1>
           </div>
 
-          <div className="w-full max-w-7xl flex flex-col md:flex-row justify-between items-end gap-8 mt-12">
-            <div className="max-w-[320px] text-primary/60 uppercase text-[10px] font-semibold tracking-[0.3em] leading-relaxed">
-              ESTILO PREMIUM. <br />
-              CUIDADO EDITORIAL PARA O HOMEM QUE BUSCA EXCELÊNCIA ABSOLUTA EM CADA DETALHE.
+          <p className="max-w-2xl text-neutral-400 font-light text-lg md:text-xl mb-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
+            A convergência entre técnica clássica e estética futurista. Onde cada corte é uma declaração de excelência absoluta.
+          </p>
+          
+          <div className="flex flex-col md:flex-row gap-6 items-center animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
+            <div className="shiny-border">
+              <Link href="/agendar" className="shiny-border-content px-12 py-5 flex items-center gap-3 group">
+                <span className="font-bold uppercase tracking-[0.3em] text-xs text-white group-hover:text-primary transition-colors">Iniciar Reserva</span>
+                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
-            
-            <Link href="/agendar" className="group flex items-center gap-4">
-              <span className="font-anton text-4xl text-white group-hover:text-primary transition-colors uppercase">Agendar Agora</span>
-              <div className="w-16 h-16 border border-white/20 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all duration-500">
-                <ArrowRight className="text-white group-hover:text-black" />
+          </div>
+        </div>
+
+        {/* Metrics Ticker */}
+        <div className="absolute bottom-0 w-full glass border-y border-white/5 py-4 overflow-hidden">
+          <div className="ticker-scroll">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex gap-16 px-8 items-center">
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Atendimento</span>
+                  <span className="text-sm font-mono text-white">24/7 PREMIUM</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Estilo</span>
+                  <span className="text-sm font-mono text-primary">SYNAPSE MODULAR</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Experiência</span>
+                  <span className="text-sm font-mono text-secondary">CURADORIA EDITORIAL</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Local</span>
+                  <span className="text-sm font-mono text-white">STUDIO PRIVATIVO</span>
+                </div>
               </div>
-            </Link>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-background pt-48 pb-12">
+      <footer className="bg-[#050505] pt-48 pb-12 border-t border-white/5 relative overflow-hidden">
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]" />
+        
         <div className="container mx-auto px-8 md:px-12">
           <div className="mb-32">
-            <h2 className="text-8xl md:text-[12rem] font-anton text-white mb-12">LET'S <br /> CREATE.</h2>
-            <Link href="mailto:contato@goldbarbearia.com" className="font-anton text-4xl md:text-6xl text-primary underline underline-offset-[16px] decoration-1 hover:text-white transition-colors">
+            <h2 className="text-7xl md:text-9xl font-serif text-white mb-12">LET'S <br /> CREATE.</h2>
+            <Link href="mailto:contato@goldbarbearia.com" className="font-serif text-3xl md:text-5xl text-primary hover:text-white transition-colors underline-offset-8 underline decoration-white/10">
               CONTATO@GOLDBARBEARIA.COM
             </Link>
           </div>
           
-          <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">
-            <div>© 2025 GOLDBARBEARIA. DESIGN DE ALTO PADRÃO.</div>
-            <div className="flex gap-12">
+          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="font-serif text-2xl text-white">GoldBarbearia</div>
+            
+            <div className="flex flex-col md:flex-row gap-12 text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-500">
               <Link href="/" className="hover:text-white transition-colors">Início</Link>
               <Link href="#" className="hover:text-white transition-colors">Instagram</Link>
-              <Link href="#" className="hover:text-white transition-colors">Facebook</Link>
-              <Link href="/admin/login" className="hover:text-white transition-colors">Admin Access</Link>
+              <Link href="/admin/login" className="hover:text-white transition-colors">Acesso Admin</Link>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10B981]" />
+              <span className="text-[9px] font-mono text-emerald-500 uppercase tracking-widest">All Systems Operational</span>
             </div>
           </div>
         </div>
