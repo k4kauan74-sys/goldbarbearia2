@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -67,14 +66,6 @@ export function BookingForm() {
       const existing = JSON.parse(localStorage.getItem('gold_appointments') || '[]');
       localStorage.setItem('gold_appointments', JSON.stringify([...existing, newAppointment]));
     }, 1500);
-  };
-
-  const nextStep = () => {
-    if (step === 'service' && !selectedService) return;
-    if (step === 'professional' && !selectedProfessional) return;
-    if (step === 'datetime' && (!selectedDate || !selectedTime)) return;
-    
-    setStep(steps[currentStepIndex + 1]);
   };
 
   const prevStep = () => {
@@ -187,21 +178,23 @@ export function BookingForm() {
               <div className="grid md:grid-cols-2 gap-10">
                 <div className="space-y-4">
                   <Label className="text-white/60 uppercase text-[10px] tracking-[0.2em] font-black">1. Selecione a Data</Label>
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    className="rounded-sm border border-white/10 bg-background/20"
-                    locale={ptBR}
-                    disabled={(date) => {
-                      if (!today) return false;
-                      const compareDate = new Date(date);
-                      compareDate.setHours(0, 0, 0, 0);
-                      const todayCompare = new Date(today);
-                      todayCompare.setHours(0, 0, 0, 0);
-                      return compareDate < todayCompare || date.getDay() === 0;
-                    }}
-                  />
+                  <div className="flex justify-center border border-white/10 rounded-sm bg-background/20 p-2">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      className="w-full"
+                      locale={ptBR}
+                      disabled={(date) => {
+                        if (!today) return false;
+                        const compareDate = new Date(date);
+                        compareDate.setHours(0, 0, 0, 0);
+                        const todayCompare = new Date(today);
+                        todayCompare.setHours(0, 0, 0, 0);
+                        return compareDate < todayCompare || date.getDay() === 0;
+                      }}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-4">
                   <Label className="text-white/60 uppercase text-[10px] tracking-[0.2em] font-black">2. Horários Disponíveis</Label>
