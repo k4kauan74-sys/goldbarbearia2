@@ -14,7 +14,6 @@ export function Navbar() {
       
       <div className="hidden md:flex items-center gap-10 font-medium uppercase tracking-[0.2em] text-[10px]">
         <Link href="/" className="text-white hover:text-primary transition-colors">Início</Link>
-        <Link href="/#servicos" className="text-white hover:text-primary transition-colors">Serviços</Link>
         <Link href="/admin/login" className="text-white/60 hover:text-white transition-colors">Admin</Link>
         <Link 
           href="/agendar" 
