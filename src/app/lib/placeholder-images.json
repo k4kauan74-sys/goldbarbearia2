@@ -1,4 +1,3 @@
-
 {
   "placeholderImages": [
     {
@@ -24,6 +23,12 @@
       "description": "Haircut service detail",
       "imageUrl": "https://picsum.photos/seed/s1/600/400",
       "imageHint": "haircut"
+    },
+    {
+      "id": "custom-hero-bg",
+      "description": "Custom luxury hero background",
+      "imageUrl": "https://drive.google.com/uc?id=1PSM5jWasxOUVSQ-C2dg27NVUdZeEZtYH",
+      "imageHint": "luxury background"
     }
   ]
 }

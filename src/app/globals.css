@@ -1,28 +1,27 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 45 14% 16%;
+    --background: 45 14% 8%; /* Escurecido para um preto mais profundo */
     --foreground: 0 0% 100%;
-    --card: 45 14% 12%;
+    --card: 45 14% 10%;
     --card-foreground: 0 0% 100%;
-    --popover: 45 14% 12%;
+    --popover: 45 14% 10%;
     --popover-foreground: 0 0% 100%;
     --primary: 46 79% 48%; /* Gold #D9AE1A */
-    --primary-foreground: 45 14% 10%;
+    --primary-foreground: 45 14% 5%;
     --secondary: 18 74% 40%; /* Copper #B3471A */
     --secondary-foreground: 0 0% 100%;
-    --muted: 45 14% 20%;
-    --muted-foreground: 45 5% 70%;
-    --accent: 18 74% 40%;
-    --accent-foreground: 0 0% 100%;
+    --muted: 45 14% 15%;
+    --muted-foreground: 45 5% 60%;
+    --accent: 46 79% 48%;
+    --accent-foreground: 45 14% 5%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 45 10% 25%;
-    --input: 45 10% 25%;
+    --border: 45 10% 20%;
+    --input: 45 10% 20%;
     --ring: 46 79% 48%;
     --radius: 0.25rem;
   }
@@ -50,4 +49,10 @@
 
 .bg-gold {
   background-color: #D9AE1A;
+}
+
+/* Custom fade for Hero Image */
+.hero-mask {
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 }

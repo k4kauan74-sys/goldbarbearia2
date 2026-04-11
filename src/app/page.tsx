@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
@@ -6,37 +5,43 @@ import { MOCK_SERVICES, MOCK_PROFESSIONALS } from "@/lib/mock-data";
 import { Scissors, Clock, MapPin, Phone, Instagram, Facebook } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function Home() {
+  const heroImage = PlaceHolderImages.find(img => img.id === 'custom-hero-bg')?.imageUrl || "https://picsum.photos/seed/barberhero/1920/1080";
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
       
-      {/* Hero Section - Reduzida a altura de h-screen para min-h-[80vh] para trazer o conteúdo seguinte mais para cima */}
-      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden pt-20">
+      {/* Hero Section */}
+      <section className="relative min-h-[75vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image 
-            src="https://picsum.photos/seed/barberhero/1920/1080"
-            alt="Barbearia Luxury"
+            src={heroImage}
+            alt="Gold Barbearia Background"
             fill
-            className="object-cover opacity-30 grayscale"
+            className="object-cover opacity-50 grayscale-[0.2] hero-mask"
             priority
-            data-ai-hint="luxury barbearia"
+            unoptimized={heroImage.includes('drive.google.com')}
+            data-ai-hint="luxury background"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
+          {/* Overlay Gradients for smooth transition to black/gold */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-transparent to-transparent" />
         </div>
         
-        <div className="container relative z-10 px-4 text-center">
-          <h1 className="text-6xl md:text-8xl font-black mb-6 tracking-tighter uppercase italic">
-            Agende seu <span className="text-primary">Corte</span>
+        <div className="container relative z-10 px-4 text-center mt-12">
+          <h1 className="text-6xl md:text-9xl font-black mb-4 tracking-tighter uppercase italic leading-none">
+            Gold <span className="text-primary">Barbearia</span>
           </h1>
-          <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto mb-10 font-light">
-            Experiência premium em barbearia clássica e moderna no coração da cidade.
+          <p className="text-xl md:text-3xl text-white/90 max-w-2xl mx-auto mb-10 font-light tracking-widest uppercase">
+            Estilo <span className="text-primary font-bold">Premium</span> para Homens de Ouro
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/agendar" 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-12 py-5 rounded-sm text-xl font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-12 py-5 rounded-sm text-xl font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-primary/30"
             >
               Agendar Agora
             </Link>
@@ -44,30 +49,30 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Section - Reduzido o padding superior de py-24 para pt-8 pb-24 */}
-      <section id="servicos" className="py-16 md:pt-8 md:pb-24 bg-card relative">
+      {/* Services Section - Tabela de Valores mais próxima do Hero */}
+      <section id="servicos" className="py-12 bg-card relative z-20 -mt-10 border-t border-primary/20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-black uppercase mb-4 tracking-tight">
-              Tabela de <span className="text-primary">Valores</span>
+          <div className="text-center mb-10">
+            <h2 className="text-4xl md:text-5xl font-black uppercase mb-4 tracking-tight italic">
+              Nossos <span className="text-primary">Preços</span>
             </h2>
-            <div className="w-24 h-1 bg-primary mx-auto" />
+            <div className="w-32 h-1 bg-primary mx-auto shadow-[0_0_10px_rgba(217,174,26,0.5)]" />
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 max-w-6xl mx-auto">
             {MOCK_SERVICES.map((service) => (
               <div 
                 key={service.id} 
-                className="flex items-center justify-between p-6 rounded-sm border border-white/5 hover:border-primary/50 transition-colors group bg-background/50"
+                className="flex items-center justify-between p-5 rounded-sm border border-white/5 hover:border-primary/50 transition-all group bg-background/80 backdrop-blur-sm hover:translate-y-[-2px]"
               >
                 <div>
-                  <h3 className="text-xl font-bold mb-1 group-hover:text-primary transition-colors">{service.name}</h3>
-                  <div className="flex items-center text-white/40 text-sm">
+                  <h3 className="text-lg font-bold mb-0.5 group-hover:text-primary transition-colors">{service.name}</h3>
+                  <div className="flex items-center text-white/40 text-xs">
                     <Clock className="h-3 w-3 mr-1" />
                     <span>{service.duration} min</span>
                   </div>
                 </div>
-                <div className="text-2xl font-black text-primary italic">
+                <div className="text-xl font-black text-primary italic">
                   R$ {service.price.toFixed(2)}
                 </div>
               </div>
@@ -77,7 +82,7 @@ export default function Home() {
       </section>
 
       {/* Professionals Section */}
-      <section id="profissionais" className="py-24">
+      <section id="profissionais" className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black uppercase mb-4 tracking-tight">
@@ -99,7 +104,7 @@ export default function Home() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="absolute bottom-4 left-4">
-                    <Badge className="bg-primary text-primary-foreground font-bold">ATIVO</Badge>
+                    <Badge className="bg-primary text-primary-foreground font-bold">DISPONÍVEL</Badge>
                   </div>
                 </div>
                 <CardContent className="p-0">
