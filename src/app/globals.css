@@ -56,7 +56,8 @@
 }
 
 .bg-gold-black-fade {
-  background: linear-gradient(to bottom, rgba(217, 174, 26, 0.4) 0%, rgba(0, 0, 0, 1) 100%);
+  /* Opacidade reduzida de 0.4 para 0.15 para um efeito mais sutil */
+  background: linear-gradient(to bottom, rgba(217, 174, 26, 0.15) 0%, rgba(0, 0, 0, 1) 100%);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
