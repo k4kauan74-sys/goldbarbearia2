@@ -9,7 +9,7 @@ export function Navbar() {
       <nav className="glass rounded-full px-6 py-3 flex items-center justify-between shadow-2xl shadow-primary/10">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-secondary" />
-          <span className="font-serif text-xl tracking-tight text-white uppercase">
+          <span className="font-anton text-xl tracking-widest text-white uppercase">
             GoldBarbearia
           </span>
         </Link>

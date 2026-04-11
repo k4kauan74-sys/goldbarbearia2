@@ -15,7 +15,7 @@ export default function Home() {
 
         <div className="container relative z-10 px-4 flex flex-col items-center text-center">
           <div className="mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            <h1 className="text-[15vw] md:text-[10rem] font-serif leading-[0.85] text-white flex flex-col items-center uppercase">
+            <h1 className="text-[15vw] md:text-[10rem] font-anton leading-[0.85] text-white flex flex-col items-center uppercase tracking-tighter">
               <span>GOLD</span>
               <span className="text-shimmer">BARBEARIA</span>
             </h1>
@@ -64,14 +64,14 @@ export default function Home() {
         
         <div className="container mx-auto px-8 md:px-12">
           <div className="mb-32">
-            <h2 className="text-7xl md:text-9xl font-serif text-white mb-12 uppercase">LET'S <br /> CREATE.</h2>
-            <Link href="mailto:contato@goldbarbearia.com" className="font-serif text-3xl md:text-5xl text-primary hover:text-white transition-colors underline-offset-8 underline decoration-white/10">
+            <h2 className="text-7xl md:text-9xl font-anton text-white mb-12 uppercase tracking-tighter">LET'S <br /> CREATE.</h2>
+            <Link href="mailto:contato@goldbarbearia.com" className="font-anton text-3xl md:text-5xl text-primary hover:text-white transition-colors underline-offset-8 underline decoration-white/10 tracking-tight">
               CONTATO@GOLDBARBEARIA.COM
             </Link>
           </div>
           
           <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="font-serif text-2xl text-white uppercase">GoldBarbearia</div>
+            <div className="font-anton text-2xl text-white uppercase tracking-widest">GoldBarbearia</div>
             
             <div className="flex flex-col md:flex-row gap-12 text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-500">
               <Link href="/" className="hover:text-white transition-colors">Início</Link>

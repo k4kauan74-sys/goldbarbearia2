@@ -35,12 +35,12 @@
     @apply bg-background text-foreground font-body antialiased selection:bg-primary/30;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif tracking-tight leading-[0.9] not-italic;
+    @apply font-anton tracking-tight leading-[0.85] not-italic;
   }
 }
 
-.font-serif {
-  font-family: 'Instrument Serif', serif;
+.font-anton {
+  font-family: 'Anton', sans-serif;
 }
 
 .glass {
