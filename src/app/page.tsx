@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
@@ -173,7 +174,7 @@ export default function Home() {
           </div>
           
           <div className="pt-8 border-t border-white/5 text-center text-white/40 text-sm">
-            &copy; {new Date().getFullYear()} GoldBarbearia. Todos os direitos reservados.
+            &copy; 2025 GoldBarbearia. Todos os direitos reservados.
           </div>
         </div>
       </footer>

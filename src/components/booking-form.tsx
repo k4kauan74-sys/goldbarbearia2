@@ -23,7 +23,8 @@ export function BookingForm() {
   const [step, setStep] = useState<Step>('service');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [today, setToday] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [clientName, setClientName] = useState("");
   const [clientPhone, setClientPhone] = useState("");
@@ -31,6 +32,13 @@ export function BookingForm() {
   
   const { toast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    // Set dates after mount to avoid hydration mismatch
+    const now = new Date();
+    setSelectedDate(now);
+    setToday(now);
+  }, []);
 
   // Step Progress
   const steps: Step[] = ['service', 'professional', 'datetime', 'contact', 'success'];
@@ -55,7 +63,7 @@ export function BookingForm() {
         phone: clientPhone,
         serviceId: selectedService?.id,
         professionalId: selectedProfessional?.id,
-        date: format(selectedDate!, "yyyy-MM-dd"),
+        date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
         time: selectedTime,
         status: 'confirmed'
       };
@@ -189,7 +197,14 @@ export function BookingForm() {
                     onSelect={setSelectedDate}
                     className="rounded-sm border border-white/10 bg-background/20"
                     locale={ptBR}
-                    disabled={(date) => date < new Date() || date.getDay() === 0}
+                    disabled={(date) => {
+                      if (!today) return false;
+                      const compareDate = new Date(date);
+                      compareDate.setHours(0, 0, 0, 0);
+                      const todayCompare = new Date(today);
+                      todayCompare.setHours(0, 0, 0, 0);
+                      return compareDate < todayCompare || date.getDay() === 0;
+                    }}
                   />
                 </div>
                 <div className="space-y-4">
