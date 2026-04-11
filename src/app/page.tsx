@@ -12,18 +12,18 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      {/* Hero Section - Reduzida a altura de h-screen para min-h-[80vh] para trazer o conteúdo seguinte mais para cima */}
+      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 z-0">
           <Image 
             src="https://picsum.photos/seed/barberhero/1920/1080"
             alt="Barbearia Luxury"
             fill
-            className="object-cover opacity-40 grayscale"
+            className="object-cover opacity-30 grayscale"
             priority
             data-ai-hint="luxury barbearia"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
         </div>
         
         <div className="container relative z-10 px-4 text-center">
@@ -44,17 +44,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="servicos" className="py-24 bg-card">
+      {/* Services Section - Reduzido o padding superior de py-24 para pt-8 pb-24 */}
+      <section id="servicos" className="py-16 md:pt-8 md:pb-24 bg-card relative">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-black uppercase mb-4 tracking-tight">
               Tabela de <span className="text-primary">Valores</span>
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto" />
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
             {MOCK_SERVICES.map((service) => (
               <div 
                 key={service.id} 
