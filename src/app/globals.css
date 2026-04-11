@@ -4,24 +4,24 @@
 
 @layer base {
   :root {
-    --background: 45 14% 8%; /* Escurecido para um preto mais profundo */
+    --background: 0 0% 0%; /* Preto Puro */
     --foreground: 0 0% 100%;
-    --card: 45 14% 10%;
+    --card: 45 14% 5%;
     --card-foreground: 0 0% 100%;
-    --popover: 45 14% 10%;
+    --popover: 45 14% 5%;
     --popover-foreground: 0 0% 100%;
     --primary: 46 79% 48%; /* Gold #D9AE1A */
     --primary-foreground: 45 14% 5%;
     --secondary: 18 74% 40%; /* Copper #B3471A */
     --secondary-foreground: 0 0% 100%;
-    --muted: 45 14% 15%;
+    --muted: 45 14% 10%;
     --muted-foreground: 45 5% 60%;
     --accent: 46 79% 48%;
     --accent-foreground: 45 14% 5%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 45 10% 20%;
-    --input: 45 10% 20%;
+    --border: 45 10% 15%;
+    --input: 45 10% 15%;
     --ring: 46 79% 48%;
     --radius: 0.25rem;
   }
@@ -53,6 +53,14 @@
 
 /* Custom fade for Hero Image */
 .hero-mask {
-  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.gold-glow {
+  box-shadow: 0 0 40px rgba(217, 174, 26, 0.15);
+}
+
+.bg-black-gold-fade {
+  background: linear-gradient(to bottom, #000000 0%, #000000 70%, #D9AE1A 100%);
 }
