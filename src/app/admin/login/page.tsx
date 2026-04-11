@@ -22,9 +22,9 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    // Simulated login
+    // Credenciais atualizadas conforme solicitação
     setTimeout(() => {
-      if (username === "admin" && password === "gold123") {
+      if (username === "admin@barber.com" && password === "admin123") {
         localStorage.setItem("gold_admin_logged", "true");
         router.push("/admin/dashboard");
       } else {
@@ -52,12 +52,13 @@ export default function AdminLoginPage() {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-white/40">Usuário</Label>
+              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-white/40">E-mail</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
                 <Input 
+                  type="email"
                   className="pl-10 bg-background/50 border-white/5 py-6 text-xs font-bold uppercase tracking-widest"
-                  placeholder="DIGITE SEU USUÁRIO"
+                  placeholder="EX: ADMIN@BARBER.COM"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
