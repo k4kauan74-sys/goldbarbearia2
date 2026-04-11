@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { MOCK_SERVICES } from "@/lib/mock-data";
@@ -11,15 +10,15 @@ export default function Home() {
       
       {/* Hero Section */}
       <section className="relative min-h-[40vh] flex items-center justify-center overflow-hidden">
-        {/* Top Fade Gradient */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-b from-primary/15 to-transparent pointer-events-none" />
+        {/* Top Fade Gradient - Fade Dourado de Cima para Baixo */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-b from-primary/15 via-transparent to-black pointer-events-none" />
         
-        <div className="container relative z-10 px-4 text-center mt-20">
+        <div className="container relative z-10 px-4 text-center mt-24 mb-12">
           <div className="inline-block mb-8 py-2 px-8 border border-primary/20 rounded-sm bg-black/40 backdrop-blur-sm">
             <span className="text-primary text-[10px] font-black uppercase tracking-[0.5em]">Excelência Absoluta</span>
           </div>
-          <h1 className="text-6xl md:text-[8rem] font-black mb-6 tracking-tighter uppercase leading-[0.8] text-white">
-            Gold <span className="block md:inline text-outline-gold">Barbearia</span>
+          <h1 className="text-6xl md:text-[8rem] font-black mb-6 uppercase leading-[0.8] text-white">
+            <span className="tracking-tighter">Gold</span> <span className="block md:inline text-outline-gold tracking-normal">Barbearia</span>
           </h1>
           <p className="text-sm md:text-base text-white/40 max-w-2xl mx-auto mb-16 font-black tracking-[0.4em] uppercase">
             Estilo <span className="text-primary">Premium</span>
@@ -36,7 +35,7 @@ export default function Home() {
       </section>
 
       {/* Services Section */}
-      <section id="servicos" className="pb-32 pt-16 bg-transparent relative z-20">
+      <section id="servicos" className="pb-32 pt-16 bg-black relative z-20">
         <div className="container mx-auto px-4 relative">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-4xl font-black uppercase mb-4 tracking-tighter">
