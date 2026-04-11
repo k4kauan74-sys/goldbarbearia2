@@ -24,7 +24,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row gap-6 items-center animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
             <div className="shiny-border">
               <Link href="/agendar" className="shiny-border-content px-12 py-5 flex items-center gap-3 group">
-                <span className="font-bold uppercase tracking-[0.3em] text-xs text-white group-hover:text-primary transition-colors">Iniciar Reserva</span>
+                <span className="font-bold uppercase tracking-[0.3em] text-xs text-white group-hover:text-primary transition-colors">Agendar Agora</span>
                 <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
