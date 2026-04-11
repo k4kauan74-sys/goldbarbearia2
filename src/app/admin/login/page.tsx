@@ -3,7 +3,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, User, Eye, EyeOff } from "lucide-react";
+import { Lock, User, Eye, EyeOff, ChevronLeft } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +23,6 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    // Credenciais atualizadas conforme solicitação
     setTimeout(() => {
       if (username === "admin@barber.com" && password === "admin123") {
         localStorage.setItem("gold_admin_logged", "true");
@@ -40,6 +40,14 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+      <div className="absolute top-8 left-8">
+        <Link href="/">
+          <Button variant="ghost" className="text-white/40 hover:text-white font-black uppercase tracking-widest text-[10px] gap-2">
+            <ChevronLeft className="h-4 w-4" /> Voltar ao Início
+          </Button>
+        </Link>
+      </div>
+
       <Card className="w-full max-w-md relative z-10 bg-card border-white/5 shadow-2xl">
         <CardHeader className="text-center space-y-6">
           <div className="space-y-1">

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { 
   Calendar as CalendarIcon, 
   Users, 
@@ -12,7 +13,8 @@ import {
   Trash2, 
   CheckCircle, 
   Clock, 
-  TrendingUp
+  TrendingUp,
+  Home
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -82,6 +84,13 @@ export default function AdminDashboardPage() {
           <Button variant="ghost" className="w-full justify-start gap-3 text-white/40 hover:text-white font-bold uppercase tracking-widest text-[10px]">
             <Settings className="h-4 w-4" /> Configurações
           </Button>
+          <div className="pt-4 mt-4 border-t border-white/5">
+            <Link href="/">
+              <Button variant="ghost" className="w-full justify-start gap-3 text-white/40 hover:text-white font-bold uppercase tracking-widest text-[10px]">
+                <Home className="h-4 w-4" /> Voltar ao Site
+              </Button>
+            </Link>
+          </div>
         </nav>
         <div className="p-4 border-t border-white/5">
           <Button variant="ghost" onClick={handleLogout} className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 font-bold uppercase tracking-widest text-[10px]">
