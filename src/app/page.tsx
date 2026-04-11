@@ -8,12 +8,12 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-black overflow-x-hidden">
       <Navbar />
       
-      {/* Hero Section with Golden Fade */}
-      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
-        {/* The Golden Fade Gradient */}
+      {/* Hero Section with Golden Fade from Top */}
+      <section className="relative min-h-[75vh] flex items-center justify-center overflow-hidden">
+        {/* The Golden Fade Gradient: Gold at top, Black at bottom */}
         <div className="absolute inset-0 z-0 bg-black" />
-        <div className="absolute inset-0 z-0 bg-black-gold-fade opacity-60" />
-        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(217,174,26,0.3)_0%,_transparent_70%)]" />
+        <div className="absolute inset-0 z-0 bg-gold-black-fade" />
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,_rgba(217,174,26,0.15)_0%,_transparent_70%)]" />
         
         <div className="container relative z-10 px-4 text-center mt-20">
           <div className="inline-block mb-6 py-2 px-6 border border-primary/30 rounded-full bg-black/50 backdrop-blur-sm animate-pulse">
@@ -36,7 +36,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* Services Section - Starts on Pure Black */}
       <section id="servicos" className="pb-24 pt-12 bg-black relative z-20">
         <div className="container mx-auto px-4 relative">
           <div className="text-center mb-16">
