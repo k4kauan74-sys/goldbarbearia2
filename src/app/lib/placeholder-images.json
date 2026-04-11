@@ -1,0 +1,29 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-barber",
+      "description": "Professional barber shop interior with luxury chairs",
+      "imageUrl": "https://picsum.photos/seed/barber1/1200/800",
+      "imageHint": "barber shop"
+    },
+    {
+      "id": "professional-1",
+      "description": "Experienced barber specialist",
+      "imageUrl": "https://picsum.photos/seed/p1/400/500",
+      "imageHint": "barber man"
+    },
+    {
+      "id": "professional-2",
+      "description": "Style and beard specialist",
+      "imageUrl": "https://picsum.photos/seed/p2/400/500",
+      "imageHint": "stylish man"
+    },
+    {
+      "id": "service-corte",
+      "description": "Haircut service detail",
+      "imageUrl": "https://picsum.photos/seed/s1/600/400",
+      "imageHint": "haircut"
+    }
+  ]
+}
