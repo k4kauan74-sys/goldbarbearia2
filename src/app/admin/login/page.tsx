@@ -39,16 +39,8 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-5 select-none pointer-events-none">
-        <span className="text-[40vw] font-black text-outline-gold leading-none">G</span>
-      </div>
-
       <Card className="w-full max-w-md relative z-10 bg-card border-white/5 shadow-2xl">
         <CardHeader className="text-center space-y-6">
-          <div className="mx-auto w-16 h-16 border-2 border-primary/50 flex items-center justify-center rounded-sm">
-            <span className="font-headline text-3xl font-black text-outline-gold leading-none">G</span>
-          </div>
           <div className="space-y-1">
             <CardTitle className="text-3xl font-black uppercase tracking-tighter">
               Acesso <span className="text-primary">Admin</span>

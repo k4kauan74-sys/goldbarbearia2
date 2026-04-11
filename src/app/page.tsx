@@ -10,9 +10,9 @@ export default function Home() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-black" />
-        <div className="absolute inset-0 z-0 bg-gold-black-fade opacity-15" />
+      <section className="relative min-h-[40vh] flex items-center justify-center overflow-hidden">
+        {/* Top Fade Gradient */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-b from-primary/15 to-transparent pointer-events-none" />
         
         <div className="container relative z-10 px-4 text-center mt-20">
           <div className="inline-block mb-8 py-2 px-8 border border-primary/20 rounded-sm bg-black/40 backdrop-blur-sm">
@@ -58,7 +58,7 @@ export default function Home() {
                     <span>{service.duration} min</span>
                   </div>
                 </div>
-                <div className="text-2xl font-black text-primary italic">
+                <div className="text-2xl font-black text-primary">
                   R$ {service.price.toFixed(2)}
                 </div>
               </div>
@@ -72,14 +72,11 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-20 mb-20">
             <div className="space-y-10">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-8 h-8 border border-primary/50 rounded-sm">
-                  <span className="font-headline text-lg font-black text-outline-gold leading-none">G</span>
-                </div>
+              <Link href="/" className="flex items-center gap-4">
                 <span className="font-headline text-2xl font-black tracking-tighter text-white uppercase">
                   Gold<span className="text-primary">Barbearia</span>
                 </span>
-              </div>
+              </Link>
               <p className="text-white/30 text-xs font-bold uppercase tracking-widest leading-loose max-w-sm">
                 Cuidando do seu estilo com maestria desde 2010. Onde tradição encontra a modernidade no mais alto padrão.
               </p>

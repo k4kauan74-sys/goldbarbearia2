@@ -8,9 +8,6 @@ export function Navbar() {
     <nav className="fixed top-0 w-full z-50 bg-transparent border-b border-white/5 h-20">
       <div className="container mx-auto px-4 h-full flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="flex items-center justify-center w-10 h-10 border border-primary/50 rounded-sm">
-            <span className="font-headline text-2xl font-black text-outline-gold leading-none">G</span>
-          </div>
           <span className="font-headline text-xl font-black tracking-tighter text-white uppercase">
             Gold<span className="text-primary">Barbearia</span>
           </span>

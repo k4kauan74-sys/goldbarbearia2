@@ -70,9 +70,6 @@ export default function AdminDashboardPage() {
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-card border-r border-white/5 flex flex-col">
         <div className="p-6 border-b border-white/5 flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 border border-primary/50 rounded-sm">
-            <span className="font-headline text-lg font-black text-outline-gold leading-none">G</span>
-          </div>
           <span className="font-headline text-xl font-black tracking-tighter">GOLD<span className="text-primary">ADMIN</span></span>
         </div>
         <nav className="flex-1 p-4 space-y-2">
