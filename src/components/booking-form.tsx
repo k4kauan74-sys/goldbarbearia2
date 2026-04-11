@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar as CalendarIcon, Clock, User, Scissors, CheckCircle2, ChevronRight, ChevronLeft } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, User, Scissors, CheckCircle2, ChevronLeft } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -34,13 +34,11 @@ export function BookingForm() {
   const router = useRouter();
 
   useEffect(() => {
-    // Set dates after mount to avoid hydration mismatch
     const now = new Date();
     setSelectedDate(now);
     setToday(now);
   }, []);
 
-  // Step Progress
   const steps: Step[] = ['service', 'professional', 'datetime', 'contact', 'success'];
   const currentStepIndex = steps.indexOf(step);
 
@@ -52,11 +50,9 @@ export function BookingForm() {
     }
 
     setIsSubmitting(true);
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       setStep('success');
-      // In a real app, we'd save to DB here
       const newAppointment = {
         id: Math.random().toString(36).substr(2, 9),
         clientName,
@@ -95,7 +91,7 @@ export function BookingForm() {
             <div 
               key={s} 
               className={cn(
-                "relative z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300",
+                "relative z-10 w-10 h-10 rounded-full flex items-center justify-center font-black transition-all duration-300",
                 idx <= currentStepIndex ? "bg-primary text-primary-foreground" : "bg-card border border-white/10 text-white/40"
               )}
             >
@@ -109,7 +105,7 @@ export function BookingForm() {
         {step === 'service' && (
           <>
             <CardHeader className="text-center bg-background/30 py-8">
-              <CardTitle className="text-3xl font-black uppercase tracking-tight italic">
+              <CardTitle className="text-3xl font-black uppercase tracking-tight">
                 Escolha o <span className="text-primary">Serviço</span>
               </CardTitle>
             </CardHeader>
@@ -118,7 +114,7 @@ export function BookingForm() {
                 {MOCK_SERVICES.map((s) => (
                   <button
                     key={s.id}
-                    onClick={() => { setSelectedService(s); nextStep(); }}
+                    onClick={() => { setSelectedService(s); setStep('professional'); }}
                     className={cn(
                       "flex items-center justify-between p-6 rounded-sm border transition-all hover:scale-[1.01] active:scale-[0.99]",
                       selectedService?.id === s.id 
@@ -131,11 +127,11 @@ export function BookingForm() {
                         <Scissors className="h-6 w-6 text-primary" />
                       </div>
                       <div className="text-left">
-                        <h3 className="font-bold text-lg">{s.name}</h3>
-                        <p className="text-sm text-white/40">{s.duration} minutos</p>
+                        <h3 className="font-black text-lg uppercase">{s.name}</h3>
+                        <p className="text-xs font-bold text-white/40 uppercase tracking-widest">{s.duration} minutos</p>
                       </div>
                     </div>
-                    <div className="text-xl font-black italic text-primary">R$ {s.price.toFixed(2)}</div>
+                    <div className="text-xl font-black text-primary">R$ {s.price.toFixed(2)}</div>
                   </button>
                 ))}
               </div>
@@ -146,7 +142,7 @@ export function BookingForm() {
         {step === 'professional' && (
           <>
             <CardHeader className="text-center bg-background/30 py-8">
-              <CardTitle className="text-3xl font-black uppercase tracking-tight italic">
+              <CardTitle className="text-3xl font-black uppercase tracking-tight">
                 Quem vai <span className="text-primary">Atender?</span>
               </CardTitle>
             </CardHeader>
@@ -155,7 +151,7 @@ export function BookingForm() {
                 {MOCK_PROFESSIONALS.map((p) => (
                   <button
                     key={p.id}
-                    onClick={() => { setSelectedProfessional(p); nextStep(); }}
+                    onClick={() => { setSelectedProfessional(p); setStep('datetime'); }}
                     className={cn(
                       "flex flex-col items-center p-6 rounded-sm border transition-all hover:scale-[1.02] active:scale-[0.98]",
                       selectedProfessional?.id === p.id 
@@ -166,13 +162,13 @@ export function BookingForm() {
                     <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-primary/20">
                       <img src={p.photo} alt={p.name} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all" />
                     </div>
-                    <h3 className="font-bold text-center mb-1">{p.name}</h3>
-                    <p className="text-xs text-white/40 text-center">{p.specialty}</p>
+                    <h3 className="font-black text-center mb-1 uppercase text-sm">{p.name}</h3>
+                    <p className="text-[10px] font-bold text-white/40 text-center uppercase tracking-widest">{p.specialty}</p>
                   </button>
                 ))}
               </div>
               <div className="mt-8">
-                <Button variant="ghost" onClick={prevStep} className="text-white/40 hover:text-white uppercase tracking-widest text-xs">
+                <Button variant="ghost" onClick={prevStep} className="text-white/40 hover:text-white uppercase tracking-widest text-[10px] font-black">
                   <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
                 </Button>
               </div>
@@ -183,14 +179,14 @@ export function BookingForm() {
         {step === 'datetime' && (
           <>
             <CardHeader className="text-center bg-background/30 py-8">
-              <CardTitle className="text-3xl font-black uppercase tracking-tight italic">
+              <CardTitle className="text-3xl font-black uppercase tracking-tight">
                 Data e <span className="text-primary">Hora</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <div className="grid md:grid-cols-2 gap-10">
                 <div className="space-y-4">
-                  <Label className="text-white/60 uppercase text-xs tracking-widest font-bold">1. Selecione a Data</Label>
+                  <Label className="text-white/60 uppercase text-[10px] tracking-[0.2em] font-black">1. Selecione a Data</Label>
                   <Calendar
                     mode="single"
                     selected={selectedDate}
@@ -208,14 +204,14 @@ export function BookingForm() {
                   />
                 </div>
                 <div className="space-y-4">
-                  <Label className="text-white/60 uppercase text-xs tracking-widest font-bold">2. Horários Disponíveis</Label>
+                  <Label className="text-white/60 uppercase text-[10px] tracking-[0.2em] font-black">2. Horários Disponíveis</Label>
                   <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {TIME_SLOTS.map((time) => (
                       <button
                         key={time}
-                        onClick={() => setSelectedTime(time)}
+                        onClick={() => { setSelectedTime(time); setStep('contact'); }}
                         className={cn(
-                          "py-2 px-3 text-sm font-bold rounded-sm border transition-all",
+                          "py-3 px-3 text-[10px] font-black rounded-sm border transition-all uppercase tracking-widest",
                           selectedTime === time 
                             ? "bg-primary text-primary-foreground border-primary" 
                             : "border-white/10 bg-background/40 hover:border-primary/50 text-white/60"
@@ -227,16 +223,9 @@ export function BookingForm() {
                   </div>
                 </div>
               </div>
-              <div className="mt-10 flex justify-between items-center">
-                <Button variant="ghost" onClick={prevStep} className="text-white/40 hover:text-white uppercase tracking-widest text-xs">
+              <div className="mt-10">
+                <Button variant="ghost" onClick={prevStep} className="text-white/40 hover:text-white uppercase tracking-widest text-[10px] font-black">
                   <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
-                </Button>
-                <Button 
-                  onClick={nextStep} 
-                  disabled={!selectedDate || !selectedTime}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 font-bold uppercase tracking-widest"
-                >
-                  Continuar <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -246,7 +235,7 @@ export function BookingForm() {
         {step === 'contact' && (
           <>
             <CardHeader className="text-center bg-background/30 py-8">
-              <CardTitle className="text-3xl font-black uppercase tracking-tight italic">
+              <CardTitle className="text-3xl font-black uppercase tracking-tight">
                 Finalizar <span className="text-primary">Agendamento</span>
               </CardTitle>
             </CardHeader>
@@ -254,78 +243,78 @@ export function BookingForm() {
               <div className="grid md:grid-cols-2 gap-10">
                 {/* Summary */}
                 <div className="space-y-6 bg-background/40 p-6 rounded-sm border border-white/5">
-                  <h3 className="text-xl font-bold uppercase italic text-primary border-b border-white/10 pb-4">Resumo</h3>
+                  <h3 className="text-sm font-black uppercase tracking-[0.3em] text-primary border-b border-white/10 pb-4">Resumo</h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <Scissors className="h-4 w-4 text-primary" />
                       <div>
-                        <p className="text-xs text-white/40 uppercase">Serviço</p>
-                        <p className="font-bold">{selectedService?.name}</p>
+                        <p className="text-[9px] text-white/40 uppercase font-black tracking-widest">Serviço</p>
+                        <p className="font-black uppercase text-xs">{selectedService?.name}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <User className="h-4 w-4 text-primary" />
                       <div>
-                        <p className="text-xs text-white/40 uppercase">Profissional</p>
-                        <p className="font-bold">{selectedProfessional?.name}</p>
+                        <p className="text-[9px] text-white/40 uppercase font-black tracking-widest">Profissional</p>
+                        <p className="font-black uppercase text-xs">{selectedProfessional?.name}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <CalendarIcon className="h-4 w-4 text-primary" />
                       <div>
-                        <p className="text-xs text-white/40 uppercase">Data</p>
-                        <p className="font-bold">{selectedDate ? format(selectedDate, "dd 'de' MMMM", { locale: ptBR }) : ''}</p>
+                        <p className="text-[9px] text-white/40 uppercase font-black tracking-widest">Data</p>
+                        <p className="font-black uppercase text-xs">{selectedDate ? format(selectedDate, "dd 'de' MMMM", { locale: ptBR }) : ''}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <Clock className="h-4 w-4 text-primary" />
                       <div>
-                        <p className="text-xs text-white/40 uppercase">Horário</p>
-                        <p className="font-bold">{selectedTime}</p>
+                        <p className="text-[9px] text-white/40 uppercase font-black tracking-widest">Horário</p>
+                        <p className="font-black uppercase text-xs">{selectedTime}</p>
                       </div>
                     </div>
                   </div>
                   <div className="pt-4 border-t border-white/10 flex justify-between items-center">
-                    <span className="font-bold uppercase tracking-widest text-sm">Total</span>
-                    <span className="text-2xl font-black text-primary italic">R$ {selectedService?.price.toFixed(2)}</span>
+                    <span className="font-black uppercase tracking-widest text-[10px]">Total</span>
+                    <span className="text-xl font-black text-primary">R$ {selectedService?.price.toFixed(2)}</span>
                   </div>
                 </div>
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-xs uppercase tracking-widest font-bold text-white/60">Seu Nome Completo</Label>
+                    <Label htmlFor="name" className="text-[10px] uppercase tracking-widest font-black text-white/60">Seu Nome Completo</Label>
                     <Input 
                       id="name" 
                       value={clientName} 
                       onChange={(e) => setClientName(e.target.value)}
-                      placeholder="Ex: João Silva" 
-                      className="bg-background/40 border-white/10 py-6"
+                      placeholder="EX: JOÃO SILVA" 
+                      className="bg-background/40 border-white/10 py-6 text-[10px] font-black uppercase tracking-widest"
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-xs uppercase tracking-widest font-bold text-white/60">Seu WhatsApp</Label>
+                    <Label htmlFor="phone" className="text-[10px] uppercase tracking-widest font-black text-white/60">Seu WhatsApp</Label>
                     <Input 
                       id="phone" 
                       value={clientPhone}
                       onChange={(e) => setClientPhone(e.target.value)}
                       placeholder="(00) 00000-0000" 
-                      className="bg-background/40 border-white/10 py-6"
+                      className="bg-background/40 border-white/10 py-6 text-[10px] font-black uppercase tracking-widest"
                       required
                     />
                   </div>
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-8 text-xl font-black uppercase tracking-widest italic shadow-xl shadow-primary/20"
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-8 text-xs font-black uppercase tracking-[0.3em] shadow-xl shadow-primary/20"
                   >
-                    {isSubmitting ? "Confirmando..." : "Confirmar Agendamento"}
+                    {isSubmitting ? "CONFIRMANDO..." : "CONFIRMAR RESERVA"}
                   </Button>
                 </form>
               </div>
               <div className="mt-8">
-                <Button variant="ghost" onClick={prevStep} className="text-white/40 hover:text-white uppercase tracking-widest text-xs">
+                <Button variant="ghost" onClick={prevStep} className="text-white/40 hover:text-white uppercase tracking-widest text-[10px] font-black">
                   <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
                 </Button>
               </div>
@@ -338,16 +327,16 @@ export function BookingForm() {
             <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mb-8 animate-bounce shadow-2xl shadow-primary/40">
               <CheckCircle2 className="h-12 w-12 text-primary-foreground" />
             </div>
-            <h2 className="text-4xl md:text-5xl font-black uppercase italic mb-4 tracking-tighter">
+            <h2 className="text-4xl md:text-5xl font-black uppercase mb-4 tracking-tighter">
               Tudo <span className="text-primary">Pronto!</span>
             </h2>
-            <p className="text-xl text-white/60 max-w-md mx-auto mb-12">
-              Seu agendamento foi confirmado com sucesso. Te esperamos em breve para sua experiência Gold!
+            <p className="text-sm font-black uppercase tracking-widest text-white/60 max-w-md mx-auto mb-12">
+              Seu agendamento foi confirmado. Te esperamos para sua experiência Gold!
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
                 onClick={() => router.push('/')}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-6 font-bold uppercase tracking-widest"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-6 font-black uppercase tracking-widest text-[10px]"
               >
                 Voltar ao Início
               </Button>
