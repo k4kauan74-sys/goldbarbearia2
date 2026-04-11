@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
-import { ArrowRight, Circle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
@@ -9,7 +9,7 @@ export default function Home() {
       
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden pt-20">
-        {/* Ambient Blurs */}
+        {/* Ambient Blurs - Updated to Gold/Orange */}
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/20 rounded-full blur-[120px] animate-float" />
         <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-secondary/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '2s' }} />
 
@@ -22,7 +22,7 @@ export default function Home() {
           </div>
 
           <p className="max-w-2xl text-neutral-400 font-light text-lg md:text-xl mb-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
-            A convergência entre técnica clássica e estética futurista. Onde cada corte é uma declaração de excelência absoluta.
+            A convergência entre técnica clássica e estética futurista. Onde cada corte é uma declaração de excelência absoluta em tons de ouro.
           </p>
           
           <div className="flex flex-col md:flex-row gap-6 items-center animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
