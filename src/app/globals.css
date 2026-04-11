@@ -51,16 +51,23 @@
   background-color: #D9AE1A;
 }
 
-/* Custom fade for Hero Image */
-.hero-mask {
-  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-}
-
 .gold-glow {
   box-shadow: 0 0 40px rgba(217, 174, 26, 0.15);
 }
 
 .bg-black-gold-fade {
-  background: linear-gradient(to bottom, #000000 0%, #000000 70%, #D9AE1A 100%);
+  background: linear-gradient(to bottom, #000000 0%, #000000 50%, #D9AE1A 100%);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #D9AE1A;
+  border-radius: 10px;
 }

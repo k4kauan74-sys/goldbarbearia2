@@ -1,41 +1,25 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { MOCK_SERVICES } from "@/lib/mock-data";
 import { Scissors, Clock, MapPin, Phone, Instagram, Facebook } from "lucide-react";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function Home() {
-  const heroImage = PlaceHolderImages.find(img => img.id === 'custom-hero-bg')?.imageUrl || "https://picsum.photos/seed/barberhero/1920/1080";
-
   return (
     <div className="flex flex-col min-h-screen bg-black">
       <Navbar />
       
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
-        <div className="absolute inset-0 z-0">
-          <Image 
-            src={heroImage}
-            alt="Gold Barbearia Background"
-            fill
-            className="object-cover opacity-40 grayscale-[0.5] hero-mask"
-            priority
-            unoptimized={heroImage.includes('drive.google.com')}
-            data-ai-hint="luxury background"
-          />
-          {/* Overlay Gradients - Black to Gold Fade */}
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-black/80 to-black" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-transparent" />
-          <div className="absolute inset-0 bg-black/40" />
-        </div>
+        {/* Golden Fade Background Effect */}
+        <div className="absolute inset-0 z-0 bg-black-gold-fade opacity-80" />
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(217,174,26,0.15)_0%,_transparent_70%)]" />
         
         <div className="container relative z-10 px-4 text-center">
           <div className="inline-block mb-6 py-2 px-6 border border-primary/30 rounded-full bg-black/50 backdrop-blur-sm animate-pulse">
             <span className="text-primary text-xs font-black uppercase tracking-[0.3em]">A Excelência em Cada Detalhe</span>
           </div>
           <h1 className="text-7xl md:text-[10rem] font-black mb-4 tracking-tighter uppercase italic leading-[0.85] text-white">
-            Gold <span className="text-primary block md:inline drop-shadow-[0_0_15px_rgba(217,174,26,0.3)]">Barbearia</span>
+            Gold <span className="text-primary block md:inline drop-shadow-[0_0_25px_rgba(217,174,26,0.5)]">Barbearia</span>
           </h1>
           <p className="text-xl md:text-2xl text-white/70 max-w-2xl mx-auto mb-12 font-light tracking-[0.2em] uppercase">
             Estilo <span className="text-primary font-bold">Premium</span> para Homens de Ouro
@@ -43,7 +27,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Link 
               href="/agendar" 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-16 py-6 rounded-sm text-xl font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(217,174,26,0.4)]"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-16 py-6 rounded-sm text-xl font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(217,174,26,0.4)]"
             >
               Agendar Agora
             </Link>
@@ -51,7 +35,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Section - Tabela de Valores */}
+      {/* Services Section */}
       <section id="servicos" className="py-24 bg-black relative z-20 border-t border-primary/10">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
         <div className="container mx-auto px-4 relative">
