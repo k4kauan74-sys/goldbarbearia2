@@ -1,11 +1,8 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
-import { MOCK_SERVICES, MOCK_PROFESSIONALS } from "@/lib/mock-data";
+import { MOCK_SERVICES } from "@/lib/mock-data";
 import { Scissors, Clock, MapPin, Phone, Instagram, Facebook } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function Home() {
@@ -77,44 +74,6 @@ export default function Home() {
                   R$ {service.price.toFixed(2)}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Professionals Section */}
-      <section id="profissionais" className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black uppercase mb-4 tracking-tight">
-              Nossos <span className="text-primary">Especialistas</span>
-            </h2>
-            <div className="w-24 h-1 bg-primary mx-auto" />
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {MOCK_PROFESSIONALS.map((prof) => (
-              <Card key={prof.id} className="overflow-hidden border-none group bg-transparent">
-                <div className="relative aspect-[4/5] mb-4">
-                  <Image 
-                    src={prof.photo} 
-                    alt={prof.name}
-                    fill
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110"
-                    data-ai-hint="man barber"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute bottom-4 left-4">
-                    <Badge className="bg-primary text-primary-foreground font-bold">DISPONÍVEL</Badge>
-                  </div>
-                </div>
-                <CardContent className="p-0">
-                  <h3 className="text-2xl font-bold uppercase italic tracking-tighter group-hover:text-primary transition-colors">
-                    {prof.name}
-                  </h3>
-                  <p className="text-white/60 font-medium">{prof.specialty}</p>
-                </CardContent>
-              </Card>
             ))}
           </div>
         </div>
