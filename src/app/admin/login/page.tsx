@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, User, Eye, EyeOff, ChevronLeft } from "lucide-react";
+import { Eye, EyeOff, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#171e19] p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
       <div className="absolute top-8 left-8 z-20">
         <Link href="/">
           <Button variant="ghost" className="text-white/40 hover:text-white font-anton uppercase tracking-widest text-[10px] gap-2">
@@ -47,8 +47,9 @@ export default function AdminLoginPage() {
         </Link>
       </div>
 
+      {/* Ambient Orbs */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#b7c6c2] rounded-full blur-[120px] opacity-10 animate-float" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary rounded-full blur-[120px] opacity-10 animate-float" />
       </div>
 
       <Card className="w-full max-w-md relative z-10 bg-transparent border-none shadow-none">
@@ -57,13 +58,13 @@ export default function AdminLoginPage() {
             <CardTitle className="text-6xl font-anton text-white tracking-tighter uppercase">
               ADMIN <span className="text-primary">ACCESS</span>
             </CardTitle>
-            <CardDescription className="text-accent text-[10px] font-bold uppercase tracking-[0.4em]">Painel de Controle Editorial</CardDescription>
+            <CardDescription className="text-primary/60 text-[10px] font-bold uppercase tracking-[0.4em]">Painel de Controle Editorial</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-10">
             <div className="space-y-4">
-              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-accent">E-mail</Label>
+              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-primary/60">E-mail</Label>
               <div className="relative">
                 <Input 
                   type="email"
@@ -76,7 +77,7 @@ export default function AdminLoginPage() {
               </div>
             </div>
             <div className="space-y-4">
-              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-accent">Senha</Label>
+              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-primary/60">Senha</Label>
               <div className="relative">
                 <Input 
                   type={showPassword ? "text" : "password"}
