@@ -15,9 +15,9 @@ export default function Home() {
 
         <div className="container relative z-10 px-4 flex flex-col items-center text-center">
           <div className="mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            <h1 className="text-[15vw] md:text-[10rem] font-serif leading-[0.85] text-white flex flex-col items-center">
-              <span>ESTILO</span>
-              <span className="text-shimmer">SUPREMO</span>
+            <h1 className="text-[15vw] md:text-[10rem] font-serif leading-[0.85] text-white flex flex-col items-center uppercase">
+              <span>GOLD</span>
+              <span className="text-shimmer">BARBEARIA</span>
             </h1>
           </div>
 
@@ -68,7 +68,7 @@ export default function Home() {
         
         <div className="container mx-auto px-8 md:px-12">
           <div className="mb-32">
-            <h2 className="text-7xl md:text-9xl font-serif text-white mb-12">LET'S <br /> CREATE.</h2>
+            <h2 className="text-7xl md:text-9xl font-serif text-white mb-12 uppercase">LET'S <br /> CREATE.</h2>
             <Link href="mailto:contato@goldbarbearia.com" className="font-serif text-3xl md:text-5xl text-primary hover:text-white transition-colors underline-offset-8 underline decoration-white/10">
               CONTATO@GOLDBARBEARIA.COM
             </Link>
