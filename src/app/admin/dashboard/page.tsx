@@ -12,11 +12,9 @@ import {
   Trash2, 
   CheckCircle, 
   Clock, 
-  TrendingUp,
-  Scissors
+  TrendingUp
 } from "lucide-react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 import { 
   Table, 
@@ -71,47 +69,46 @@ export default function AdminDashboardPage() {
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-card border-r border-white/5 flex flex-col">
-        <div className="p-6 border-b border-white/5 flex items-center gap-2">
-          <Scissors className="text-primary h-6 w-6" />
-          <span className="font-headline text-xl font-bold italic tracking-tight">GOLD<span className="text-primary">ADMIN</span></span>
+        <div className="p-6 border-b border-white/5 flex items-center gap-3">
+          <div className="flex items-center justify-center w-8 h-8 border border-primary/50 rounded-sm">
+            <span className="font-headline text-lg font-black text-outline-gold leading-none">G</span>
+          </div>
+          <span className="font-headline text-xl font-black tracking-tighter">GOLD<span className="text-primary">ADMIN</span></span>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <Button variant="secondary" className="w-full justify-start gap-3 bg-primary text-primary-foreground">
+          <Button variant="secondary" className="w-full justify-start gap-3 bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[10px]">
             <CalendarIcon className="h-4 w-4" /> Agendamentos
           </Button>
-          <Button variant="ghost" className="w-full justify-start gap-3 text-white/60 hover:text-white">
+          <Button variant="ghost" className="w-full justify-start gap-3 text-white/40 hover:text-white font-bold uppercase tracking-widest text-[10px]">
             <Users className="h-4 w-4" /> Profissionais
           </Button>
-          <Button variant="ghost" className="w-full justify-start gap-3 text-white/60 hover:text-white">
-            <Scissors className="h-4 w-4" /> Serviços
-          </Button>
-          <Button variant="ghost" className="w-full justify-start gap-3 text-white/60 hover:text-white">
+          <Button variant="ghost" className="w-full justify-start gap-3 text-white/40 hover:text-white font-bold uppercase tracking-widest text-[10px]">
             <Settings className="h-4 w-4" /> Configurações
           </Button>
         </nav>
         <div className="p-4 border-t border-white/5">
-          <Button variant="ghost" onClick={handleLogout} className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10">
+          <Button variant="ghost" onClick={handleLogout} className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 font-bold uppercase tracking-widest text-[10px]">
             <LogOut className="h-4 w-4" /> Sair
           </Button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+      <main className="flex-1 p-6 md:p-10 overflow-y-auto bg-background">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
-            <h1 className="text-4xl font-black uppercase italic tracking-tighter">
+            <h1 className="text-4xl font-black uppercase tracking-tighter">
               Painel de <span className="text-primary">Agendamentos</span>
             </h1>
-            <p className="text-white/40">Gerencie todos os horários e clientes em um só lugar.</p>
+            <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-2">Gestão Gold em tempo real</p>
           </div>
           
           <div className="flex items-center gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
               <Input 
-                placeholder="Buscar cliente ou telefone..." 
-                className="pl-10 bg-card border-white/10 w-full md:w-[300px]"
+                placeholder="BUSCAR CLIENTE..." 
+                className="pl-10 bg-card border-white/10 w-full md:w-[300px] text-[10px] font-bold tracking-widest uppercase"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -124,46 +121,46 @@ export default function AdminDashboardPage() {
           <Card className="bg-card border-white/5">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-white/40 text-sm font-bold uppercase tracking-wider">Total Hoje</span>
-                <Clock className="text-primary h-5 w-5" />
+                <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Total Hoje</span>
+                <Clock className="text-primary h-4 w-4" />
               </div>
-              <div className="text-4xl font-black italic">{appointments.length}</div>
+              <div className="text-4xl font-black">{appointments.length}</div>
             </CardContent>
           </Card>
           <Card className="bg-card border-white/5">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-white/40 text-sm font-bold uppercase tracking-wider">Confirmados</span>
-                <CheckCircle className="text-green-500 h-5 w-5" />
+                <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Confirmados</span>
+                <CheckCircle className="text-green-500 h-4 w-4" />
               </div>
-              <div className="text-4xl font-black italic">{appointments.length}</div>
+              <div className="text-4xl font-black">{appointments.length}</div>
             </CardContent>
           </Card>
           <Card className="bg-card border-white/5">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-white/40 text-sm font-bold uppercase tracking-wider">Receita Est.</span>
-                <TrendingUp className="text-secondary h-5 w-5" />
+                <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Receita Est.</span>
+                <TrendingUp className="text-primary h-4 w-4" />
               </div>
-              <div className="text-4xl font-black italic text-primary">R$ {appointments.reduce((acc, curr) => acc + (MOCK_SERVICES.find(s => s.id === curr.serviceId)?.price || 0), 0).toFixed(2)}</div>
+              <div className="text-4xl font-black text-primary">R$ {appointments.reduce((acc, curr) => acc + (MOCK_SERVICES.find(s => s.id === curr.serviceId)?.price || 0), 0).toFixed(2)}</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Appointments Table */}
-        <Card className="bg-card border-white/5 shadow-xl">
-          <CardHeader className="border-b border-white/5">
-            <CardTitle className="text-xl font-bold uppercase italic tracking-widest">Lista de Reservas</CardTitle>
+        <Card className="bg-card border-white/5 shadow-2xl overflow-hidden">
+          <CardHeader className="border-b border-white/5 bg-white/5">
+            <CardTitle className="text-sm font-black uppercase tracking-[0.3em]">Lista de Reservas</CardTitle>
           </CardHeader>
           <Table>
             <TableHeader className="bg-background/50">
               <TableRow className="border-white/5">
-                <TableHead className="font-bold uppercase text-xs tracking-wider text-white/40">Data/Hora</TableHead>
-                <TableHead className="font-bold uppercase text-xs tracking-wider text-white/40">Cliente</TableHead>
-                <TableHead className="font-bold uppercase text-xs tracking-wider text-white/40">WhatsApp</TableHead>
-                <TableHead className="font-bold uppercase text-xs tracking-wider text-white/40">Serviço</TableHead>
-                <TableHead className="font-bold uppercase text-xs tracking-wider text-white/40">Profissional</TableHead>
-                <TableHead className="font-bold uppercase text-xs tracking-wider text-white/40 text-right">Ações</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40">Data/Hora</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40">Cliente</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40">WhatsApp</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40">Serviço</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40">Profissional</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40 text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -171,16 +168,16 @@ export default function AdminDashboardPage() {
                 <TableRow key={apt.id} className="border-white/5 hover:bg-white/5 transition-colors">
                   <TableCell>
                     <div className="flex flex-col">
-                      <span className="font-bold">{format(new Date(apt.date), "dd/MM/yyyy")}</span>
-                      <span className="text-xs text-primary">{apt.time}</span>
+                      <span className="font-black text-xs">{format(new Date(apt.date), "dd/MM/yyyy")}</span>
+                      <span className="text-[10px] font-bold text-primary">{apt.time}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="font-bold text-lg">{apt.clientName}</TableCell>
-                  <TableCell className="text-white/60">{apt.phone}</TableCell>
+                  <TableCell className="font-black text-sm uppercase tracking-tight">{apt.clientName}</TableCell>
+                  <TableCell className="text-white/40 font-bold text-xs">{apt.phone}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="border-primary/30 text-primary">{getServiceName(apt.serviceId)}</Badge>
+                    <Badge variant="outline" className="border-primary/20 text-primary text-[9px] font-black uppercase tracking-widest">{getServiceName(apt.serviceId)}</Badge>
                   </TableCell>
-                  <TableCell className="font-medium">{getProfName(apt.professionalId)}</TableCell>
+                  <TableCell className="font-bold text-xs uppercase text-white/60">{getProfName(apt.professionalId)}</TableCell>
                   <TableCell className="text-right">
                     <Button 
                       variant="ghost" 
@@ -194,8 +191,8 @@ export default function AdminDashboardPage() {
                 </TableRow>
               )) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-white/20 italic">
-                    Nenhum agendamento encontrado.
+                  <TableCell colSpan={6} className="h-32 text-center text-white/10 font-black uppercase tracking-[0.3em] text-xs">
+                    Nenhum agendamento
                   </TableCell>
                 </TableRow>
               )}

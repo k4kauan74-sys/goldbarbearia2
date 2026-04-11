@@ -2,27 +2,26 @@
 "use client";
 
 import Link from "next/link";
-import { Scissors } from "lucide-react";
 
 export function Navbar() {
   return (
-    <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-white/10 h-20">
+    <nav className="fixed top-0 w-full z-50 bg-transparent border-b border-white/5 h-20">
       <div className="container mx-auto px-4 h-full flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="bg-primary p-2 rounded-sm rotate-45 group-hover:rotate-0 transition-transform duration-300">
-            <Scissors className="text-primary-foreground -rotate-45 group-hover:rotate-0 transition-transform duration-300 h-6 w-6" />
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="flex items-center justify-center w-10 h-10 border border-primary/50 rounded-sm">
+            <span className="font-headline text-2xl font-black text-outline-gold leading-none">G</span>
           </div>
-          <span className="font-headline text-xl font-black tracking-tight text-white uppercase">
+          <span className="font-headline text-xl font-black tracking-tighter text-white uppercase">
             Gold<span className="text-primary">Barbearia</span>
           </span>
         </Link>
-        <div className="hidden md:flex items-center gap-8 font-bold uppercase tracking-wider text-xs">
+        <div className="hidden md:flex items-center gap-8 font-bold uppercase tracking-widest text-[10px]">
           <Link href="/#servicos" className="hover:text-primary transition-colors">Serviços</Link>
-          <Link href="/agendar" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-sm transition-all font-bold">Agendar</Link>
-          <Link href="/admin/login" className="text-white/60 hover:text-white text-[10px] border border-white/20 px-2 py-0.5 rounded-sm">Admin</Link>
+          <Link href="/agendar" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-sm transition-all font-black">Agendar</Link>
+          <Link href="/admin/login" className="text-white/40 hover:text-white border border-white/10 px-2 py-1 rounded-sm">Admin</Link>
         </div>
         <div className="md:hidden">
-           <Link href="/agendar" className="bg-primary text-primary-foreground px-4 py-2 rounded-sm font-bold text-xs uppercase">AGENDAR</Link>
+           <Link href="/agendar" className="bg-primary text-primary-foreground px-5 py-2.5 rounded-sm font-black text-[10px] uppercase tracking-widest">AGENDAR</Link>
         </div>
       </div>
     </nav>
