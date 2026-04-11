@@ -4,59 +4,67 @@
 
 @layer base {
   :root {
-    --background: 0 0% 0%; /* Preto Puro */
+    --background: 137 14% 10%; /* Navy #171e19 */
     --foreground: 0 0% 100%;
-    --card: 45 14% 5%;
+    --card: 137 14% 12%;
     --card-foreground: 0 0% 100%;
-    --popover: 45 14% 5%;
+    --popover: 137 14% 10%;
     --popover-foreground: 0 0% 100%;
-    --primary: 46 79% 48%; /* Gold #D9AE1A */
-    --primary-foreground: 45 14% 5%;
-    --secondary: 18 74% 40%; /* Copper #B3471A */
-    --secondary-foreground: 0 0% 100%;
-    --muted: 45 14% 10%;
-    --muted-foreground: 45 5% 60%;
-    --accent: 46 79% 48%;
-    --accent-foreground: 45 14% 5%;
+    --primary: 164 12% 75%; /* Sage #b7c6c2 */
+    --primary-foreground: 137 14% 10%;
+    --secondary: 188 70% 91%; /* Cyan #d5f4f9 */
+    --secondary-foreground: 137 14% 10%;
+    --muted: 137 14% 15%;
+    --muted-foreground: 164 5% 60%;
+    --accent: 4 9% 58%; /* Taupe #9f8d8b */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 45 10% 15%;
-    --input: 45 10% 15%;
-    --ring: 46 79% 48%;
-    --radius: 0.25rem;
+    --border: 137 10% 20%;
+    --input: 137 10% 20%;
+    --ring: 164 12% 75%;
+    --radius: 0rem;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border cursor-default;
   }
   body {
-    @apply bg-background text-foreground font-body;
+    @apply bg-background text-foreground font-body overflow-x-hidden;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-headline;
+    @apply font-headline uppercase tracking-tighter leading-[0.85];
   }
 }
 
-.gold-gradient {
-  background: linear-gradient(135deg, #D9AE1A 0%, #B3471A 100%);
+.font-anton {
+  font-family: 'Anton', sans-serif;
 }
 
-.text-gold {
-  color: #D9AE1A;
+.text-outline {
+  -webkit-text-stroke: 1px #b7c6c2;
+  color: transparent;
 }
 
-.bg-gold {
-  background-color: #D9AE1A;
+.blur-orb {
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.gold-glow {
-  box-shadow: 0 0 40px rgba(217, 174, 26, 0.15);
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
 }
 
-.bg-gold-black-fade {
-  background: linear-gradient(to bottom, rgba(217, 174, 26, 0.15) 0%, rgba(0, 0, 0, 1) 100%);
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.mix-blend-nav {
+  mix-blend-mode: difference;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -68,19 +76,9 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #D9AE1A;
-  border-radius: 10px;
+  background: #b7c6c2;
 }
 
-/* Utilitário para letra vazada - Refinado para uniformidade */
-.text-outline-gold {
-  -webkit-text-stroke: 1px #D9AE1A;
-  color: transparent;
-  paint-order: stroke fill;
-}
-
-@media (min-width: 768px) {
-  .text-outline-gold {
-    -webkit-text-stroke: 2px #D9AE1A;
-  }
+.hover-reveal-viewport {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }

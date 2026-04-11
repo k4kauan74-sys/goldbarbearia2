@@ -1,27 +1,33 @@
-
 "use client";
 
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export function Navbar() {
   return (
-    <nav className="fixed top-0 w-full z-50 bg-transparent border-b border-white/5 h-20">
-      <div className="container mx-auto px-4 h-full flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
-          <span className="font-headline text-xl font-black tracking-tighter text-white uppercase">
-            Gold<span className="text-primary">Barbearia</span>
-          </span>
+    <nav className="fixed top-0 w-full z-[100] h-20 mix-blend-nav px-8 md:px-12 flex items-center justify-between">
+      <Link href="/" className="group">
+        <span className="font-anton text-2xl tracking-widest text-white uppercase">
+          GoldBarbearia
+        </span>
+      </Link>
+      
+      <div className="hidden md:flex items-center gap-10 font-medium uppercase tracking-[0.2em] text-[10px]">
+        <Link href="/" className="text-white hover:text-primary transition-colors">Início</Link>
+        <Link href="/#servicos" className="text-white hover:text-primary transition-colors">Serviços</Link>
+        <Link href="/admin/login" className="text-white/60 hover:text-white transition-colors">Admin</Link>
+        <Link 
+          href="/agendar" 
+          className="border border-white px-8 py-3 hover:bg-white hover:text-black transition-all duration-500 font-semibold"
+        >
+          Agendar
         </Link>
-        <div className="hidden md:flex items-center gap-8 font-bold uppercase tracking-widest text-[10px]">
-          <Link href="/" className="hover:text-primary transition-colors">Início</Link>
-          <Link href="/#servicos" className="hover:text-primary transition-colors">Serviços</Link>
-          <Link href="/agendar" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-sm transition-all font-black">Agendar</Link>
-          <Link href="/admin/login" className="text-white/40 hover:text-white border border-white/10 px-2 py-1 rounded-sm">Admin</Link>
-        </div>
-        <div className="md:hidden flex items-center gap-4">
-           <Link href="/" className="text-white/40 text-[10px] font-black uppercase tracking-widest">Início</Link>
-           <Link href="/agendar" className="bg-primary text-primary-foreground px-5 py-2.5 rounded-sm font-black text-[10px] uppercase tracking-widest">AGENDAR</Link>
-        </div>
+      </div>
+
+      <div className="md:hidden flex items-center gap-4">
+        <Link href="/agendar" className="border border-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white">
+          Agendar
+        </Link>
       </div>
     </nav>
   );

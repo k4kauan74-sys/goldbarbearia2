@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -39,48 +38,50 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-      <div className="absolute top-8 left-8">
+    <div className="min-h-screen flex items-center justify-center bg-[#171e19] p-4 relative overflow-hidden">
+      <div className="absolute top-8 left-8 z-20">
         <Link href="/">
-          <Button variant="ghost" className="text-white/40 hover:text-white font-black uppercase tracking-widest text-[10px] gap-2">
-            <ChevronLeft className="h-4 w-4" /> Voltar ao Início
+          <Button variant="ghost" className="text-white/40 hover:text-white font-anton uppercase tracking-widest text-[10px] gap-2">
+            <ChevronLeft className="h-4 w-4" /> VOLTAR AO INÍCIO
           </Button>
         </Link>
       </div>
 
-      <Card className="w-full max-w-md relative z-10 bg-card border-white/5 shadow-2xl">
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#b7c6c2] rounded-full blur-[120px] opacity-10 animate-float" />
+      </div>
+
+      <Card className="w-full max-w-md relative z-10 bg-transparent border-none shadow-none">
         <CardHeader className="text-center space-y-6">
-          <div className="space-y-1">
-            <CardTitle className="text-3xl font-black uppercase tracking-tighter">
-              Acesso <span className="text-primary">Admin</span>
+          <div className="space-y-4">
+            <CardTitle className="text-6xl font-anton text-white tracking-tighter uppercase">
+              ADMIN <span className="text-primary">ACCESS</span>
             </CardTitle>
-            <CardDescription className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em]">Painel de Controle Gold</CardDescription>
+            <CardDescription className="text-accent text-[10px] font-bold uppercase tracking-[0.4em]">Painel de Controle Editorial</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-white/40">E-mail</Label>
+          <form onSubmit={handleLogin} className="space-y-10">
+            <div className="space-y-4">
+              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-accent">E-mail</Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
                 <Input 
                   type="email"
-                  className="pl-10 bg-background/50 border-white/5 py-6 text-xs font-bold uppercase tracking-widest"
-                  placeholder="EX: ADMIN@BARBER.COM"
+                  className="bg-transparent border-white/10 border-b border-t-0 border-x-0 rounded-none py-8 text-lg font-medium text-white placeholder:text-white/10 focus-visible:ring-0 focus-visible:border-primary transition-colors"
+                  placeholder="ADMIN@BARBER.COM"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-white/40">Senha</Label>
+            <div className="space-y-4">
+              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-accent">Senha</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
                 <Input 
                   type={showPassword ? "text" : "password"}
-                  className="pl-10 pr-10 bg-background/50 border-white/5 py-6 text-xs font-bold uppercase tracking-widest"
-                  placeholder="DIGITE SUA SENHA"
+                  className="bg-transparent border-white/10 border-b border-t-0 border-x-0 rounded-none py-8 text-lg font-medium text-white placeholder:text-white/10 focus-visible:ring-0 focus-visible:border-primary transition-colors"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -88,23 +89,18 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors focus:outline-none"
-                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors focus:outline-none"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-[0.3em] py-8 text-xs shadow-xl shadow-primary/10"
+              className="w-full bg-primary text-black hover:bg-white font-anton uppercase tracking-[0.3em] py-12 text-xl transition-all duration-500"
               disabled={loading}
             >
-              {loading ? "VERIFICANDO..." : "ENTRAR NO PAINEL"}
+              {loading ? "VERIFYING..." : "ENTER PANEL"}
             </Button>
           </form>
         </CardContent>

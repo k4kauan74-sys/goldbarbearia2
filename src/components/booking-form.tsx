@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar as CalendarIcon, Clock, User, Scissors, CheckCircle2, ChevronLeft } from "lucide-react";
+import { Scissors, CheckCircle2, ChevronLeft, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -73,268 +73,199 @@ export function BookingForm() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto py-10">
-      {/* Progress Stepper */}
-      {step !== 'success' && (
-        <div className="flex justify-between mb-12 relative px-4">
-          <div className="absolute top-1/2 left-0 w-full h-0.5 bg-white/10 -translate-y-1/2 z-0" />
-          {steps.slice(0, 4).map((s, idx) => (
-            <div 
-              key={s} 
-              className={cn(
-                "relative z-10 w-10 h-10 rounded-full flex items-center justify-center font-black transition-all duration-300",
-                idx <= currentStepIndex ? "bg-primary text-primary-foreground" : "bg-card border border-white/10 text-white/40"
-              )}
-            >
-              {idx + 1}
-            </div>
-          ))}
-        </div>
-      )}
-
-      <Card className="bg-card border-white/10 shadow-2xl overflow-hidden">
+    <div className="w-full max-w-5xl mx-auto py-12 px-4">
+      <Card className="bg-background border-none shadow-none">
         {step === 'service' && (
-          <>
-            <CardHeader className="text-center bg-background/30 py-8">
-              <CardTitle className="text-3xl font-black uppercase tracking-tight">
-                Escolha o <span className="text-primary">Serviço</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid gap-4">
-                {MOCK_SERVICES.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => { setSelectedService(s); setStep('professional'); }}
-                    className={cn(
-                      "flex items-center justify-between p-6 rounded-sm border transition-all hover:scale-[1.01] active:scale-[0.99]",
-                      selectedService?.id === s.id 
-                        ? "border-primary bg-primary/10 shadow-lg shadow-primary/5" 
-                        : "border-white/5 bg-background/40 hover:border-white/20"
-                    )}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-white/5 rounded-sm">
-                        <Scissors className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className="text-left">
-                        <h3 className="font-black text-lg uppercase">{s.name}</h3>
-                        <p className="text-xs font-bold text-white/40 uppercase tracking-widest">{s.duration} minutos</p>
-                      </div>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <h2 className="text-7xl font-anton mb-12 text-white">CHOOSE <br /> SERVICE</h2>
+            <div className="grid gap-4">
+              {MOCK_SERVICES.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => { setSelectedService(s); setStep('professional'); }}
+                  className="flex items-center justify-between p-8 border border-white/10 hover:border-primary transition-all duration-500 group"
+                >
+                  <div className="flex items-center gap-8">
+                    <span className="font-anton text-2xl text-white/20 group-hover:text-primary transition-colors">0{MOCK_SERVICES.indexOf(s) + 1}</span>
+                    <div className="text-left">
+                      <h3 className="font-anton text-4xl text-white">{s.name}</h3>
+                      <p className="text-[10px] font-bold text-accent uppercase tracking-widest">{s.duration} MINUTOS</p>
                     </div>
-                    <div className="text-xl font-black text-primary">R$ {s.price.toFixed(2)}</div>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </>
+                  </div>
+                  <div className="font-anton text-3xl text-primary">R$ {s.price.toFixed(2)}</div>
+                </button>
+              ))}
+            </div>
+          </div>
         )}
 
         {step === 'professional' && (
-          <>
-            <CardHeader className="text-center bg-background/30 py-8">
-              <CardTitle className="text-3xl font-black uppercase tracking-tight">
-                Quem vai <span className="text-primary">Atender?</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid sm:grid-cols-3 gap-6">
-                {MOCK_PROFESSIONALS.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => { setSelectedProfessional(p); setStep('datetime'); }}
-                    className={cn(
-                      "flex flex-col items-center p-6 rounded-sm border transition-all hover:scale-[1.02] active:scale-[0.98]",
-                      selectedProfessional?.id === p.id 
-                        ? "border-primary bg-primary/10 shadow-lg shadow-primary/5" 
-                        : "border-white/5 bg-background/40 hover:border-white/20"
-                    )}
-                  >
-                    <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-primary/20">
-                      <img src={p.photo} alt={p.name} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all" />
-                    </div>
-                    <h3 className="font-black text-center mb-1 uppercase text-sm">{p.name}</h3>
-                    <p className="text-[10px] font-bold text-white/40 text-center uppercase tracking-widest">{p.specialty}</p>
-                  </button>
-                ))}
-              </div>
-              <div className="mt-8">
-                <Button variant="ghost" onClick={prevStep} className="text-white/40 hover:text-white uppercase tracking-widest text-[10px] font-black">
-                  <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
-                </Button>
-              </div>
-            </CardContent>
-          </>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex justify-between items-end mb-12">
+              <h2 className="text-7xl font-anton text-white">SELECT <br /> EXPERT</h2>
+              <Button variant="ghost" onClick={prevStep} className="text-accent hover:text-white uppercase tracking-widest text-[10px]">
+                <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
+              </Button>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-8">
+              {MOCK_PROFESSIONALS.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => { setSelectedProfessional(p); setStep('datetime'); }}
+                  className="group relative"
+                >
+                  <div className="aspect-[3/4] overflow-hidden mb-6 bg-muted">
+                    <img 
+                      src={p.photo} 
+                      alt={p.name} 
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" 
+                    />
+                    <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <h3 className="font-anton text-3xl text-white mb-1 uppercase">{p.name}</h3>
+                  <p className="text-[10px] font-bold text-accent uppercase tracking-widest">{p.specialty}</p>
+                </button>
+              ))}
+            </div>
+          </div>
         )}
 
         {step === 'datetime' && (
-          <>
-            <CardHeader className="text-center bg-background/30 py-8">
-              <CardTitle className="text-3xl font-black uppercase tracking-tight">
-                Data e <span className="text-primary">Hora</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid md:grid-cols-2 gap-10">
-                <div className="space-y-4">
-                  <Label className="text-white/60 uppercase text-[10px] tracking-[0.2em] font-black">1. Selecione a Data</Label>
-                  <div className="flex justify-center border border-white/10 rounded-sm bg-background/20 p-2">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      className="w-full"
-                      locale={ptBR}
-                      disabled={(date) => {
-                        if (!today) return false;
-                        const compareDate = new Date(date);
-                        compareDate.setHours(0, 0, 0, 0);
-                        const todayCompare = new Date(today);
-                        todayCompare.setHours(0, 0, 0, 0);
-                        return compareDate < todayCompare || date.getDay() === 0;
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <Label className="text-white/60 uppercase text-[10px] tracking-[0.2em] font-black">2. Horários Disponíveis</Label>
-                  <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                    {TIME_SLOTS.map((time) => (
-                      <button
-                        key={time}
-                        onClick={() => { setSelectedTime(time); setStep('contact'); }}
-                        className={cn(
-                          "py-3 px-3 text-[10px] font-black rounded-sm border transition-all uppercase tracking-widest",
-                          selectedTime === time 
-                            ? "bg-primary text-primary-foreground border-primary" 
-                            : "border-white/10 bg-background/40 hover:border-primary/50 text-white/60"
-                        )}
-                      >
-                        {time}
-                      </button>
-                    ))}
-                  </div>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex justify-between items-end mb-12">
+              <h2 className="text-7xl font-anton text-white">DATE & <br /> TIME</h2>
+              <Button variant="ghost" onClick={prevStep} className="text-accent hover:text-white uppercase tracking-widest text-[10px]">
+                <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
+              </Button>
+            </div>
+            <div className="grid md:grid-cols-12 gap-12">
+              <div className="md:col-span-7">
+                <div className="border border-white/10 p-4">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    className="w-full text-white"
+                    locale={ptBR}
+                    disabled={(date) => {
+                      if (!today) return false;
+                      const compareDate = new Date(date);
+                      compareDate.setHours(0, 0, 0, 0);
+                      const todayCompare = new Date(today);
+                      todayCompare.setHours(0, 0, 0, 0);
+                      return compareDate < todayCompare || date.getDay() === 0;
+                    }}
+                  />
                 </div>
               </div>
-              <div className="mt-10">
-                <Button variant="ghost" onClick={prevStep} className="text-white/40 hover:text-white uppercase tracking-widest text-[10px] font-black">
-                  <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
-                </Button>
+              <div className="md:col-span-5">
+                <div className="grid grid-cols-3 gap-3">
+                  {TIME_SLOTS.map((time) => (
+                    <button
+                      key={time}
+                      onClick={() => { setSelectedTime(time); setStep('contact'); }}
+                      className={cn(
+                        "py-4 px-2 text-[10px] font-bold border transition-all uppercase tracking-widest",
+                        selectedTime === time 
+                          ? "bg-primary text-black border-primary" 
+                          : "border-white/10 text-white/40 hover:border-white hover:text-white"
+                      )}
+                    >
+                      {time}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </CardContent>
-          </>
+            </div>
+          </div>
         )}
 
         {step === 'contact' && (
-          <>
-            <CardHeader className="text-center bg-background/30 py-8">
-              <CardTitle className="text-3xl font-black uppercase tracking-tight">
-                Finalizar <span className="text-primary">Agendamento</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid md:grid-cols-2 gap-10">
-                {/* Summary */}
-                <div className="space-y-6 bg-background/40 p-6 rounded-sm border border-white/5">
-                  <h3 className="text-sm font-black uppercase tracking-[0.3em] text-primary border-b border-white/10 pb-4">Resumo</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <Scissors className="h-4 w-4 text-primary" />
-                      <div>
-                        <p className="text-[9px] text-white/40 uppercase font-black tracking-widest">Serviço</p>
-                        <p className="font-black uppercase text-xs">{selectedService?.name}</p>
-                      </div>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex justify-between items-end mb-12">
+              <h2 className="text-7xl font-anton text-white">FINALIZE <br /> BOOKING</h2>
+              <Button variant="ghost" onClick={prevStep} className="text-accent hover:text-white uppercase tracking-widest text-[10px]">
+                <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
+              </Button>
+            </div>
+            <div className="grid md:grid-cols-2 gap-20">
+              <div className="space-y-12">
+                <div className="border-b border-white/10 pb-8">
+                  <span className="text-accent uppercase text-[10px] font-black tracking-[0.4em] mb-4 block">Reservation Details</span>
+                  <div className="grid grid-cols-2 gap-8">
+                    <div>
+                      <p className="text-[9px] text-white/40 uppercase font-bold tracking-widest mb-1">Service</p>
+                      <p className="font-anton text-2xl text-white">{selectedService?.name}</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <User className="h-4 w-4 text-primary" />
-                      <div>
-                        <p className="text-[9px] text-white/40 uppercase font-black tracking-widest">Profissional</p>
-                        <p className="font-black uppercase text-xs">{selectedProfessional?.name}</p>
-                      </div>
+                    <div>
+                      <p className="text-[9px] text-white/40 uppercase font-bold tracking-widest mb-1">Expert</p>
+                      <p className="font-anton text-2xl text-white">{selectedProfessional?.name}</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <CalendarIcon className="h-4 w-4 text-primary" />
-                      <div>
-                        <p className="text-[9px] text-white/40 uppercase font-black tracking-widest">Data</p>
-                        <p className="font-black uppercase text-xs">{selectedDate ? format(selectedDate, "dd 'de' MMMM", { locale: ptBR }) : ''}</p>
-                      </div>
+                    <div>
+                      <p className="text-[9px] text-white/40 uppercase font-bold tracking-widest mb-1">Date</p>
+                      <p className="font-anton text-2xl text-white">{selectedDate ? format(selectedDate, "dd MMM", { locale: ptBR }) : ''}</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Clock className="h-4 w-4 text-primary" />
-                      <div>
-                        <p className="text-[9px] text-white/40 uppercase font-black tracking-widest">Horário</p>
-                        <p className="font-black uppercase text-xs">{selectedTime}</p>
-                      </div>
+                    <div>
+                      <p className="text-[9px] text-white/40 uppercase font-bold tracking-widest mb-1">Time</p>
+                      <p className="font-anton text-2xl text-white">{selectedTime}</p>
                     </div>
-                  </div>
-                  <div className="pt-4 border-t border-white/10 flex justify-between items-center">
-                    <span className="font-black uppercase tracking-widest text-[10px]">Total</span>
-                    <span className="text-xl font-black text-primary">R$ {selectedService?.price.toFixed(2)}</span>
                   </div>
                 </div>
+                <div className="flex justify-between items-end">
+                  <span className="font-anton text-2xl text-white">TOTAL</span>
+                  <span className="text-5xl font-anton text-primary">R$ {selectedService?.price.toFixed(2)}</span>
+                </div>
+              </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-[10px] uppercase tracking-widest font-black text-white/60">Seu Nome Completo</Label>
-                    <Input 
-                      id="name" 
-                      value={clientName} 
-                      onChange={(e) => setClientName(e.target.value)}
-                      placeholder="EX: JOÃO SILVA" 
-                      className="bg-background/40 border-white/10 py-6 text-[10px] font-black uppercase tracking-widest"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-[10px] uppercase tracking-widest font-black text-white/60">Seu WhatsApp</Label>
-                    <Input 
-                      id="phone" 
-                      value={clientPhone}
-                      onChange={(e) => setClientPhone(e.target.value)}
-                      placeholder="(00) 00000-0000" 
-                      className="bg-background/40 border-white/10 py-6 text-[10px] font-black uppercase tracking-widest"
-                      required
-                    />
-                  </div>
-                  <Button 
-                    type="submit" 
-                    disabled={isSubmitting}
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-8 text-xs font-black uppercase tracking-[0.3em] shadow-xl shadow-primary/20"
-                  >
-                    {isSubmitting ? "CONFIRMANDO..." : "CONFIRMAR RESERVA"}
-                  </Button>
-                </form>
-              </div>
-              <div className="mt-8">
-                <Button variant="ghost" onClick={prevStep} className="text-white/40 hover:text-white uppercase tracking-widest text-[10px] font-black">
-                  <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="space-y-4">
+                  <Label className="text-[10px] uppercase tracking-widest font-black text-accent">Nome Completo</Label>
+                  <Input 
+                    value={clientName} 
+                    onChange={(e) => setClientName(e.target.value)}
+                    placeholder="JOÃO SILVA" 
+                    className="bg-transparent border-white/10 border-b border-t-0 border-x-0 rounded-none py-8 text-xl font-medium text-white placeholder:text-white/10 focus-visible:ring-0 focus-visible:border-primary transition-colors"
+                    required
+                  />
+                </div>
+                <div className="space-y-4">
+                  <Label className="text-[10px] uppercase tracking-widest font-black text-accent">WhatsApp</Label>
+                  <Input 
+                    value={clientPhone}
+                    onChange={(e) => setClientPhone(e.target.value)}
+                    placeholder="(00) 00000-0000" 
+                    className="bg-transparent border-white/10 border-b border-t-0 border-x-0 rounded-none py-8 text-xl font-medium text-white placeholder:text-white/10 focus-visible:ring-0 focus-visible:border-primary transition-colors"
+                    required
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full bg-primary text-black hover:bg-white py-12 text-2xl font-anton tracking-widest transition-all duration-500"
+                >
+                  {isSubmitting ? "PROCESSING..." : "CONFIRM RESERVATION"}
                 </Button>
-              </div>
-            </CardContent>
-          </>
+              </form>
+            </div>
+          </div>
         )}
 
         {step === 'success' && (
-          <CardContent className="py-20 flex flex-col items-center text-center">
-            <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mb-8 animate-bounce shadow-2xl shadow-primary/40">
-              <CheckCircle2 className="h-12 w-12 text-primary-foreground" />
+          <div className="py-24 flex flex-col items-center text-center animate-in zoom-in duration-700">
+            <div className="w-32 h-32 border border-primary rounded-full flex items-center justify-center mb-12">
+              <CheckCircle2 className="h-16 w-16 text-primary" />
             </div>
-            <h2 className="text-4xl md:text-5xl font-black uppercase mb-4 tracking-tighter">
-              Tudo <span className="text-primary">Pronto!</span>
-            </h2>
-            <p className="text-sm font-black uppercase tracking-widest text-white/60 max-w-md mx-auto mb-12">
-              Seu agendamento foi confirmado. Te esperamos para sua experiência Gold!
+            <h2 className="text-8xl font-anton text-white mb-6">COMPLETED</h2>
+            <p className="text-accent uppercase tracking-[0.4em] text-xs max-w-md mx-auto mb-16">
+              Sua reserva foi processada com sucesso. Prepare-se para uma experiência de alto padrão.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                onClick={() => router.push('/')}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-6 font-black uppercase tracking-widest text-[10px]"
-              >
-                Voltar ao Início
-              </Button>
-            </div>
-          </CardContent>
+            <Button 
+              onClick={() => router.push('/')}
+              className="bg-white text-black hover:bg-primary px-16 py-8 font-anton text-xl tracking-widest"
+            >
+              VOLTAR AO INÍCIO
+            </Button>
+          </div>
         )}
       </Card>
     </div>
