@@ -233,6 +233,13 @@ export default function AdminDashboardPage() {
     toast({ title: "Sucesso", description: "Profissional salvo." });
   };
 
+  const deleteProfessional = (id: string) => {
+    const updated = professionals.filter(p => p.id !== id);
+    setProfessionals(updated);
+    localStorage.setItem('gold_professionals', JSON.stringify(updated));
+    toast({ title: "Removido", description: "Profissional excluído." });
+  };
+
   const resetProfForm = () => {
     setEditingProf(null);
     setProfName("");
@@ -415,7 +422,7 @@ export default function AdminDashboardPage() {
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-[#0a0a0a] border-white/10 text-white">
-                <DialogHeader><DialogTitle className="font-anton text-2xl uppercase tracking-widest">Especialista</DialogTitle></DialogHeader>
+                <DialogHeader><DialogTitle className="font-anton text-2xl uppercase tracking-widest">{editingProf ? 'Editar Especialista' : 'Novo Especialista'}</DialogTitle></DialogHeader>
                 <div className="space-y-6 py-4">
                   <div className="flex flex-col items-center gap-4">
                     <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/10 bg-neutral-900 group relative">
@@ -535,7 +542,7 @@ export default function AdminDashboardPage() {
                     </div>
                     <div className="flex gap-3 mt-10">
                       <Button variant="ghost" onClick={() => openEditProf(prof)} className="flex-1 border border-white/10 text-white/40 hover:text-white uppercase text-[9px] h-12 rounded-xl"><Edit2 className="mr-2 h-3 w-3" /> Editar Perfil</Button>
-                      <Button variant="ghost" size="icon" className="border border-white/10 text-white/20 hover:text-destructive h-12 w-12 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => deleteProfessional(prof.id)} className="border border-white/10 text-white/20 hover:text-destructive h-12 w-12 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
                 </div>
