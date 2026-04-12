@@ -77,7 +77,7 @@ export function BookingForm() {
       <div className="glass rounded-[2rem] p-8 md:p-12 shadow-2xl shadow-primary/5">
         {step === 'service' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <h2 className="text-6xl md:text-8xl font-serif mb-12 text-white">SELECT <br /> <span className="text-shimmer">MODULE</span></h2>
+            <h2 className="text-4xl md:text-6xl font-anton mb-12 text-white uppercase tracking-tighter">SELECIONE O <br /> <span className="text-shimmer">SERVIÇO</span></h2>
             <div className="grid gap-4">
               {MOCK_SERVICES.map((s, idx) => (
                 <button
@@ -88,11 +88,11 @@ export function BookingForm() {
                   <div className="flex items-center gap-8">
                     <span className="font-mono text-[10px] text-neutral-500 group-hover:text-primary transition-colors">0{idx + 1}</span>
                     <div className="text-left">
-                      <h3 className="font-serif text-3xl text-white group-hover:text-shimmer">{s.name}</h3>
+                      <h3 className="font-anton text-2xl text-white group-hover:text-shimmer uppercase tracking-wider">{s.name}</h3>
                       <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">{s.duration} MINS</p>
                     </div>
                   </div>
-                  <div className="font-serif text-3xl text-primary">R$ {s.price.toFixed(2)}</div>
+                  <div className="font-anton text-2xl text-primary">R$ {s.price.toFixed(2)}</div>
                 </button>
               ))}
             </div>
@@ -102,7 +102,7 @@ export function BookingForm() {
         {step === 'professional' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex justify-between items-end mb-12">
-              <h2 className="text-6xl md:text-8xl font-serif text-white">CHOOSE <br /> <span className="text-shimmer">EXPERT</span></h2>
+              <h2 className="text-4xl md:text-6xl font-anton text-white uppercase tracking-tighter">ESCOLHA O <br /> <span className="text-shimmer">PROFISSIONAL</span></h2>
               <Button variant="ghost" onClick={prevStep} className="text-neutral-500 hover:text-white uppercase tracking-widest text-[10px]">
                 <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
               </Button>
@@ -121,7 +121,7 @@ export function BookingForm() {
                       className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
                     />
                   </div>
-                  <h3 className="font-serif text-2xl text-white mb-1">{p.name}</h3>
+                  <h3 className="font-anton text-xl text-white mb-1 uppercase tracking-wider">{p.name}</h3>
                   <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">{p.specialty}</p>
                 </button>
               ))}
@@ -132,7 +132,7 @@ export function BookingForm() {
         {step === 'datetime' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex justify-between items-end mb-12">
-              <h2 className="text-6xl md:text-8xl font-serif text-white">SYNC <br /> <span className="text-shimmer">CLOCK</span></h2>
+              <h2 className="text-4xl md:text-6xl font-anton text-white uppercase tracking-tighter">DATA E <br /> <span className="text-shimmer">HORA</span></h2>
               <Button variant="ghost" onClick={prevStep} className="text-neutral-500 hover:text-white uppercase tracking-widest text-[10px]">
                 <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
               </Button>
@@ -143,7 +143,11 @@ export function BookingForm() {
                   <Calendar
                     mode="single"
                     selected={selectedDate}
-                    onSelect={setSelectedDate}
+                    onSelect={(date) => {
+                      if (date) {
+                        setSelectedDate(date);
+                      }
+                    }}
                     className="w-full text-white"
                     locale={ptBR}
                     disabled={(date) => {
@@ -166,7 +170,7 @@ export function BookingForm() {
                       className={cn(
                         "py-4 px-2 text-[10px] font-mono border rounded-xl transition-all uppercase tracking-widest",
                         selectedTime === time 
-                          ? "bg-primary text-white border-primary shadow-[0_0_15px_rgba(139,92,246,0.3)]" 
+                          ? "bg-primary text-black border-primary shadow-[0_0_15px_rgba(251,191,36,0.3)]" 
                           : "border-white/5 text-neutral-500 hover:border-white/20 hover:text-white"
                       )}
                     >
@@ -182,7 +186,7 @@ export function BookingForm() {
         {step === 'contact' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex justify-between items-end mb-12">
-              <h2 className="text-6xl md:text-8xl font-serif text-white">VERIFY <br /> <span className="text-shimmer">DATA</span></h2>
+              <h2 className="text-4xl md:text-6xl font-anton text-white uppercase tracking-tighter">REVISÃO DOS <br /> <span className="text-shimmer">DADOS</span></h2>
               <Button variant="ghost" onClick={prevStep} className="text-neutral-500 hover:text-white uppercase tracking-widest text-[10px]">
                 <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
               </Button>
@@ -194,24 +198,24 @@ export function BookingForm() {
                   <div className="grid grid-cols-2 gap-8">
                     <div>
                       <p className="text-[9px] text-neutral-500 uppercase font-mono tracking-widest mb-1">Serviço</p>
-                      <p className="font-serif text-2xl text-white">{selectedService?.name}</p>
+                      <p className="font-anton text-xl text-white uppercase">{selectedService?.name}</p>
                     </div>
                     <div>
                       <p className="text-[9px] text-neutral-500 uppercase font-mono tracking-widest mb-1">Especialista</p>
-                      <p className="font-serif text-2xl text-white">{selectedProfessional?.name}</p>
+                      <p className="font-anton text-xl text-white uppercase">{selectedProfessional?.name}</p>
                     </div>
                     <div>
                       <p className="text-[9px] text-neutral-500 uppercase font-mono tracking-widest mb-1">Data</p>
-                      <p className="font-serif text-2xl text-white">{selectedDate ? format(selectedDate, "dd MMM", { locale: ptBR }) : ''}</p>
+                      <p className="font-anton text-xl text-white uppercase">{selectedDate ? format(selectedDate, "dd MMM", { locale: ptBR }) : ''}</p>
                     </div>
                     <div>
                       <p className="text-[9px] text-neutral-500 uppercase font-mono tracking-widest mb-1">Hora</p>
-                      <p className="font-serif text-2xl text-white">{selectedTime}</p>
+                      <p className="font-anton text-xl text-white uppercase">{selectedTime}</p>
                     </div>
                   </div>
                   <div className="mt-12 pt-8 border-t border-white/5 flex justify-between items-end">
-                    <span className="font-serif text-2xl text-white">INVESTIMENTO</span>
-                    <span className="text-4xl font-serif text-shimmer">R$ {selectedService?.price.toFixed(2)}</span>
+                    <span className="font-anton text-xl text-white uppercase">Investimento</span>
+                    <span className="text-3xl font-anton text-shimmer">R$ {selectedService?.price.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -228,7 +232,7 @@ export function BookingForm() {
                   />
                 </div>
                 <div className="space-y-4">
-                  <Label className="text-[10px] uppercase tracking-widest font-mono text-neutral-500">Comunicação (WhatsApp)</Label>
+                  <Label className="text-[10px] uppercase tracking-widest font-mono text-neutral-500">WhatsApp</Label>
                   <Input 
                     value={clientPhone}
                     onChange={(e) => setClientPhone(e.target.value)}
@@ -241,9 +245,9 @@ export function BookingForm() {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="shiny-border-content w-full bg-transparent text-white hover:bg-white/5 py-12 text-xl font-bold tracking-[0.3em] transition-all duration-500"
+                    className="shiny-border-content w-full bg-transparent text-white hover:bg-white/5 py-12 text-xl font-anton uppercase tracking-[0.3em] transition-all duration-500"
                   >
-                    {isSubmitting ? "PROCESSING..." : "CONFIRM RESERVATION"}
+                    {isSubmitting ? "PROCESSANDO..." : "CONFIRMAR RESERVA"}
                   </Button>
                 </div>
               </form>
@@ -253,19 +257,19 @@ export function BookingForm() {
 
         {step === 'success' && (
           <div className="py-24 flex flex-col items-center text-center animate-in zoom-in duration-700">
-            <div className="w-24 h-24 rounded-full glass flex items-center justify-center mb-12 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-              <CheckCircle2 className="h-10 w-10 text-emerald-500" />
+            <div className="w-24 h-24 rounded-full glass flex items-center justify-center mb-12 shadow-[0_0_30px_rgba(251,191,36,0.2)]">
+              <CheckCircle2 className="h-10 w-10 text-primary" />
             </div>
-            <h2 className="text-7xl md:text-9xl font-serif text-white mb-6">CONFIRMED</h2>
+            <h2 className="text-6xl md:text-8xl font-anton text-white mb-6 uppercase tracking-tighter">CONFIRMADO</h2>
             <p className="text-neutral-500 uppercase tracking-[0.4em] text-[10px] max-w-md mx-auto mb-16">
               Sua sessão foi agendada nos sistemas Gold. Aguardamos sua chegada no horário sincronizado.
             </p>
             <div className="shiny-border">
               <Button 
                 onClick={() => router.push('/')}
-                className="shiny-border-content bg-transparent text-white hover:bg-white/5 px-16 py-8 font-bold text-xs tracking-[0.3em]"
+                className="shiny-border-content bg-transparent text-white hover:bg-white/5 px-16 py-8 font-anton uppercase tracking-[0.3em] text-xs"
               >
-                RETURN TO BASE
+                VOLTAR AO INÍCIO
               </Button>
             </div>
           </div>
