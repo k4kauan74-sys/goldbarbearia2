@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
@@ -17,7 +17,10 @@ import {
   Home,
   Plus,
   Edit2,
-  UserPlus
+  UserPlus,
+  Filter,
+  Upload,
+  X
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -35,8 +38,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { MOCK_SERVICES, MOCK_PROFESSIONALS } from "@/lib/mock-data";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MOCK_SERVICES, MOCK_PROFESSIONALS, TIME_SLOTS } from "@/lib/mock-data";
 import { Professional, Appointment } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 type ViewMode = 'appointments' | 'professionals';
 
@@ -45,13 +51,28 @@ export default function AdminDashboardPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedProfFilter, setSelectedProfFilter] = useState<string>("all");
+  const { toast } = useToast();
+  
+  // Dialog States
   const [isProfDialogOpen, setIsProfDialogOpen] = useState(false);
+  const [isAptDialogOpen, setIsAptDialogOpen] = useState(false);
   const [editingProf, setEditingProf] = useState<Professional | null>(null);
+  const [editingApt, setEditingApt] = useState<Appointment | null>(null);
   
   // Form State for Professional
   const [profName, setProfName] = useState("");
   const [profSpecialty, setProfSpecialty] = useState("");
   const [profPhoto, setProfPhoto] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Form State for Appointment
+  const [aptClient, setAptClient] = useState("");
+  const [aptPhone, setAptPhone] = useState("");
+  const [aptService, setAptService] = useState("");
+  const [aptProf, setAptProf] = useState("");
+  const [aptDate, setAptDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [aptTime, setAptTime] = useState("");
 
   const router = useRouter();
 
@@ -66,7 +87,7 @@ export default function AdminDashboardPage() {
     const savedApts = JSON.parse(localStorage.getItem('gold_appointments') || '[]');
     setAppointments(savedApts);
 
-    // Load Professionals (Initialize if empty)
+    // Load Professionals
     const savedProfs = JSON.parse(localStorage.getItem('gold_professionals') || '[]');
     if (savedProfs.length === 0) {
       localStorage.setItem('gold_professionals', JSON.stringify(MOCK_PROFESSIONALS));
@@ -81,17 +102,99 @@ export default function AdminDashboardPage() {
     router.push("/admin/login");
   };
 
+  // Appointment CRUD
+  const handleSaveAppointment = () => {
+    if (!aptClient || !aptPhone || !aptService || !aptProf || !aptDate || !aptTime) {
+      toast({ title: "Erro", description: "Preencha todos os campos.", variant: "destructive" });
+      return;
+    }
+
+    let updatedApts;
+    if (editingApt) {
+      updatedApts = appointments.map(a => a.id === editingApt.id ? { 
+        ...a, 
+        clientName: aptClient, 
+        phone: aptPhone, 
+        serviceId: aptService, 
+        professionalId: aptProf, 
+        date: aptDate, 
+        time: aptTime 
+      } : a);
+    } else {
+      const newApt: Appointment = {
+        id: Math.random().toString(36).substr(2, 9),
+        clientName: aptClient,
+        phone: aptPhone,
+        serviceId: aptService,
+        professionalId: aptProf,
+        date: aptDate,
+        time: aptTime,
+        status: 'confirmed'
+      };
+      updatedApts = [...appointments, newApt];
+    }
+    
+    setAppointments(updatedApts);
+    localStorage.setItem('gold_appointments', JSON.stringify(updatedApts));
+    setIsAptDialogOpen(false);
+    resetAptForm();
+    toast({ title: "Sucesso", description: "Agendamento salvo com sucesso." });
+  };
+
   const deleteAppointment = (id: string) => {
     const updated = appointments.filter(a => a.id !== id);
     setAppointments(updated);
     localStorage.setItem('gold_appointments', JSON.stringify(updated));
+    toast({ title: "Removido", description: "Agendamento excluído." });
+  };
+
+  const resetAptForm = () => {
+    setEditingApt(null);
+    setAptClient("");
+    setAptPhone("");
+    setAptService("");
+    setAptProf("");
+    setAptDate(format(new Date(), "yyyy-MM-dd"));
+    setAptTime("");
+  };
+
+  const openEditApt = (apt: Appointment) => {
+    setEditingApt(apt);
+    setAptClient(apt.clientName);
+    setAptPhone(apt.phone);
+    setAptService(apt.serviceId);
+    setAptProf(apt.professionalId);
+    setAptDate(apt.date);
+    setAptTime(apt.time);
+    setIsAptDialogOpen(true);
   };
 
   // Professional CRUD
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfPhoto(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSaveProfessional = () => {
+    if (!profName || !profSpecialty) {
+      toast({ title: "Erro", description: "Nome e especialidade são obrigatórios.", variant: "destructive" });
+      return;
+    }
+
     let updatedProfs;
     if (editingProf) {
-      updatedProfs = professionals.map(p => p.id === editingProf.id ? { ...p, name: profName, specialty: profSpecialty, photo: profPhoto || p.photo } : p);
+      updatedProfs = professionals.map(p => p.id === editingProf.id ? { 
+        ...p, 
+        name: profName, 
+        specialty: profSpecialty, 
+        photo: profPhoto || p.photo 
+      } : p);
     } else {
       const newProf: Professional = {
         id: Math.random().toString(36).substr(2, 9),
@@ -107,16 +210,18 @@ export default function AdminDashboardPage() {
     localStorage.setItem('gold_professionals', JSON.stringify(updatedProfs));
     setIsProfDialogOpen(false);
     resetProfForm();
+    toast({ title: "Sucesso", description: "Profissional salvo." });
   };
 
   const deleteProfessional = (id: string) => {
     const updated = professionals.filter(p => p.id !== id);
     setProfessionals(updated);
     localStorage.setItem('gold_professionals', JSON.stringify(updated));
-    // Also cleanup appointments for this professional (optional but recommended)
+    // Optional: cleanup appointments
     const updatedApts = appointments.filter(a => a.professionalId !== id);
     setAppointments(updatedApts);
     localStorage.setItem('gold_appointments', JSON.stringify(updatedApts));
+    toast({ title: "Removido", description: "Profissional e sua agenda foram removidos." });
   };
 
   const resetProfForm = () => {
@@ -137,10 +242,11 @@ export default function AdminDashboardPage() {
   const getServiceName = (id: string) => MOCK_SERVICES.find(s => s.id === id)?.name || "N/A";
   const getProfName = (id: string) => professionals.find(p => p.id === id)?.name || "N/A";
 
-  const filteredAppointments = appointments.filter(a => 
-    a.clientName.toLowerCase().includes(search.toLowerCase()) ||
-    a.phone.includes(search)
-  ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const filteredAppointments = appointments.filter(a => {
+    const matchesSearch = a.clientName.toLowerCase().includes(search.toLowerCase()) || a.phone.includes(search);
+    const matchesProf = selectedProfFilter === "all" || a.professionalId === selectedProfFilter;
+    return matchesSearch && matchesProf;
+  }).sort((a, b) => new Date(b.date + 'T' + b.time).getTime() - new Date(a.date + 'T' + a.time).getTime());
 
   return (
     <div className="min-h-screen bg-[#030303] flex flex-col md:flex-row text-white font-body">
@@ -199,17 +305,131 @@ export default function AdminDashboardPage() {
             <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mt-3">Gestão em tempo real sincronizada</p>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             {viewMode === 'appointments' ? (
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                <Input 
-                  placeholder="BUSCAR CLIENTE..." 
-                  className="pl-12 bg-[#0a0a0a] border-white/10 rounded-full h-12 w-full md:w-[350px] text-[10px] font-anton tracking-widest uppercase focus:border-primary/40 transition-all"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
+              <>
+                <div className="flex items-center gap-3">
+                  <Filter className="h-4 w-4 text-white/20" />
+                  <Select value={selectedProfFilter} onValueChange={setSelectedProfFilter}>
+                    <SelectTrigger className="bg-[#0a0a0a] border-white/10 w-[180px] h-12 text-[10px] font-anton tracking-widest uppercase">
+                      <SelectValue placeholder="FILTRAR POR..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0a0a0a] border-white/10 text-white">
+                      <SelectItem value="all">TODOS OS PROFISSIONAIS</SelectItem>
+                      {professionals.map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                  <Input 
+                    placeholder="BUSCAR CLIENTE..." 
+                    className="pl-12 bg-[#0a0a0a] border-white/10 rounded-full h-12 w-full md:w-[250px] text-[10px] font-anton tracking-widest uppercase focus:border-primary/40 transition-all"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+
+                <Dialog open={isAptDialogOpen} onOpenChange={(open) => { setIsAptDialogOpen(open); if(!open) resetAptForm(); }}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-white text-black hover:bg-primary font-anton uppercase tracking-widest text-[10px] px-8 py-6 rounded-full transition-all">
+                      <Plus className="mr-2 h-4 w-4" /> Novo Horário
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-[#0a0a0a] border-white/10 text-white sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle className="font-anton text-2xl uppercase tracking-widest">
+                        {editingApt ? "Editar Agendamento" : "Criar Novo Agendamento"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-6 py-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase tracking-widest text-white/40">Cliente</Label>
+                          <Input 
+                            value={aptClient}
+                            onChange={(e) => setAptClient(e.target.value)}
+                            className="bg-transparent border-white/10 border-b rounded-none py-6 focus:border-primary uppercase"
+                            placeholder="NOME"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase tracking-widest text-white/40">Telefone</Label>
+                          <Input 
+                            value={aptPhone}
+                            onChange={(e) => setAptPhone(e.target.value)}
+                            className="bg-transparent border-white/10 border-b rounded-none py-6 focus:border-primary"
+                            placeholder="(00) 00000-0000"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase tracking-widest text-white/40">Serviço</Label>
+                          <Select value={aptService} onValueChange={setAptService}>
+                            <SelectTrigger className="bg-transparent border-white/10 border-b rounded-none h-12">
+                              <SelectValue placeholder="SELECIONE" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#0a0a0a] border-white/10 text-white">
+                              {MOCK_SERVICES.map(s => (
+                                <SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase tracking-widest text-white/40">Barbeiro</Label>
+                          <Select value={aptProf} onValueChange={setAptProf}>
+                            <SelectTrigger className="bg-transparent border-white/10 border-b rounded-none h-12">
+                              <SelectValue placeholder="SELECIONE" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#0a0a0a] border-white/10 text-white">
+                              {professionals.map(p => (
+                                <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase tracking-widest text-white/40">Data</Label>
+                          <Input 
+                            type="date"
+                            value={aptDate}
+                            onChange={(e) => setAptDate(e.target.value)}
+                            className="bg-transparent border-white/10 border-b rounded-none py-6 focus:border-primary"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase tracking-widest text-white/40">Hora</Label>
+                          <Select value={aptTime} onValueChange={setAptTime}>
+                            <SelectTrigger className="bg-transparent border-white/10 border-b rounded-none h-12">
+                              <SelectValue placeholder="SELECIONE" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#0a0a0a] border-white/10 text-white">
+                              {TIME_SLOTS.map(t => (
+                                <SelectItem key={t} value={t}>{t}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button 
+                        onClick={handleSaveAppointment}
+                        className="w-full bg-primary text-black hover:bg-white font-anton uppercase tracking-widest py-8"
+                      >
+                        {editingApt ? "ATUALIZAR RESERVA" : "CONFIRMAR AGENDAMENTO"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
             ) : (
               <Dialog open={isProfDialogOpen} onOpenChange={(open) => { setIsProfDialogOpen(open); if(!open) resetProfForm(); }}>
                 <DialogTrigger asChild>
@@ -224,12 +444,38 @@ export default function AdminDashboardPage() {
                     </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-6 py-4">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white/10 bg-neutral-900 group relative">
+                        {profPhoto ? (
+                          <img src={profPhoto} alt="Preview" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-white/10">
+                            <Users className="h-12 w-12" />
+                          </div>
+                        )}
+                        <button 
+                          onClick={() => fileInputRef.current?.click()}
+                          className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                        >
+                          <Upload className="h-6 w-6 text-white" />
+                        </button>
+                      </div>
+                      <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        className="hidden" 
+                        accept="image/*" 
+                        onChange={handlePhotoUpload} 
+                      />
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest">Clique para enviar foto</p>
+                    </div>
+
                     <div className="space-y-2">
                       <Label className="text-[10px] uppercase tracking-widest text-white/40">Nome do Especialista</Label>
                       <Input 
                         value={profName}
                         onChange={(e) => setProfName(e.target.value)}
-                        className="bg-transparent border-white/10 border-b rounded-none py-6 text-lg focus:border-primary"
+                        className="bg-transparent border-white/10 border-b rounded-none py-6 text-lg focus:border-primary uppercase"
                         placeholder="NOME COMPLETO"
                       />
                     </div>
@@ -238,7 +484,7 @@ export default function AdminDashboardPage() {
                       <Input 
                         value={profSpecialty}
                         onChange={(e) => setProfSpecialty(e.target.value)}
-                        className="bg-transparent border-white/10 border-b rounded-none py-6 text-lg focus:border-primary"
+                        className="bg-transparent border-white/10 border-b rounded-none py-6 text-lg focus:border-primary uppercase"
                         placeholder="EX: CORTES CLÁSSICOS"
                       />
                     </div>
@@ -264,29 +510,31 @@ export default function AdminDashboardPage() {
               <Card className="bg-[#0a0a0a] border-white/5 rounded-3xl p-4">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Total Hoje</span>
+                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Total Visível</span>
                     <Clock className="text-primary h-5 w-5" />
                   </div>
-                  <div className="text-5xl font-anton tracking-tighter">{appointments.length}</div>
+                  <div className="text-5xl font-anton tracking-tighter">{filteredAppointments.length}</div>
                 </CardContent>
               </Card>
               <Card className="bg-[#0a0a0a] border-white/5 rounded-3xl p-4">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Ativos</span>
+                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Hoje</span>
                     <CheckCircle className="text-emerald-500 h-5 w-5" />
                   </div>
-                  <div className="text-5xl font-anton tracking-tighter">{appointments.filter(a => a.status === 'confirmed').length}</div>
+                  <div className="text-5xl font-anton tracking-tighter">
+                    {appointments.filter(a => a.date === format(new Date(), "yyyy-MM-dd")).length}
+                  </div>
                 </CardContent>
               </Card>
               <Card className="bg-[#0a0a0a] border-white/5 rounded-3xl p-4">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Receita Est.</span>
+                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Faturamento Est.</span>
                     <TrendingUp className="text-primary h-5 w-5" />
                   </div>
                   <div className="text-5xl font-anton tracking-tighter text-primary">
-                    R$ {appointments.reduce((acc, curr) => acc + (MOCK_SERVICES.find(s => s.id === curr.serviceId)?.price || 0), 0).toFixed(0)}
+                    R$ {filteredAppointments.reduce((acc, curr) => acc + (MOCK_SERVICES.find(s => s.id === curr.serviceId)?.price || 0), 0).toFixed(0)}
                   </div>
                 </CardContent>
               </Card>
@@ -295,11 +543,13 @@ export default function AdminDashboardPage() {
             {/* Appointments Table */}
             <Card className="bg-[#0a0a0a] border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
               <CardHeader className="border-b border-white/5 bg-white/[0.02] py-8">
-                <CardTitle className="text-xs font-anton uppercase tracking-[0.4em] text-white/60">Lista de Reservas em Tempo Real</CardTitle>
+                <CardTitle className="text-xs font-anton uppercase tracking-[0.4em] text-white/60">
+                  {selectedProfFilter === "all" ? "Lista de Reservas em Tempo Real" : `Agenda de ${getProfName(selectedProfFilter)}`}
+                </CardTitle>
               </CardHeader>
               <Table>
                 <TableHeader className="bg-black/40">
-                  <TableRow className="border-white/5">
+                  <TableRow className="border-white/5 hover:bg-transparent">
                     <TableHead className="font-anton uppercase text-[10px] tracking-[0.2em] text-white/30 h-16">Data / Hora</TableHead>
                     <TableHead className="font-anton uppercase text-[10px] tracking-[0.2em] text-white/30">Cliente</TableHead>
                     <TableHead className="font-anton uppercase text-[10px] tracking-[0.2em] text-white/30">WhatsApp</TableHead>
@@ -313,7 +563,7 @@ export default function AdminDashboardPage() {
                     <TableRow key={apt.id} className="border-white/5 hover:bg-white/[0.03] transition-colors group">
                       <TableCell className="py-8">
                         <div className="flex flex-col">
-                          <span className="font-anton text-sm">{format(new Date(apt.date), "dd/MM/yyyy")}</span>
+                          <span className="font-anton text-sm">{format(new Date(apt.date + 'T12:00:00'), "dd/MM/yyyy")}</span>
                           <span className="text-[10px] font-mono text-primary uppercase tracking-widest">{apt.time}</span>
                         </div>
                       </TableCell>
@@ -328,14 +578,24 @@ export default function AdminDashboardPage() {
                         {getProfName(apt.professionalId)}
                       </TableCell>
                       <TableCell className="text-right pr-8">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => deleteAppointment(apt.id)}
-                          className="text-white/20 hover:text-destructive hover:bg-destructive/10 transition-all"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => openEditApt(apt)}
+                            className="text-white/20 hover:text-primary hover:bg-primary/10 transition-all"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => deleteAppointment(apt.id)}
+                            className="text-white/20 hover:text-destructive hover:bg-destructive/10 transition-all"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   )) : (
@@ -375,10 +635,13 @@ export default function AdminDashboardPage() {
                           <span className="text-[9px] text-white/20 uppercase tracking-widest font-mono">Agendamentos</span>
                           <span className="font-anton text-lg">{appointments.filter(a => a.professionalId === prof.id).length}</span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] text-white/20 uppercase tracking-widest font-mono">Status da Agenda</span>
-                          <span className="text-[9px] text-emerald-500 uppercase tracking-widest font-bold">Livre para Hoje</span>
-                        </div>
+                        <Button 
+                          variant="link" 
+                          onClick={() => { setSelectedProfFilter(prof.id); setViewMode('appointments'); }}
+                          className="p-0 h-auto text-[9px] text-primary uppercase tracking-widest font-bold"
+                        >
+                          Ver Agenda Completa →
+                        </Button>
                       </div>
                     </div>
                     
@@ -420,5 +683,3 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-
-const cn = (...classes: any[]) => classes.filter(Boolean).join(" ");
