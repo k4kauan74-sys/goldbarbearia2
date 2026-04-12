@@ -14,7 +14,10 @@ import {
   CheckCircle, 
   Clock, 
   TrendingUp,
-  Home
+  Home,
+  Plus,
+  Edit2,
+  UserPlus
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -30,11 +33,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { MOCK_SERVICES, MOCK_PROFESSIONALS } from "@/lib/mock-data";
+import { Professional, Appointment } from "@/lib/types";
+
+type ViewMode = 'appointments' | 'professionals';
 
 export default function AdminDashboardPage() {
-  const [appointments, setAppointments] = useState<any[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>('appointments');
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [search, setSearch] = useState("");
+  const [isProfDialogOpen, setIsProfDialogOpen] = useState(false);
+  const [editingProf, setEditingProf] = useState<Professional | null>(null);
+  
+  // Form State for Professional
+  const [profName, setProfName] = useState("");
+  const [profSpecialty, setProfSpecialty] = useState("");
+  const [profPhoto, setProfPhoto] = useState("");
+
   const router = useRouter();
 
   useEffect(() => {
@@ -44,8 +62,18 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    const data = JSON.parse(localStorage.getItem('gold_appointments') || '[]');
-    setAppointments(data);
+    // Load Appointments
+    const savedApts = JSON.parse(localStorage.getItem('gold_appointments') || '[]');
+    setAppointments(savedApts);
+
+    // Load Professionals (Initialize if empty)
+    const savedProfs = JSON.parse(localStorage.getItem('gold_professionals') || '[]');
+    if (savedProfs.length === 0) {
+      localStorage.setItem('gold_professionals', JSON.stringify(MOCK_PROFESSIONALS));
+      setProfessionals(MOCK_PROFESSIONALS);
+    } else {
+      setProfessionals(savedProfs);
+    }
   }, [router]);
 
   const handleLogout = () => {
@@ -59,8 +87,55 @@ export default function AdminDashboardPage() {
     localStorage.setItem('gold_appointments', JSON.stringify(updated));
   };
 
+  // Professional CRUD
+  const handleSaveProfessional = () => {
+    let updatedProfs;
+    if (editingProf) {
+      updatedProfs = professionals.map(p => p.id === editingProf.id ? { ...p, name: profName, specialty: profSpecialty, photo: profPhoto || p.photo } : p);
+    } else {
+      const newProf: Professional = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: profName,
+        specialty: profSpecialty,
+        photo: profPhoto || "https://picsum.photos/seed/newprof/400/500",
+        active: true
+      };
+      updatedProfs = [...professionals, newProf];
+    }
+    
+    setProfessionals(updatedProfs);
+    localStorage.setItem('gold_professionals', JSON.stringify(updatedProfs));
+    setIsProfDialogOpen(false);
+    resetProfForm();
+  };
+
+  const deleteProfessional = (id: string) => {
+    const updated = professionals.filter(p => p.id !== id);
+    setProfessionals(updated);
+    localStorage.setItem('gold_professionals', JSON.stringify(updated));
+    // Also cleanup appointments for this professional (optional but recommended)
+    const updatedApts = appointments.filter(a => a.professionalId !== id);
+    setAppointments(updatedApts);
+    localStorage.setItem('gold_appointments', JSON.stringify(updatedApts));
+  };
+
+  const resetProfForm = () => {
+    setEditingProf(null);
+    setProfName("");
+    setProfSpecialty("");
+    setProfPhoto("");
+  };
+
+  const openEditProf = (prof: Professional) => {
+    setEditingProf(prof);
+    setProfName(prof.name);
+    setProfSpecialty(prof.specialty);
+    setProfPhoto(prof.photo);
+    setIsProfDialogOpen(true);
+  };
+
   const getServiceName = (id: string) => MOCK_SERVICES.find(s => s.id === id)?.name || "N/A";
-  const getProfName = (id: string) => MOCK_PROFESSIONALS.find(p => p.id === id)?.name || "N/A";
+  const getProfName = (id: string) => professionals.find(p => p.id === id)?.name || "N/A";
 
   const filteredAppointments = appointments.filter(a => 
     a.clientName.toLowerCase().includes(search.toLowerCase()) ||
@@ -68,144 +143,282 @@ export default function AdminDashboardPage() {
   ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
-    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#030303] flex flex-col md:flex-row text-white font-body">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-card border-r border-white/5 flex flex-col">
-        <div className="p-6 border-b border-white/5 flex items-center gap-3">
-          <span className="font-headline text-xl font-black tracking-tighter">GOLD<span className="text-primary">ADMIN</span></span>
+      <aside className="w-full md:w-64 bg-[#0a0a0a] border-r border-white/5 flex flex-col">
+        <div className="p-8 border-b border-white/5 flex items-center gap-3">
+          <span className="font-anton text-2xl tracking-tighter uppercase">GOLD<span className="text-primary">ADMIN</span></span>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
-          <Button variant="secondary" className="w-full justify-start gap-3 bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[10px]">
+        <nav className="flex-1 p-6 space-y-3">
+          <Button 
+            variant="ghost" 
+            onClick={() => setViewMode('appointments')}
+            className={cn(
+              "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-6",
+              viewMode === 'appointments' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
+            )}
+          >
             <CalendarIcon className="h-4 w-4" /> Agendamentos
           </Button>
-          <Button variant="ghost" className="w-full justify-start gap-3 text-white/40 hover:text-white font-bold uppercase tracking-widest text-[10px]">
-            <Users className="h-4 w-4" /> Profissionais
+          <Button 
+            variant="ghost" 
+            onClick={() => setViewMode('professionals')}
+            className={cn(
+              "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-6",
+              viewMode === 'professionals' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
+            )}
+          >
+            <Users className="h-4 w-4" /> Equipe / Profissionais
           </Button>
-          <Button variant="ghost" className="w-full justify-start gap-3 text-white/40 hover:text-white font-bold uppercase tracking-widest text-[10px]">
-            <Settings className="h-4 w-4" /> Configurações
-          </Button>
-          <div className="pt-4 mt-4 border-t border-white/5">
+          
+          <div className="pt-6 mt-6 border-t border-white/5">
             <Link href="/">
-              <Button variant="ghost" className="w-full justify-start gap-3 text-white/40 hover:text-white font-bold uppercase tracking-widest text-[10px]">
+              <Button variant="ghost" className="w-full justify-start gap-3 text-white/40 hover:text-white font-anton uppercase tracking-widest text-[10px]">
                 <Home className="h-4 w-4" /> Voltar ao Site
               </Button>
             </Link>
           </div>
         </nav>
-        <div className="p-4 border-t border-white/5">
-          <Button variant="ghost" onClick={handleLogout} className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 font-bold uppercase tracking-widest text-[10px]">
+        <div className="p-6 border-t border-white/5">
+          <Button variant="ghost" onClick={handleLogout} className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 font-anton uppercase tracking-widest text-[10px]">
             <LogOut className="h-4 w-4" /> Sair
           </Button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-10 overflow-y-auto bg-background">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+      <main className="flex-1 p-6 md:p-12 overflow-y-auto bg-[#030303]">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div>
-            <h1 className="text-4xl font-black uppercase tracking-tighter">
-              Painel de <span className="text-primary">Agendamentos</span>
+            <h1 className="text-5xl font-anton uppercase tracking-tighter">
+              {viewMode === 'appointments' ? "PAINEL DE " : "GESTÃO DE "}
+              <span className="text-shimmer">
+                {viewMode === 'appointments' ? "AGENDAMENTOS" : "PROFISSIONAIS"}
+              </span>
             </h1>
-            <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-2">Gestão Gold em tempo real</p>
+            <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mt-3">Gestão em tempo real sincronizada</p>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-              <Input 
-                placeholder="BUSCAR CLIENTE..." 
-                className="pl-10 bg-card border-white/10 w-full md:w-[300px] text-[10px] font-bold tracking-widest uppercase"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
+            {viewMode === 'appointments' ? (
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                <Input 
+                  placeholder="BUSCAR CLIENTE..." 
+                  className="pl-12 bg-[#0a0a0a] border-white/10 rounded-full h-12 w-full md:w-[350px] text-[10px] font-anton tracking-widest uppercase focus:border-primary/40 transition-all"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+            ) : (
+              <Dialog open={isProfDialogOpen} onOpenChange={(open) => { setIsProfDialogOpen(open); if(!open) resetProfForm(); }}>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary text-black hover:bg-white font-anton uppercase tracking-widest text-[10px] px-8 py-6 rounded-full transition-all">
+                    <UserPlus className="mr-2 h-4 w-4" /> Novo Profissional
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white">
+                  <DialogHeader>
+                    <DialogTitle className="font-anton text-2xl uppercase tracking-widest">
+                      {editingProf ? "Editar Profissional" : "Adicionar Profissional"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-6 py-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-white/40">Nome do Especialista</Label>
+                      <Input 
+                        value={profName}
+                        onChange={(e) => setProfName(e.target.value)}
+                        className="bg-transparent border-white/10 border-b rounded-none py-6 text-lg focus:border-primary"
+                        placeholder="NOME COMPLETO"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-white/40">Especialidade</Label>
+                      <Input 
+                        value={profSpecialty}
+                        onChange={(e) => setProfSpecialty(e.target.value)}
+                        className="bg-transparent border-white/10 border-b rounded-none py-6 text-lg focus:border-primary"
+                        placeholder="EX: CORTES CLÁSSICOS"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button 
+                      onClick={handleSaveProfessional}
+                      className="w-full bg-primary text-black hover:bg-white font-anton uppercase tracking-widest py-8"
+                    >
+                      Salvar Alterações
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </header>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <Card className="bg-card border-white/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Total Hoje</span>
-                <Clock className="text-primary h-4 w-4" />
-              </div>
-              <div className="text-4xl font-black">{appointments.length}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-white/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Confirmados</span>
-                <CheckCircle className="text-green-500 h-4 w-4" />
-              </div>
-              <div className="text-4xl font-black">{appointments.length}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-white/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Receita Est.</span>
-                <TrendingUp className="text-primary h-4 w-4" />
-              </div>
-              <div className="text-4xl font-black text-primary">R$ {appointments.reduce((acc, curr) => acc + (MOCK_SERVICES.find(s => s.id === curr.serviceId)?.price || 0), 0).toFixed(2)}</div>
-            </CardContent>
-          </Card>
-        </div>
+        {viewMode === 'appointments' ? (
+          <>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <Card className="bg-[#0a0a0a] border-white/5 rounded-3xl p-4">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Total Hoje</span>
+                    <Clock className="text-primary h-5 w-5" />
+                  </div>
+                  <div className="text-5xl font-anton tracking-tighter">{appointments.length}</div>
+                </CardContent>
+              </Card>
+              <Card className="bg-[#0a0a0a] border-white/5 rounded-3xl p-4">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Ativos</span>
+                    <CheckCircle className="text-emerald-500 h-5 w-5" />
+                  </div>
+                  <div className="text-5xl font-anton tracking-tighter">{appointments.filter(a => a.status === 'confirmed').length}</div>
+                </CardContent>
+              </Card>
+              <Card className="bg-[#0a0a0a] border-white/5 rounded-3xl p-4">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Receita Est.</span>
+                    <TrendingUp className="text-primary h-5 w-5" />
+                  </div>
+                  <div className="text-5xl font-anton tracking-tighter text-primary">
+                    R$ {appointments.reduce((acc, curr) => acc + (MOCK_SERVICES.find(s => s.id === curr.serviceId)?.price || 0), 0).toFixed(0)}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-        {/* Appointments Table */}
-        <Card className="bg-card border-white/5 shadow-2xl overflow-hidden">
-          <CardHeader className="border-b border-white/5 bg-white/5">
-            <CardTitle className="text-sm font-black uppercase tracking-[0.3em]">Lista de Reservas</CardTitle>
-          </CardHeader>
-          <Table>
-            <TableHeader className="bg-background/50">
-              <TableRow className="border-white/5">
-                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40">Data/Hora</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40">Cliente</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40">WhatsApp</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40">Serviço</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40">Profissional</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] text-white/40 text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAppointments.length > 0 ? filteredAppointments.map((apt) => (
-                <TableRow key={apt.id} className="border-white/5 hover:bg-white/5 transition-colors">
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-black text-xs">{format(new Date(apt.date), "dd/MM/yyyy")}</span>
-                      <span className="text-[10px] font-bold text-primary">{apt.time}</span>
+            {/* Appointments Table */}
+            <Card className="bg-[#0a0a0a] border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
+              <CardHeader className="border-b border-white/5 bg-white/[0.02] py-8">
+                <CardTitle className="text-xs font-anton uppercase tracking-[0.4em] text-white/60">Lista de Reservas em Tempo Real</CardTitle>
+              </CardHeader>
+              <Table>
+                <TableHeader className="bg-black/40">
+                  <TableRow className="border-white/5">
+                    <TableHead className="font-anton uppercase text-[10px] tracking-[0.2em] text-white/30 h-16">Data / Hora</TableHead>
+                    <TableHead className="font-anton uppercase text-[10px] tracking-[0.2em] text-white/30">Cliente</TableHead>
+                    <TableHead className="font-anton uppercase text-[10px] tracking-[0.2em] text-white/30">WhatsApp</TableHead>
+                    <TableHead className="font-anton uppercase text-[10px] tracking-[0.2em] text-white/30">Serviço</TableHead>
+                    <TableHead className="font-anton uppercase text-[10px] tracking-[0.2em] text-white/30">Profissional</TableHead>
+                    <TableHead className="font-anton uppercase text-[10px] tracking-[0.2em] text-white/30 text-right pr-12">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredAppointments.length > 0 ? filteredAppointments.map((apt) => (
+                    <TableRow key={apt.id} className="border-white/5 hover:bg-white/[0.03] transition-colors group">
+                      <TableCell className="py-8">
+                        <div className="flex flex-col">
+                          <span className="font-anton text-sm">{format(new Date(apt.date), "dd/MM/yyyy")}</span>
+                          <span className="text-[10px] font-mono text-primary uppercase tracking-widest">{apt.time}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-anton text-sm uppercase tracking-tight">{apt.clientName}</TableCell>
+                      <TableCell className="text-white/40 font-mono text-[10px] tracking-widest">{apt.phone}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="border-primary/20 text-primary text-[9px] font-anton uppercase tracking-widest px-3 py-1">
+                          {getServiceName(apt.serviceId)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-anton text-[10px] uppercase text-white/60 tracking-widest">
+                        {getProfName(apt.professionalId)}
+                      </TableCell>
+                      <TableCell className="text-right pr-8">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => deleteAppointment(apt.id)}
+                          className="text-white/20 hover:text-destructive hover:bg-destructive/10 transition-all"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-48 text-center text-white/10 font-anton uppercase tracking-[0.5em] text-xs">
+                        Nenhum registro encontrado
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
+          </>
+        ) : (
+          /* Professionals Grid */
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {professionals.map((prof) => (
+              <Card key={prof.id} className="bg-[#0a0a0a] border-white/5 rounded-[2rem] overflow-hidden group hover:border-primary/20 transition-all duration-500">
+                <div className="flex flex-col md:flex-row h-full">
+                  <div className="w-full md:w-48 h-64 md:h-auto overflow-hidden">
+                    <img 
+                      src={prof.photo} 
+                      alt={prof.name} 
+                      className="w-full h-full object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" 
+                    />
+                  </div>
+                  <div className="flex-1 p-8 flex flex-col justify-between">
+                    <div>
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-anton text-2xl uppercase tracking-widest text-white">{prof.name}</h3>
+                        <Badge className="bg-emerald-500/10 text-emerald-500 border-none text-[8px] font-anton tracking-[0.2em] uppercase px-3">Ativo</Badge>
+                      </div>
+                      <p className="text-[10px] font-mono text-primary uppercase tracking-widest mb-6">{prof.specialty}</p>
+                      
+                      <div className="space-y-4 pt-6 border-t border-white/5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] text-white/20 uppercase tracking-widest font-mono">Agendamentos</span>
+                          <span className="font-anton text-lg">{appointments.filter(a => a.professionalId === prof.id).length}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] text-white/20 uppercase tracking-widest font-mono">Status da Agenda</span>
+                          <span className="text-[9px] text-emerald-500 uppercase tracking-widest font-bold">Livre para Hoje</span>
+                        </div>
+                      </div>
                     </div>
-                  </TableCell>
-                  <TableCell className="font-black text-sm uppercase tracking-tight">{apt.clientName}</TableCell>
-                  <TableCell className="text-white/40 font-bold text-xs">{apt.phone}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="border-primary/20 text-primary text-[9px] font-black uppercase tracking-widest">{getServiceName(apt.serviceId)}</Badge>
-                  </TableCell>
-                  <TableCell className="font-bold text-xs uppercase text-white/60">{getProfName(apt.professionalId)}</TableCell>
-                  <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => deleteAppointment(apt.id)}
-                      className="text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              )) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-white/10 font-black uppercase tracking-[0.3em] text-xs">
-                    Nenhum agendamento
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </Card>
+                    
+                    <div className="flex gap-3 mt-10">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => openEditProf(prof)}
+                        className="flex-1 border border-white/10 text-white/40 hover:text-white hover:border-white/20 font-anton uppercase tracking-widest text-[9px] rounded-xl h-12"
+                      >
+                        <Edit2 className="mr-2 h-3 w-3" /> Editar Perfil
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => deleteProfessional(prof.id)}
+                        className="border border-white/10 text-white/20 hover:text-destructive hover:bg-destructive/10 rounded-xl h-12 w-12"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+            
+            <button 
+              onClick={() => setIsProfDialogOpen(true)}
+              className="border-2 border-dashed border-white/5 rounded-[2rem] p-12 flex flex-col items-center justify-center gap-4 text-white/10 hover:text-primary hover:border-primary/20 hover:bg-primary/[0.02] transition-all group duration-500"
+            >
+              <div className="w-16 h-16 rounded-full border-2 border-dashed border-current flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Plus className="h-8 w-8" />
+              </div>
+              <span className="font-anton uppercase tracking-[0.4em] text-[10px]">Contratar Especialista</span>
+            </button>
+          </div>
+        )}
       </main>
     </div>
   );
 }
+
+const cn = (...classes: any[]) => classes.filter(Boolean).join(" ");
