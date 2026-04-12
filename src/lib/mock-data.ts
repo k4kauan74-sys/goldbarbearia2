@@ -15,6 +15,7 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     name: 'Ricardo "Mãos de Tesoura"', 
     photo: 'https://picsum.photos/seed/barber-p1/400/500', 
     specialty: 'Cortes Clássicos & Degradê',
+    commission: 50,
     active: true 
   },
   { 
@@ -22,6 +23,7 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     name: 'Lucas Barba de Ouro', 
     photo: 'https://picsum.photos/seed/barber-p2/400/500', 
     specialty: 'Visagismo de Barba',
+    commission: 40,
     active: true 
   },
   { 
@@ -29,6 +31,7 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     name: 'André Estilo', 
     photo: 'https://picsum.photos/seed/barber-p3/400/500', 
     specialty: 'Cabelos Modernos',
+    commission: 45,
     active: true 
   },
 ];

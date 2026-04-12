@@ -11,6 +11,7 @@ export type Professional = {
   name: string;
   photo: string;
   specialty: string;
+  commission: number; // Percentage (0-100)
   active: boolean;
 };
 
