@@ -59,18 +59,11 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#050505] pt-48 pb-12 border-t border-white/5 relative overflow-hidden">
+      <footer className="bg-[#050505] pt-24 pb-12 border-t border-white/5 relative overflow-hidden">
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]" />
         
         <div className="container mx-auto px-8 md:px-12">
-          <div className="mb-32">
-            <h2 className="text-7xl md:text-9xl font-anton text-white mb-12 uppercase tracking-tighter">LET'S <br /> CREATE.</h2>
-            <Link href="mailto:contato@goldbarbearia.com" className="font-anton text-3xl md:text-5xl text-primary hover:text-white transition-colors underline-offset-8 underline decoration-white/10 tracking-tight">
-              CONTATO@GOLDBARBEARIA.COM
-            </Link>
-          </div>
-          
-          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="pt-12 flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="font-anton text-2xl text-white uppercase tracking-widest">GoldBarbearia</div>
             
             <div className="flex flex-col md:flex-row gap-12 text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-500">
