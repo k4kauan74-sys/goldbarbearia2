@@ -77,7 +77,9 @@ export function BookingForm() {
       <div className="glass rounded-[2rem] p-8 md:p-12 shadow-2xl shadow-primary/5">
         {step === 'service' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <h2 className="text-4xl md:text-6xl font-anton mb-12 text-white uppercase tracking-tighter">SELECIONE O <br /> <span className="text-shimmer">SERVIÇO</span></h2>
+            <h2 className="text-3xl md:text-5xl font-anton mb-12 text-white uppercase tracking-tighter">
+              SELECIONE O <span className="text-shimmer">SERVIÇO</span>
+            </h2>
             <div className="grid gap-4">
               {MOCK_SERVICES.map((s, idx) => (
                 <button
@@ -102,7 +104,9 @@ export function BookingForm() {
         {step === 'professional' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex justify-between items-end mb-12">
-              <h2 className="text-4xl md:text-6xl font-anton text-white uppercase tracking-tighter">ESCOLHA O <br /> <span className="text-shimmer">PROFISSIONAL</span></h2>
+              <h2 className="text-3xl md:text-5xl font-anton text-white uppercase tracking-tighter">
+                ESCOLHA O <span className="text-shimmer">PROFISSIONAL</span>
+              </h2>
               <Button variant="ghost" onClick={prevStep} className="text-neutral-500 hover:text-white uppercase tracking-widest text-[10px]">
                 <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
               </Button>
@@ -132,7 +136,9 @@ export function BookingForm() {
         {step === 'datetime' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex justify-between items-end mb-12">
-              <h2 className="text-4xl md:text-6xl font-anton text-white uppercase tracking-tighter">DATA E <br /> <span className="text-shimmer">HORA</span></h2>
+              <h2 className="text-3xl md:text-5xl font-anton text-white uppercase tracking-tighter">
+                DATA E <span className="text-shimmer">HORA</span>
+              </h2>
               <Button variant="ghost" onClick={prevStep} className="text-neutral-500 hover:text-white uppercase tracking-widest text-[10px]">
                 <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
               </Button>
@@ -186,7 +192,9 @@ export function BookingForm() {
         {step === 'contact' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex justify-between items-end mb-12">
-              <h2 className="text-4xl md:text-6xl font-anton text-white uppercase tracking-tighter">REVISÃO DOS <br /> <span className="text-shimmer">DADOS</span></h2>
+              <h2 className="text-3xl md:text-5xl font-anton text-white uppercase tracking-tighter">
+                REVISÃO DOS <span className="text-shimmer">DADOS</span>
+              </h2>
               <Button variant="ghost" onClick={prevStep} className="text-neutral-500 hover:text-white uppercase tracking-widest text-[10px]">
                 <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
               </Button>
