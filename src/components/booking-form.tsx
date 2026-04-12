@@ -9,12 +9,11 @@ import { ptBR } from "date-fns/locale";
 import { MOCK_SERVICES, MOCK_PROFESSIONALS, TIME_SLOTS } from "@/lib/mock-data";
 import { Service, Professional } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { CustomCalendar } from "@/components/custom-calendar";
 
 type Step = 'service' | 'professional' | 'datetime' | 'contact' | 'success';
 
@@ -77,7 +76,7 @@ export function BookingForm() {
       <div className="glass rounded-[2rem] p-8 md:p-12 shadow-2xl shadow-primary/5">
         {step === 'service' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <h2 className="text-3xl md:text-5xl font-anton mb-12 text-white uppercase tracking-tighter">
+            <h2 className="text-3xl md:text-5xl font-anton mb-12 text-white uppercase tracking-tighter whitespace-nowrap overflow-hidden">
               SELECIONE O <span className="text-shimmer">SERVIÇO</span>
             </h2>
             <div className="grid gap-4">
@@ -145,23 +144,17 @@ export function BookingForm() {
             </div>
             <div className="grid md:grid-cols-12 gap-12">
               <div className="md:col-span-7">
-                <div className="glass rounded-3xl p-6">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={(date) => {
-                      if (date) {
-                        setSelectedDate(date);
-                      }
-                    }}
-                    className="w-full text-white"
-                    locale={ptBR}
-                    disabled={(date) => {
+                <div className="glass rounded-3xl p-6 md:p-8">
+                  <CustomCalendar
+                    selectedDate={selectedDate}
+                    onSelect={(date) => setSelectedDate(date)}
+                    disabledDays={(date) => {
                       if (!today) return false;
                       const compareDate = new Date(date);
                       compareDate.setHours(0, 0, 0, 0);
                       const todayCompare = new Date(today);
                       todayCompare.setHours(0, 0, 0, 0);
+                      // Desabilitar domingos e dias passados
                       return compareDate < todayCompare || date.getDay() === 0;
                     }}
                   />
