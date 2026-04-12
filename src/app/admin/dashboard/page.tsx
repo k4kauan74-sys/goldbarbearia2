@@ -104,7 +104,7 @@ export default function AdminDashboardPage() {
     const totalCommissions = appointments.reduce((acc, curr) => {
       const service = MOCK_SERVICES.find(s => s.id === curr.serviceId);
       const prof = professionals.find(p => p.id === curr.professionalId);
-      const commissionAmount = ((service?.price || 0) * (prof?.commission || 0)) / 100;
+      const commissionAmount = ((service?.price || 0) * (prof?.commission ?? 0)) / 100;
       return acc + commissionAmount;
     }, 0);
 
@@ -114,14 +114,14 @@ export default function AdminDashboardPage() {
         const service = MOCK_SERVICES.find(s => s.id === curr.serviceId);
         return acc + (service?.price || 0);
       }, 0);
-      const commission = (revenue * p.commission) / 100;
+      const commission = (revenue * (p.commission ?? 0)) / 100;
 
       return {
         id: p.id,
         name: p.name,
         revenue,
         commission,
-        percentage: p.commission,
+        percentage: p.commission ?? 0,
         aptsCount: profApts.length
       };
     });
@@ -253,7 +253,8 @@ export default function AdminDashboardPage() {
     setProfName(prof.name);
     setProfSpecialty(prof.specialty);
     setProfPhoto(prof.photo);
-    setProfCommission(prof.commission.toString());
+    // Correção: Fallback seguro para evitar erro de toString em undefined
+    setProfCommission(prof.commission?.toString() ?? "50");
     setIsProfDialogOpen(true);
   };
 
@@ -536,7 +537,7 @@ export default function AdminDashboardPage() {
                     <div>
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-anton text-2xl uppercase tracking-widest">{prof.name}</h3>
-                        <Badge className="bg-primary/20 text-primary border-none text-[9px] uppercase px-3">{prof.commission}% COMISSÃO</Badge>
+                        <Badge className="bg-primary/20 text-primary border-none text-[9px] uppercase px-3">{(prof.commission ?? 0)}% COMISSÃO</Badge>
                       </div>
                       <p className="text-[10px] font-mono text-primary uppercase tracking-widest">{prof.specialty}</p>
                     </div>
