@@ -16,6 +16,7 @@ export type Professional = {
   specialty: string;
   commission: number; // Percentage (0-100)
   active: boolean;
+  workingHours?: string[]; // Array of time slots like ["09:00", "09:30"]
 };
 
 export type Appointment = {

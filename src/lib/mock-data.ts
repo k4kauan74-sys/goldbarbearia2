@@ -1,6 +1,12 @@
 
 import { Service, Professional } from './types';
 
+export const TIME_SLOTS = [
+  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+  '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'
+];
+
 export const MOCK_SERVICES: Service[] = [
   { id: 's1', name: 'Corte', price: 50.00, duration: 30, description: 'Corte de cabelo masculino com acabamento premium.' },
   { id: 's2', name: 'Barba', price: 35.00, duration: 20, description: 'Barba feita com toalha quente e navalha.' },
@@ -16,7 +22,8 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     photo: 'https://picsum.photos/seed/barber-p1/400/500', 
     specialty: 'Cortes Clássicos & Degradê',
     commission: 50,
-    active: true 
+    active: true,
+    workingHours: TIME_SLOTS 
   },
   { 
     id: 'p2', 
@@ -24,7 +31,8 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     photo: 'https://picsum.photos/seed/barber-p2/400/500', 
     specialty: 'Visagismo de Barba',
     commission: 40,
-    active: true 
+    active: true,
+    workingHours: TIME_SLOTS.slice(0, 10)
   },
   { 
     id: 'p3', 
@@ -32,12 +40,7 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     photo: 'https://picsum.photos/seed/barber-p3/400/500', 
     specialty: 'Cabelos Modernos',
     commission: 45,
-    active: true 
+    active: true,
+    workingHours: TIME_SLOTS.slice(6)
   },
-];
-
-export const TIME_SLOTS = [
-  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-  '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-  '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'
 ];

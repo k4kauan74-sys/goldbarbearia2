@@ -3,7 +3,6 @@
 
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { 
   Calendar as CalendarIcon, 
   Users, 
@@ -14,17 +13,12 @@ import {
   UserPlus, 
   Upload, 
   DollarSign, 
-  PieChart, 
-  TrendingUp,
-  CheckCircle,
-  Clock,
-  Home,
   Plus,
   Scissors,
-  Percent,
-  Key,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Clock,
+  Check
 } from "lucide-react";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -44,7 +38,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { MOCK_SERVICES, MOCK_PROFESSIONALS, TIME_SLOTS } from "@/lib/mock-data";
 import { Professional, Appointment, Service, AuthUser } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -77,6 +71,7 @@ export default function AdminDashboardPage() {
   const [profSpecialty, setProfSpecialty] = useState("");
   const [profPhoto, setProfPhoto] = useState("");
   const [profCommission, setProfCommission] = useState("50");
+  const [profWorkingHours, setProfWorkingHours] = useState<string[]>(TIME_SLOTS);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [aptClient, setAptClient] = useState("");
@@ -230,13 +225,22 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const toggleWorkingHour = (slot: string) => {
+    if (profWorkingHours.includes(slot)) {
+      setProfWorkingHours(prev => prev.filter(s => s !== slot));
+    } else {
+      setProfWorkingHours(prev => [...prev, slot].sort());
+    }
+  };
+
   const handleSaveProfessional = () => {
     if (!profName || !profSpecialty) return;
     let updatedProfs;
     if (editingProf) {
       updatedProfs = professionals.map(p => p.id === editingProf.id ? { 
         ...p, name: profName, specialty: profSpecialty, photo: profPhoto || p.photo, 
-        commission: Number(profCommission), email: profEmail, password: profPassword
+        commission: Number(profCommission), email: profEmail, password: profPassword,
+        workingHours: profWorkingHours
       } : p);
       
       if (editingProf.id === user?.id) {
@@ -248,7 +252,8 @@ export default function AdminDashboardPage() {
       const newProf: Professional = {
         id: Math.random().toString(36).substr(2, 9),
         name: profName, specialty: profSpecialty, photo: profPhoto || "https://picsum.photos/seed/new/400",
-        commission: Number(profCommission), active: true, email: profEmail, password: profPassword
+        commission: Number(profCommission), active: true, email: profEmail, password: profPassword,
+        workingHours: profWorkingHours
       };
       updatedProfs = [...professionals, newProf];
     }
@@ -256,24 +261,28 @@ export default function AdminDashboardPage() {
     localStorage.setItem('gold_professionals', JSON.stringify(updatedProfs));
     setIsProfDialogOpen(false);
     resetProfForm();
-    toast({ title: "Sucesso", description: "Perfil atualizado." });
+    toast({ title: "Sucesso", description: "Perfil e expediente atualizados." });
   };
 
   const deleteProfessional = (id: string) => {
     const updated = professionals.filter(p => p.id !== id);
+    setAppointments(prev => prev.filter(a => a.professionalId !== id)); // Clean up appointments
     setProfessionals(updated);
     localStorage.setItem('gold_professionals', JSON.stringify(updated));
+    localStorage.setItem('gold_appointments', JSON.stringify(appointments.filter(a => a.professionalId !== id)));
   };
 
   const resetProfForm = () => {
     setEditingProf(null); setProfName(""); setProfEmail(""); setProfPassword("123");
     setProfSpecialty(""); setProfPhoto(""); setProfCommission("50");
+    setProfWorkingHours(TIME_SLOTS);
   };
 
   const openEditProf = (prof: Professional) => {
     setEditingProf(prof); setProfName(prof.name); setProfEmail(prof.email || "");
     setProfPassword(prof.password || "123"); setProfSpecialty(prof.specialty);
     setProfPhoto(prof.photo); setProfCommission(prof.commission?.toString() ?? "50");
+    setProfWorkingHours(prof.workingHours || TIME_SLOTS);
     setIsProfDialogOpen(true);
   };
 
@@ -323,6 +332,12 @@ export default function AdminDashboardPage() {
       return matchesSearch && matchesProf;
     });
   }, [appointments, search, selectedProfFilter]);
+
+  const activeSlots = useMemo(() => {
+    if (selectedProfFilter === "all") return TIME_SLOTS;
+    const prof = professionals.find(p => p.id === selectedProfFilter);
+    return prof?.workingHours || TIME_SLOTS;
+  }, [selectedProfFilter, professionals]);
 
   const handlePrevDay = () => {
     const prev = subDays(new Date(agendaDate + 'T12:00:00'), 1);
@@ -380,56 +395,100 @@ export default function AdminDashboardPage() {
             {viewMode === 'professionals' && isAdmin && (
                <Dialog open={isProfDialogOpen} onOpenChange={setIsProfDialogOpen}>
                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-primary text-black font-anton uppercase rounded-full"><UserPlus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
-               <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase">Especialista</DialogTitle></DialogHeader>
-                 <div className="grid grid-cols-2 gap-3 py-2">
-                   <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
-                     <Label className="text-[8px] uppercase opacity-40 mb-2">Foto de Perfil</Label>
-                     <div 
-                       className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center"
-                       onClick={() => fileInputRef.current?.click()}
-                     >
-                       {profPhoto ? (
-                         <img src={profPhoto} className="w-full h-full object-cover" />
-                       ) : (
-                         <Upload className="h-4 w-4 opacity-20" />
-                       )}
+               <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%] max-h-[90vh] flex flex-col">
+                 <DialogHeader><DialogTitle className="font-anton uppercase">Especialista</DialogTitle></DialogHeader>
+                 <ScrollArea className="flex-1 pr-2">
+                   <div className="grid grid-cols-2 gap-3 py-2">
+                     <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
+                       <Label className="text-[8px] uppercase opacity-40 mb-2">Foto de Perfil</Label>
+                       <div 
+                         className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center"
+                         onClick={() => fileInputRef.current?.click()}
+                       >
+                         {profPhoto ? (
+                           <img src={profPhoto} className="w-full h-full object-cover" />
+                         ) : (
+                           <Upload className="h-4 w-4 opacity-20" />
+                         )}
+                       </div>
+                       <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} className="hidden" accept="image/*" />
                      </div>
-                     <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} className="hidden" accept="image/*" />
+                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Especialidade</Label><Input value={profSpecialty} onChange={e=>setProfSpecialty(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Comissão %</Label><Input type="number" value={profCommission} onChange={e=>setProfCommission(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                     <div className="col-span-2 space-y-2 mt-2">
+                       <Label className="text-[8px] uppercase opacity-40">Expediente (Horários Disponíveis)</Label>
+                       <div className="grid grid-cols-4 gap-2">
+                         {TIME_SLOTS.map(slot => (
+                           <button
+                             key={slot}
+                             onClick={() => toggleWorkingHour(slot)}
+                             className={cn(
+                               "py-1.5 rounded-lg text-[9px] font-anton border transition-all",
+                               profWorkingHours.includes(slot) 
+                                 ? "bg-primary text-black border-primary" 
+                                 : "bg-transparent text-white/40 border-white/10"
+                             )}
+                           >
+                             {slot}
+                           </button>
+                         ))}
+                       </div>
+                     </div>
                    </div>
-                   <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                   <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Especialidade</Label><Input value={profSpecialty} onChange={e=>setProfSpecialty(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                   <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                   <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                   <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Comissão %</Label><Input type="number" value={profCommission} onChange={e=>setProfCommission(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                 </div>
-                 <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase h-10 mt-2">Salvar</Button>
+                 </ScrollArea>
+                 <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase h-10 mt-4 shrink-0">Salvar</Button>
                </DialogContent>
              </Dialog>
             )}
             {viewMode === 'professionals' && !isAdmin && (
               <Dialog open={isProfDialogOpen} onOpenChange={setIsProfDialogOpen}>
-                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase">Meu Perfil</DialogTitle></DialogHeader>
-                  <div className="grid grid-cols-2 gap-3 py-2">
-                    <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
-                      <Label className="text-[8px] uppercase opacity-40 mb-2">Foto de Perfil</Label>
-                      <div 
-                        className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        {profPhoto ? (
-                          <img src={profPhoto} className="w-full h-full object-cover" />
-                        ) : (
-                          <Upload className="h-4 w-4 opacity-20" />
-                        )}
+                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%] max-h-[90vh] flex flex-col">
+                  <DialogHeader><DialogTitle className="font-anton uppercase">Meu Perfil</DialogTitle></DialogHeader>
+                  <ScrollArea className="flex-1 pr-2">
+                    <div className="grid grid-cols-2 gap-3 py-2">
+                      <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
+                        <Label className="text-[8px] uppercase opacity-40 mb-2">Foto de Perfil</Label>
+                        <div 
+                          className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          {profPhoto ? (
+                            <img src={profPhoto} className="w-full h-full object-cover" />
+                          ) : (
+                            <Upload className="h-4 w-4 opacity-20" />
+                          )}
+                        </div>
+                        <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} className="hidden" accept="image/*" />
+                        <p className="text-[7px] text-white/30 mt-1">Clique p/ alterar foto</p>
                       </div>
-                      <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} className="hidden" accept="image/*" />
-                      <p className="text-[7px] text-white/30 mt-1">Clique p/ alterar foto</p>
+                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                      <div className="space-y-1 col-span-2"><Label className="text-[8px] uppercase opacity-40">Nova Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                      <div className="col-span-2 space-y-2 mt-2">
+                        <Label className="text-[8px] uppercase opacity-40">Meu Expediente</Label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {TIME_SLOTS.map(slot => (
+                            <button
+                              key={slot}
+                              onClick={() => toggleWorkingHour(slot)}
+                              className={cn(
+                                "py-1.5 rounded-lg text-[9px] font-anton border transition-all",
+                                profWorkingHours.includes(slot) 
+                                  ? "bg-primary text-black border-primary" 
+                                  : "bg-transparent text-white/40 border-white/10"
+                              )}
+                            >
+                              {slot}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                    <div className="space-y-1 col-span-2"><Label className="text-[8px] uppercase opacity-40">Nova Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                  </div>
-                  <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase h-10 mt-2">Atualizar Perfil</Button>
+                  </ScrollArea>
+                  <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase h-10 mt-4 shrink-0">Atualizar Perfil</Button>
                 </DialogContent>
               </Dialog>
             )}
@@ -491,7 +550,7 @@ export default function AdminDashboardPage() {
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             {viewMode === 'appointments' && (
               <div className="p-4 space-y-2">
-                {TIME_SLOTS.map(slot => {
+                {activeSlots.map(slot => {
                   const slotApts = filteredAppointments.filter(a => a.date === agendaDate && a.time === slot);
                   return (
                     <div key={slot} className="flex gap-4 group">
@@ -536,6 +595,10 @@ export default function AdminDashboardPage() {
                     <div className="flex-1 min-w-0">
                       <div className="text-[10px] font-anton uppercase truncate">{p.name}</div>
                       <div className="text-[8px] text-primary uppercase">{p.specialty}</div>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Clock className="h-2 w-2 text-white/20" />
+                        <span className="text-[7px] text-white/30 uppercase">Expediente: {p.workingHours?.length || 0} slots</span>
+                      </div>
                     </div>
                     <div className="flex gap-1">
                       {(isAdmin || p.id === user.id) && (
