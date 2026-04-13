@@ -21,7 +21,8 @@ import {
   Home,
   Plus,
   Scissors,
-  Percent
+  Percent,
+  Key
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -233,6 +234,13 @@ export default function AdminDashboardPage() {
         ...p, name: profName, specialty: profSpecialty, photo: profPhoto || p.photo, 
         commission: Number(profCommission), email: profEmail, password: profPassword
       } : p);
+      
+      // Se o profissional editou seu próprio perfil, atualize a sessão local
+      if (editingProf.id === user?.id) {
+        const updatedUser = { ...user, name: profName, email: profEmail };
+        setUser(updatedUser);
+        localStorage.setItem("gold_user", JSON.stringify(updatedUser));
+      }
     } else {
       const newProf: Professional = {
         id: Math.random().toString(36).substr(2, 9),
@@ -245,6 +253,7 @@ export default function AdminDashboardPage() {
     localStorage.setItem('gold_professionals', JSON.stringify(updatedProfs));
     setIsProfDialogOpen(false);
     resetProfForm();
+    toast({ title: "Sucesso", description: "Perfil atualizado." });
   };
 
   const deleteProfessional = (id: string) => {
@@ -319,11 +328,11 @@ export default function AdminDashboardPage() {
         <div className="font-anton text-lg tracking-tighter uppercase">GOLD<span className="text-primary">{user.role === 'admin' ? 'ADMIN' : 'STAFF'}</span></div>
         <div className="flex gap-1">
           <Button variant="ghost" size="icon" onClick={() => setViewMode('appointments')} className={cn("h-8 w-8", viewMode === 'appointments' && "text-primary")}><CalendarIcon className="h-4 w-4" /></Button>
+          
+          <Button variant="ghost" size="icon" onClick={() => setViewMode('professionals')} className={cn("h-8 w-8", viewMode === 'professionals' && "text-primary")}><Users className="h-4 w-4" /></Button>
+          
           {isAdmin && (
-            <>
-              <Button variant="ghost" size="icon" onClick={() => setViewMode('professionals')} className={cn("h-8 w-8", viewMode === 'professionals' && "text-primary")}><Users className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="icon" onClick={() => setViewMode('services')} className={cn("h-8 w-8", viewMode === 'services' && "text-primary")}><Scissors className="h-4 w-4" /></Button>
-            </>
+            <Button variant="ghost" size="icon" onClick={() => setViewMode('services')} className={cn("h-8 w-8", viewMode === 'services' && "text-primary")}><Scissors className="h-4 w-4" /></Button>
           )}
           <Button variant="ghost" size="icon" onClick={() => setViewMode('finance')} className={cn("h-8 w-8", viewMode === 'finance' && "text-primary")}><DollarSign className="h-4 w-4" /></Button>
           <Button variant="ghost" size="icon" onClick={handleLogout} className="h-8 w-8 text-destructive"><LogOut className="h-4 w-4" /></Button>
@@ -335,7 +344,7 @@ export default function AdminDashboardPage() {
         <div className="flex justify-between items-end mb-4">
           <h1 className="text-2xl font-anton uppercase tracking-tight leading-none">
             {viewMode === 'appointments' && "AGENDA"}
-            {viewMode === 'professionals' && "EQUIPE"}
+            {viewMode === 'professionals' && (isAdmin ? "EQUIPE" : "MEU PERFIL")}
             {viewMode === 'services' && "SERVIÇOS"}
             {viewMode === 'finance' && "CAIXA"}
           </h1>
@@ -363,14 +372,56 @@ export default function AdminDashboardPage() {
                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-primary text-black font-anton uppercase rounded-full"><UserPlus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase">Especialista</DialogTitle></DialogHeader>
                  <div className="grid grid-cols-2 gap-3 py-2">
+                   <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
+                     <Label className="text-[8px] uppercase opacity-40 mb-2">Foto de Perfil</Label>
+                     <div 
+                       className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center"
+                       onClick={() => fileInputRef.current?.click()}
+                     >
+                       {profPhoto ? (
+                         <img src={profPhoto} className="w-full h-full object-cover" />
+                       ) : (
+                         <Upload className="h-4 w-4 opacity-20" />
+                       )}
+                     </div>
+                     <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} className="hidden" accept="image/*" />
+                   </div>
                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Especialidade</Label><Input value={profSpecialty} onChange={e=>setProfSpecialty(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                   <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Comissão %</Label><Input type="number" value={profCommission} onChange={e=>setProfCommission(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
                  </div>
                  <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase h-10 mt-2">Salvar</Button>
                </DialogContent>
              </Dialog>
+            )}
+            {viewMode === 'professionals' && !isAdmin && (
+              <Dialog open={isProfDialogOpen} onOpenChange={setIsProfDialogOpen}>
+                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase">Meu Perfil</DialogTitle></DialogHeader>
+                  <div className="grid grid-cols-2 gap-3 py-2">
+                    <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
+                      <Label className="text-[8px] uppercase opacity-40 mb-2">Foto de Perfil</Label>
+                      <div 
+                        className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {profPhoto ? (
+                          <img src={profPhoto} className="w-full h-full object-cover" />
+                        ) : (
+                          <Upload className="h-4 w-4 opacity-20" />
+                        )}
+                      </div>
+                      <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} className="hidden" accept="image/*" />
+                      <p className="text-[7px] text-white/30 mt-1">Clique p/ alterar foto</p>
+                    </div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                    <div className="space-y-1 col-span-2"><Label className="text-[8px] uppercase opacity-40">Nova Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                  </div>
+                  <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase h-10 mt-2">Atualizar Perfil</Button>
+                </DialogContent>
+              </Dialog>
             )}
             {viewMode === 'services' && isAdmin && (
               <Dialog open={isServiceDialogOpen} onOpenChange={setIsServiceDialogOpen}>
@@ -443,8 +494,14 @@ export default function AdminDashboardPage() {
                       <div className="text-[8px] text-primary uppercase">{p.specialty}</div>
                     </div>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => openEditProf(p)} className="h-7 w-7 border border-white/5"><Edit2 className="h-3 w-3" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteProfessional(p.id)} className="h-7 w-7 border border-white/5 text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                      {(isAdmin || p.id === user.id) && (
+                        <Button variant="ghost" size="icon" onClick={() => openEditProf(p)} className="h-7 w-7 border border-white/5">
+                          {p.id === user.id ? <Edit2 className="h-3 w-3 text-primary" /> : <Edit2 className="h-3 w-3" />}
+                        </Button>
+                      )}
+                      {isAdmin && (
+                        <Button variant="ghost" size="icon" onClick={() => deleteProfessional(p.id)} className="h-7 w-7 border border-white/5 text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -492,7 +549,7 @@ export default function AdminDashboardPage() {
       <footer className="h-10 border-t border-white/5 flex items-center justify-center px-4 bg-black">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[7px] font-mono text-white/20 uppercase tracking-widest">System Synced • 460x872 Optimized</span>
+          <span className="text-[7px] font-mono text-white/20 uppercase tracking-widest">System Synced • Profile Edit Enabled</span>
         </div>
       </footer>
     </div>
