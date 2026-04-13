@@ -10,10 +10,14 @@ export default function Home() {
       <Navbar />
       
       {/* Hero Section Inicial */}
-      <section className="relative min-h-screen flex flex-col justify-start items-center overflow-hidden pt-36">
+      <section className="relative min-h-screen flex flex-col justify-start items-center overflow-hidden pt-36 pb-32">
         {/* Ambient Blurs */}
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/20 rounded-full blur-[120px] animate-float" />
         <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-secondary/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '2s' }} />
+
+        {/* Grid Background Sutil */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+             style={{ backgroundImage: 'radial-gradient(#1A1A1A 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
         <div className="container relative z-10 px-4 flex flex-col items-center text-center">
           <div className="mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -31,19 +35,38 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Nova Seção de Chamada para Assinatura Editorial */}
-            <div className="flex flex-col items-center gap-8 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-700">
+            {/* Nova Seção Hero Premium - Minimalista e Editorial */}
+            <div className="flex flex-col items-center gap-8 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-700 mt-12">
+              {/* Tag Superior */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
+                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#D4AF37]">PLANO EXCLUSIVO | BARBEARIA</span>
+              </div>
+
+              {/* Título Principal Mapeado */}
               <h2 className="text-4xl md:text-7xl font-anton leading-[1.1] text-white uppercase tracking-tighter max-w-sm md:max-w-4xl">
                 JA PENSOU <span className="text-[#F5F5F5]">CORTAR</span> O <span className="text-[#D4AF37]">CABELO</span> QUANTAS VEZES QUISER?
               </h2>
               
-              <div className="flex flex-col items-center gap-6">
+              {/* Subtexto Mapeado */}
+              <div className="flex flex-col items-center gap-10">
                 <p className="text-[#F5F5F5] text-2xl md:text-5xl font-anton uppercase tracking-tight leading-none">
                   POR APENAS <span className="text-[#D4AF37]">69,90 R$/MÊS</span> É POSSIVEL
                 </p>
-                <Link href="#assinatura" className="mt-2 text-white/30 hover:text-white border border-white/10 hover:border-white/30 px-12 py-5 rounded-full text-[10px] uppercase tracking-[0.4em] transition-all duration-500 backdrop-blur-md">
-                  Saiba mais
-                </Link>
+
+                {/* CTAs Premium */}
+                <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+                  <Link href="https://wa.me/554892465639" target="_blank" className="flex-1">
+                    <button className="w-full bg-[#D4AF37] text-black h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:bg-[#C9A227] transition-all shadow-[0_0_30px_rgba(212,175,55,0.2)] active:scale-95">
+                      Quero entrar | R$69/mês
+                    </button>
+                  </Link>
+                  <Link href="#assinatura" className="flex-1">
+                    <button className="w-full bg-transparent text-white border border-[#2A2A2A] h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:border-[#D4AF37]/40 transition-all active:scale-95">
+                      saiba mais
+                    </button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -72,12 +95,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Hero Premium - Seção de Assinatura */}
+      {/* Hero Premium - Seção de Detalhes (Ancora) */}
       <section id="assinatura" className="relative py-24 md:py-32 bg-[#0A0A0A] overflow-hidden border-t border-white/5">
-        {/* Grid Background */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-             style={{ backgroundImage: 'radial-gradient(#1A1A1A 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-        
         {/* Glow Suave Dourado */}
         <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-[#D4AF37]/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -88,28 +107,23 @@ export default function Home() {
             <div className="space-y-8 max-w-xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
-                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#D4AF37]">Plano Exclusivo | Barbearia</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#D4AF37]">Club Gold | Benefícios</span>
               </div>
 
               <h2 className="text-6xl md:text-8xl font-anton leading-[0.9] uppercase tracking-tighter">
-                <span className="text-[#F5F5F5]">Pare de</span><br />
-                <span className="text-[#D4AF37]">gastar</span><br />
-                <span className="text-[#F5F5F5]">com cabelo</span>
+                <span className="text-[#F5F5F5]">Estilo sem</span><br />
+                <span className="text-[#D4AF37]">limites</span><br />
+                <span className="text-[#F5F5F5]">mensais</span>
               </h2>
 
               <p className="text-[#A8A8A8] text-sm md:text-base leading-relaxed tracking-wide font-light">
-                Corte o cabelo quantas vezes quiser, com a liberdade de um plano feito pra quem valoriza estilo e praticidade. Um plano simples, direto e inteligente.
+                Corte o cabelo quantas vezes quiser, com a liberdade de um plano feito pra quem valoriza o autocuidado constante. Um plano simples, direto e inteligente.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link href="https://wa.me/554892465639" target="_blank" className="flex-1">
-                  <button className="w-full bg-[#D4AF37] text-black h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:bg-[#C9A227] transition-all shadow-[0_0_30px_rgba(212,175,55,0.2)] active:scale-95">
-                    Quero entrar | R$69/mês
-                  </button>
-                </Link>
-                <Link href="#" className="flex-1">
-                  <button className="w-full bg-transparent text-white border border-[#2A2A2A] h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:border-[#D4AF37]/40 transition-all active:scale-95">
-                    Ver como funciona
+                  <button className="w-full bg-[#D4AF37] text-black h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:bg-[#C9A227] transition-all active:scale-95 shadow-lg">
+                    Assinar Agora
                   </button>
                 </Link>
               </div>
@@ -140,7 +154,7 @@ export default function Home() {
                 <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
                 <h4 className="font-anton text-[#F5F5F5] uppercase tracking-widest text-sm">Plano mensal</h4>
               </div>
-              <p className="text-[#A8A8A8] text-[10px] uppercase tracking-widest pl-4">Simples, direto e automático</p>
+              <p className="text-[#A8A8A8] text-[10px] uppercase tracking-widest pl-4">Simples e automático</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
