@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -63,10 +62,10 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#030303] p-4 relative overflow-hidden">
       <div className="absolute top-8 left-8 z-20">
         <Link href="/">
-          <Button variant="ghost" className="text-white/40 hover:text-white font-anton uppercase tracking-widest text-[10px] gap-2">
+          <Button variant="ghost" className="text-[#F5F5F5]/40 hover:text-[#F5F5F5] font-anton uppercase tracking-widest text-[10px] gap-2">
             <ChevronLeft className="h-4 w-4" /> VOLTAR AO INÍCIO
           </Button>
         </Link>
@@ -81,20 +80,20 @@ export default function AdminLoginPage() {
           <span className="text-[#D4AF37]">GOLD</span>
           <span className="text-[#F5F5F5]">ADMIN</span>
         </h1>
-        <p className="text-primary/60 text-[10px] font-bold uppercase tracking-[0.4em] mt-4">Painel de Controle Gold</p>
+        <p className="text-[#D4AF37]/60 text-[10px] font-bold uppercase tracking-[0.4em] mt-4">Painel de Controle Gold</p>
       </div>
 
-      <Card className="w-full max-w-md relative z-10 bg-white border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
+      <Card className="w-full max-w-md relative z-10 bg-[#0A0A0A] border-white/5 shadow-2xl rounded-[2.5rem] overflow-hidden">
         <CardHeader className="text-center pt-10 pb-4">
-          <CardDescription className="text-black/40 text-[9px] font-black uppercase tracking-[0.3em]">Autenticação de Segurança</CardDescription>
+          <CardDescription className="text-[#F5F5F5]/40 text-[9px] font-black uppercase tracking-[0.3em]">Autenticação de Segurança</CardDescription>
         </CardHeader>
         <CardContent className="px-8 pb-10">
           <form onSubmit={handleLogin} className="space-y-8">
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-black/60 ml-1">E-mail Corporativo</Label>
+              <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-[#F5F5F5]/60 ml-1">E-mail Corporativo</Label>
               <Input 
                 type="email"
-                className="bg-transparent border-black/10 border-b border-t-0 border-x-0 rounded-none py-6 text-base font-medium text-black placeholder:text-black/10 focus-visible:ring-0 focus-visible:border-primary transition-colors h-auto"
+                className="bg-transparent border-white/10 border-b border-t-0 border-x-0 rounded-none py-6 text-base font-medium text-[#F5F5F5] placeholder:text-[#F5F5F5]/10 focus-visible:ring-0 focus-visible:border-[#D4AF37] transition-colors h-auto"
                 placeholder="exemplo@goldbarber.com"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -102,11 +101,11 @@ export default function AdminLoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-black/60 ml-1">Senha de Acesso</Label>
+              <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-[#F5F5F5]/60 ml-1">Senha de Acesso</Label>
               <div className="relative">
                 <Input 
                   type={showPassword ? "text" : "password"}
-                  className="bg-transparent border-black/10 border-b border-t-0 border-x-0 rounded-none py-6 text-base font-medium text-black placeholder:text-black/10 focus-visible:ring-0 focus-visible:border-primary transition-colors h-auto"
+                  className="bg-transparent border-white/10 border-b border-t-0 border-x-0 rounded-none py-6 text-base font-medium text-[#F5F5F5] placeholder:text-[#F5F5F5]/10 focus-visible:ring-0 focus-visible:border-[#D4AF37] transition-colors h-auto"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -115,7 +114,7 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-black/20 hover:text-black transition-colors"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-[#F5F5F5]/20 hover:text-[#F5F5F5] transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -123,14 +122,14 @@ export default function AdminLoginPage() {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-[#D4AF37] text-black hover:bg-black hover:text-[#D4AF37] font-anton uppercase tracking-[0.2em] py-8 text-lg transition-all duration-300 rounded-2xl"
+              className="w-full bg-[#D4AF37] text-black hover:bg-[#F5F5F5] hover:text-[#D4AF37] font-anton uppercase tracking-[0.2em] py-8 text-lg transition-all duration-300 rounded-2xl"
               disabled={loading}
             >
               {loading ? "VALIDANDO..." : "ENTRAR NO PAINEL"}
             </Button>
             <div className="text-center space-y-1">
-              <p className="text-black/20 text-[8px] uppercase tracking-widest">Acesso restrito a colaboradores autorizados</p>
-              <p className="text-black/30 text-[7px] uppercase tracking-widest font-bold">Padrão p/ Barbeiros: Email + senha "123"</p>
+              <p className="text-[#F5F5F5]/20 text-[8px] uppercase tracking-widest">Acesso restrito a colaboradores autorizados</p>
+              <p className="text-[#D4AF37]/30 text-[7px] uppercase tracking-widest font-bold">Padrão p/ Barbeiros: Email + senha "123"</p>
             </div>
           </form>
         </CardContent>

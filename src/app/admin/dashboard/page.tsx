@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
@@ -352,26 +351,26 @@ export default function AdminDashboardPage() {
   if (!user) return null;
 
   return (
-    <div className="h-[872px] w-[460px] mx-auto bg-[#030303] flex flex-col text-white font-body overflow-hidden border-x border-white/5 relative">
+    <div className="h-[872px] w-[460px] mx-auto bg-[#030303] flex flex-col text-[#F5F5F5] font-body overflow-hidden border-x border-white/5 relative">
       <header className="h-14 flex items-center justify-between px-4 border-b border-white/5 bg-[#0a0a0a] z-50">
         <div className="font-anton text-lg tracking-tighter uppercase">
           <span className="text-[#D4AF37]">GOLD</span>
           <span className="text-[#F5F5F5]">{user.role === 'admin' ? 'ADMIN' : 'STAFF'}</span>
         </div>
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" onClick={() => setViewMode('appointments')} className={cn("h-8 w-8", viewMode === 'appointments' && "text-primary")}><CalendarIcon className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="icon" onClick={() => setViewMode('professionals')} className={cn("h-8 w-8", viewMode === 'professionals' && "text-primary")}><Users className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={() => setViewMode('appointments')} className={cn("h-8 w-8", viewMode === 'appointments' && "text-[#D4AF37]")}><CalendarIcon className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={() => setViewMode('professionals')} className={cn("h-8 w-8", viewMode === 'professionals' && "text-[#D4AF37]")}><Users className="h-4 w-4" /></Button>
           {isAdmin && (
-            <Button variant="ghost" size="icon" onClick={() => setViewMode('services')} className={cn("h-8 w-8", viewMode === 'services' && "text-primary")}><Scissors className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" onClick={() => setViewMode('services')} className={cn("h-8 w-8", viewMode === 'services' && "text-[#D4AF37]")}><Scissors className="h-4 w-4" /></Button>
           )}
-          <Button variant="ghost" size="icon" onClick={() => setViewMode('finance')} className={cn("h-8 w-8", viewMode === 'finance' && "text-primary")}><DollarSign className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={() => setViewMode('finance')} className={cn("h-8 w-8", viewMode === 'finance' && "text-[#D4AF37]")}><DollarSign className="h-4 w-4" /></Button>
           <Button variant="ghost" size="icon" onClick={handleLogout} className="h-8 w-8 text-destructive"><LogOut className="h-4 w-4" /></Button>
         </div>
       </header>
 
       <main className="flex-1 flex flex-col overflow-hidden p-4 pt-6">
         <div className="flex justify-between items-end mb-4">
-          <h1 className="text-2xl font-anton uppercase tracking-tight leading-none">
+          <h1 className="text-2xl font-anton uppercase tracking-tight leading-none text-[#F5F5F5]">
             {viewMode === 'appointments' && "AGENDA"}
             {viewMode === 'professionals' && (isAdmin ? "EQUIPE" : "MEU PERFIL")}
             {viewMode === 'services' && "SERVIÇOS"}
@@ -381,29 +380,29 @@ export default function AdminDashboardPage() {
           <div className="flex gap-2">
             {viewMode === 'appointments' && (
               <Dialog open={isAptDialogOpen} onOpenChange={setIsAptDialogOpen}>
-                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-white text-black font-anton uppercase rounded-full"><Plus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
-                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase">Reserva</DialogTitle></DialogHeader>
+                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-[#F5F5F5] text-black font-anton uppercase rounded-full"><Plus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
+                <DialogContent className="bg-[#0a0a0a] border-white/10 text-[#F5F5F5] w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">Reserva</DialogTitle></DialogHeader>
                   <div className="grid grid-cols-2 gap-3 py-2">
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Cliente</Label><Input value={aptClient} onChange={e=>setAptClient(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">WhatsApp</Label><Input value={aptPhone} onChange={e=>setAptPhone(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Serviço</Label><Select value={aptService} onValueChange={setAptService}><SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger><SelectContent>{services.map(s=><SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Barbeiro</Label><Select value={aptProf} onValueChange={setAptProf}><SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger><SelectContent>{professionals.map(p=><SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Data</Label><Input type="date" value={aptDate} onChange={e=>setAptDate(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Hora</Label><Select value={aptTime} onValueChange={setAptTime}><SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger><SelectContent>{TIME_SLOTS.map(t=><SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Cliente</Label><Input value={aptClient} onChange={e=>setAptClient(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">WhatsApp</Label><Input value={aptPhone} onChange={e=>setAptPhone(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Serviço</Label><Select value={aptService} onValueChange={setAptService}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{services.map(s=><SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Barbeiro</Label><Select value={aptSf} onValueChange={setAptProf}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{professionals.map(p=><SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Data</Label><Input type="date" value={aptDate} onChange={e=>setAptDate(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Hora</Label><Select value={aptTime} onValueChange={setAptTime}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{TIME_SLOTS.map(t=><SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select></div>
                   </div>
-                  <Button onClick={handleSaveAppointment} className="w-full bg-primary text-black font-anton uppercase h-10 mt-2">Salvar</Button>
+                  <Button onClick={handleSaveAppointment} className="w-full bg-[#D4AF37] text-black font-anton uppercase h-10 mt-2">Salvar</Button>
                 </DialogContent>
               </Dialog>
             )}
             {viewMode === 'professionals' && isAdmin && (
                <Dialog open={isProfDialogOpen} onOpenChange={setIsProfDialogOpen}>
-               <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-primary text-black font-anton uppercase rounded-full"><UserPlus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
-               <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%] max-h-[90vh] flex flex-col">
-                 <DialogHeader><DialogTitle className="font-anton uppercase">Especialista</DialogTitle></DialogHeader>
+               <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-[#D4AF37] text-black font-anton uppercase rounded-full"><UserPlus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
+               <DialogContent className="bg-[#0a0a0a] border-white/10 text-[#F5F5F5] w-[90%] max-h-[90vh] flex flex-col">
+                 <DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">Especialista</DialogTitle></DialogHeader>
                  <ScrollArea className="flex-1 pr-2">
                    <div className="grid grid-cols-2 gap-3 py-2">
                      <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
-                       <Label className="text-[8px] uppercase opacity-40 mb-2">Foto de Perfil</Label>
+                       <Label className="text-[8px] uppercase opacity-40 mb-2 text-[#F5F5F5]">Foto de Perfil</Label>
                        <div 
                          className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center"
                          onClick={() => fileInputRef.current?.click()}
@@ -416,13 +415,13 @@ export default function AdminDashboardPage() {
                        </div>
                        <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} className="hidden" accept="image/*" />
                      </div>
-                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Especialidade</Label><Input value={profSpecialty} onChange={e=>setProfSpecialty(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Comissão %</Label><Input type="number" value={profCommission} onChange={e=>setProfCommission(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Especialidade</Label><Input value={profSpecialty} onChange={e=>setProfSpecialty(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Comissão %</Label><Input type="number" value={profCommission} onChange={e=>setProfCommission(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                      <div className="col-span-2 space-y-2 mt-2">
-                       <Label className="text-[8px] uppercase opacity-40">Expediente (Horários Disponíveis)</Label>
+                       <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Expediente (Horários Disponíveis)</Label>
                        <div className="grid grid-cols-4 gap-2">
                          {TIME_SLOTS.map(slot => (
                            <button
@@ -431,8 +430,8 @@ export default function AdminDashboardPage() {
                              className={cn(
                                "py-1.5 rounded-lg text-[9px] font-anton border transition-all",
                                profWorkingHours.includes(slot) 
-                                 ? "bg-primary text-black border-primary" 
-                                 : "bg-transparent text-white/40 border-white/10"
+                                 ? "bg-[#D4AF37] text-black border-[#D4AF37]" 
+                                 : "bg-transparent text-[#F5F5F5]/40 border-white/10"
                              )}
                            >
                              {slot}
@@ -442,18 +441,18 @@ export default function AdminDashboardPage() {
                      </div>
                    </div>
                  </ScrollArea>
-                 <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase h-10 mt-4 shrink-0">Salvar</Button>
+                 <Button onClick={handleSaveProfessional} className="w-full bg-[#D4AF37] text-black font-anton uppercase h-10 mt-4 shrink-0">Salvar</Button>
                </DialogContent>
              </Dialog>
             )}
             {viewMode === 'professionals' && !isAdmin && (
               <Dialog open={isProfDialogOpen} onOpenChange={setIsProfDialogOpen}>
-                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%] max-h-[90vh] flex flex-col">
-                  <DialogHeader><DialogTitle className="font-anton uppercase">Meu Perfil</DialogTitle></DialogHeader>
+                <DialogContent className="bg-[#0a0a0a] border-white/10 text-[#F5F5F5] w-[90%] max-h-[90vh] flex flex-col">
+                  <DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">Meu Perfil</DialogTitle></DialogHeader>
                   <ScrollArea className="flex-1 pr-2">
                     <div className="grid grid-cols-2 gap-3 py-2">
                       <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
-                        <Label className="text-[8px] uppercase opacity-40 mb-2">Foto de Perfil</Label>
+                        <Label className="text-[8px] uppercase opacity-40 mb-2 text-[#F5F5F5]">Foto de Perfil</Label>
                         <div 
                           className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center"
                           onClick={() => fileInputRef.current?.click()}
@@ -465,13 +464,13 @@ export default function AdminDashboardPage() {
                           )}
                         </div>
                         <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} className="hidden" accept="image/*" />
-                        <p className="text-[7px] text-white/30 mt-1">Clique p/ alterar foto</p>
+                        <p className="text-[7px] text-[#F5F5F5]/30 mt-1">Clique p/ alterar foto</p>
                       </div>
-                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
-                      <div className="space-y-1 col-span-2"><Label className="text-[8px] uppercase opacity-40">Nova Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                      <div className="space-y-1 col-span-2"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nova Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                       <div className="col-span-2 space-y-2 mt-2">
-                        <Label className="text-[8px] uppercase opacity-40">Meu Expediente</Label>
+                        <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Meu Expediente</Label>
                         <div className="grid grid-cols-4 gap-2">
                           {TIME_SLOTS.map(slot => (
                             <button
@@ -480,8 +479,8 @@ export default function AdminDashboardPage() {
                               className={cn(
                                 "py-1.5 rounded-lg text-[9px] font-anton border transition-all",
                                 profWorkingHours.includes(slot) 
-                                  ? "bg-primary text-black border-primary" 
-                                  : "bg-transparent text-white/40 border-white/10"
+                                  ? "bg-[#D4AF37] text-black border-[#D4AF37]" 
+                                  : "bg-transparent text-[#F5F5F5]/40 border-white/10"
                               )}
                             >
                               {slot}
@@ -491,22 +490,22 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                   </ScrollArea>
-                  <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase h-10 mt-4 shrink-0">Atualizar Perfil</Button>
+                  <Button onClick={handleSaveProfessional} className="w-full bg-[#D4AF37] text-black font-anton uppercase h-10 mt-4 shrink-0">Atualizar Perfil</Button>
                 </DialogContent>
               </Dialog>
             )}
             {viewMode === 'services' && isAdmin && (
               <Dialog open={isServiceDialogOpen} onOpenChange={setIsServiceDialogOpen}>
-                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-primary text-black font-anton uppercase rounded-full"><Plus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
-                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase">Serviço</DialogTitle></DialogHeader>
+                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-[#D4AF37] text-black font-anton uppercase rounded-full"><Plus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
+                <DialogContent className="bg-[#0a0a0a] border-white/10 text-[#F5F5F5] w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">Serviço</DialogTitle></DialogHeader>
                   <div className="space-y-3 py-2">
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={srvName} onChange={e=>setSrvName(e.target.value)} className="h-8 text-xs" /></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nome</Label><Input value={srvName} onChange={e=>setSrvName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Preço</Label><Input type="number" value={srvPrice} onChange={e=>setSrvPrice(e.target.value)} className="h-8 text-xs" /></div>
-                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Minutos</Label><Input type="number" value={srvDuration} onChange={e=>setSrvDuration(e.target.value)} className="h-8 text-xs" /></div>
+                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Preço</Label><Input type="number" value={srvPrice} onChange={e=>setSrvPrice(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Minutos</Label><Input type="number" value={srvDuration} onChange={e=>setSrvDuration(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                     </div>
                   </div>
-                  <Button onClick={handleSaveService} className="w-full bg-primary text-black font-anton uppercase h-10 mt-2">Salvar</Button>
+                  <Button onClick={handleSaveService} className="w-full bg-[#D4AF37] text-black font-anton uppercase h-10 mt-2">Salvar</Button>
                 </DialogContent>
               </Dialog>
             )}
@@ -515,16 +514,16 @@ export default function AdminDashboardPage() {
 
         <div className="grid grid-cols-3 gap-2 mb-4">
           <Card className="bg-[#0a0a0a] border-white/5 p-2 rounded-2xl">
-            <div className="text-[7px] font-bold text-white/40 uppercase">Geração</div>
-            <div className="text-sm font-anton text-primary">R$ {financeData.totalRevenue.toFixed(0)}</div>
+            <div className="text-[7px] font-bold text-[#F5F5F5]/40 uppercase">Geração</div>
+            <div className="text-sm font-anton text-[#D4AF37]">R$ {financeData.totalRevenue.toFixed(0)}</div>
           </Card>
           <Card className="bg-[#0a0a0a] border-white/5 p-2 rounded-2xl">
-            <div className="text-[7px] font-bold text-white/40 uppercase">Agenda</div>
-            <div className="text-sm font-anton">{filteredAppointments.length}</div>
+            <div className="text-[7px] font-bold text-[#F5F5F5]/40 uppercase">Agenda</div>
+            <div className="text-sm font-anton text-[#F5F5F5]">{filteredAppointments.length}</div>
           </Card>
           <Card className="bg-[#0a0a0a] border-white/5 p-2 rounded-2xl">
-            <div className="text-[7px] font-bold text-white/40 uppercase">Saldo</div>
-            <div className="text-sm font-anton text-emerald-500">R$ {(user.role === 'admin' ? financeData.netProfit : financeData.totalCommissions).toFixed(0)}</div>
+            <div className="text-[7px] font-bold text-[#F5F5F5]/40 uppercase">Saldo</div>
+            <div className="text-sm font-anton text-[#D4AF37]">R$ {(user.role === 'admin' ? financeData.netProfit : financeData.totalCommissions).toFixed(0)}</div>
           </Card>
         </div>
 
@@ -532,14 +531,14 @@ export default function AdminDashboardPage() {
           {viewMode === 'appointments' && (
             <div className="flex items-center justify-between p-3 border-b border-white/5 bg-white/[0.02]">
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={handlePrevDay} className="h-7 w-7"><ChevronLeft className="h-4 w-4" /></Button>
-                <div className="text-[10px] font-anton text-primary uppercase min-w-[120px] text-center">
+                <Button variant="ghost" size="icon" onClick={handlePrevDay} className="h-7 w-7 text-[#F5F5F5]"><ChevronLeft className="h-4 w-4" /></Button>
+                <div className="text-[10px] font-anton text-[#D4AF37] uppercase min-w-[120px] text-center">
                   {format(new Date(agendaDate + 'T12:00:00'), "EEEE, dd 'DE' MMMM", { locale: ptBR })}
                 </div>
-                <Button variant="ghost" size="icon" onClick={handleNextDay} className="h-7 w-7"><ChevronRight className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={handleNextDay} className="h-7 w-7 text-[#F5F5F5]"><ChevronRight className="h-4 w-4" /></Button>
               </div>
               <Select value={selectedProfFilter} onValueChange={setSelectedProfFilter}>
-                <SelectTrigger className="h-7 text-[8px] w-24 border-white/10 uppercase font-anton">
+                <SelectTrigger className="h-7 text-[8px] w-24 border-white/10 uppercase font-anton text-[#F5F5F5]">
                   <SelectValue placeholder="FILTRO" />
                 </SelectTrigger>
                 <SelectContent>
@@ -557,22 +556,22 @@ export default function AdminDashboardPage() {
                   const slotApts = filteredAppointments.filter(a => a.date === agendaDate && a.time === slot);
                   return (
                     <div key={slot} className="flex gap-4 group">
-                      <div className="w-10 text-[10px] font-anton text-white/40 pt-1 text-right">{slot}</div>
+                      <div className="w-10 text-[10px] font-anton text-[#F5F5F5]/40 pt-1 text-right">{slot}</div>
                       <div className="flex-1 min-h-[48px] border-l border-white/10 pl-4 pb-4">
                         {slotApts.length > 0 ? (
                           <div className="space-y-2">
                             {slotApts.map(apt => (
-                              <div key={apt.id} className="bg-white/5 border border-white/10 rounded-2xl p-3 flex justify-between items-center group/item hover:border-primary/50 transition-colors shadow-sm">
+                              <div key={apt.id} className="bg-white/5 border border-white/10 rounded-2xl p-3 flex justify-between items-center group/item hover:border-[#D4AF37]/50 transition-colors shadow-sm">
                                 <div className="min-w-0">
-                                  <div className="text-[11px] font-anton uppercase truncate text-primary leading-tight">{apt.clientName}</div>
-                                  <div className="text-[8px] text-white/40 uppercase truncate flex items-center gap-1 mt-1">
+                                  <div className="text-[11px] font-anton uppercase truncate text-[#D4AF37] leading-tight">{apt.clientName}</div>
+                                  <div className="text-[8px] text-[#F5F5F5]/40 uppercase truncate flex items-center gap-1 mt-1">
                                     <Scissors className="h-2 w-2" /> {getServiceName(apt.serviceId)}
                                     <span className="opacity-20 mx-1">|</span>
                                     <Users className="h-2 w-2" /> {getProfName(apt.professionalId)}
                                   </div>
                                 </div>
                                 <div className="flex gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                                   <Button variant="ghost" size="icon" onClick={() => openEditApt(apt)} className="h-7 w-7 text-white/40 hover:text-white"><Edit2 className="h-3 w-3" /></Button>
+                                   <Button variant="ghost" size="icon" onClick={() => openEditApt(apt)} className="h-7 w-7 text-[#F5F5F5]/40 hover:text-[#F5F5F5]"><Edit2 className="h-3 w-3" /></Button>
                                    <Button variant="ghost" size="icon" onClick={() => deleteAppointment(apt.id)} className="h-7 w-7 text-destructive/40 hover:text-destructive"><Trash2 className="h-3 w-3" /></Button>
                                 </div>
                               </div>
@@ -596,17 +595,17 @@ export default function AdminDashboardPage() {
                   <div key={p.id} className="flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 rounded-2xl">
                     <img src={p.photo} className="w-10 h-10 rounded-full object-cover grayscale" />
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] font-anton uppercase truncate">{p.name}</div>
-                      <div className="text-[8px] text-primary uppercase">{p.specialty}</div>
+                      <div className="text-[10px] font-anton uppercase text-[#F5F5F5]">{p.name}</div>
+                      <div className="text-[8px] text-[#D4AF37] uppercase">{p.specialty}</div>
                       <div className="flex items-center gap-1 mt-1">
-                        <Clock className="h-2 w-2 text-white/20" />
-                        <span className="text-[7px] text-white/30 uppercase">Expediente: {p.workingHours?.length || 0} slots</span>
+                        <Clock className="h-2 w-2 text-[#F5F5F5]/20" />
+                        <span className="text-[7px] text-[#F5F5F5]/30 uppercase">Expediente: {p.workingHours?.length || 0} slots</span>
                       </div>
                     </div>
                     <div className="flex gap-1">
                       {(isAdmin || p.id === user.id) && (
-                        <Button variant="ghost" size="icon" onClick={() => openEditProf(p)} className="h-7 w-7 border border-white/5">
-                          {p.id === user.id ? <Edit2 className="h-3 w-3 text-primary" /> : <Edit2 className="h-3 w-3" />}
+                        <Button variant="ghost" size="icon" onClick={() => openEditProf(p)} className="h-7 w-7 border border-white/5 text-[#F5F5F5]">
+                          {p.id === user.id ? <Edit2 className="h-3 w-3 text-[#D4AF37]" /> : <Edit2 className="h-3 w-3" />}
                         </Button>
                       )}
                       {isAdmin && (
@@ -623,11 +622,11 @@ export default function AdminDashboardPage() {
                 {services.map(s => (
                   <div key={s.id} className="p-3 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center justify-between">
                     <div className="flex-1">
-                      <div className="text-[10px] font-anton uppercase">{s.name}</div>
-                      <div className="text-[8px] text-white/40">{s.duration} MIN • <span className="text-primary font-bold">R$ {s.price}</span></div>
+                      <div className="text-[10px] font-anton uppercase text-[#F5F5F5]">{s.name}</div>
+                      <div className="text-[8px] text-[#F5F5F5]/40">{s.duration} MIN • <span className="text-[#D4AF37] font-bold">R$ {s.price}</span></div>
                     </div>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => openEditService(s)} className="h-7 w-7"><Edit2 className="h-3 w-3" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => openEditService(s)} className="h-7 w-7 text-[#F5F5F5]"><Edit2 className="h-3 w-3" /></Button>
                       <Button variant="ghost" size="icon" onClick={() => deleteService(s.id)} className="h-7 w-7 text-destructive"><Trash2 className="h-3 w-3" /></Button>
                     </div>
                   </div>
@@ -638,13 +637,13 @@ export default function AdminDashboardPage() {
             {viewMode === 'finance' && (
               <div className="p-3 space-y-3">
                 <div className="space-y-2">
-                  <div className="text-[8px] font-anton uppercase text-white/30 tracking-widest">Resumo por Barbeiro</div>
+                  <div className="text-[8px] font-anton uppercase text-[#F5F5F5]/30 tracking-widest">Resumo por Barbeiro</div>
                   {financeData.profBreakdown.map(row => (
                     <div key={row.id} className="flex justify-between items-center p-3 bg-white/[0.02] rounded-2xl border border-white/5">
-                      <div className="text-[10px] font-anton uppercase">{row.name}</div>
+                      <div className="text-[10px] font-anton uppercase text-[#F5F5F5]">{row.name}</div>
                       <div className="text-right">
-                        <div className="text-[10px] font-anton text-primary">R$ {row.commission.toFixed(0)}</div>
-                        <div className="text-[7px] text-white/40 uppercase">{row.aptsCount} atendimentos</div>
+                        <div className="text-[10px] font-anton text-[#D4AF37]">R$ {row.commission.toFixed(0)}</div>
+                        <div className="text-[7px] text-[#F5F5F5]/40 uppercase">{row.aptsCount} atendimentos</div>
                       </div>
                     </div>
                   ))}
@@ -658,7 +657,7 @@ export default function AdminDashboardPage() {
       <footer className="h-10 border-t border-white/5 flex items-center justify-center px-4 bg-black">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[7px] font-mono text-white/20 uppercase tracking-widest">System Synced • Timeline Active</span>
+          <span className="text-[7px] font-mono text-[#F5F5F5]/20 uppercase tracking-widest">System Synced • Timeline Active</span>
         </div>
       </footer>
     </div>

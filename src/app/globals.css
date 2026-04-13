@@ -5,24 +5,24 @@
 @layer base {
   :root {
     --background: 0 0% 1%; /* #030303 */
-    --foreground: 0 0% 100%;
+    --foreground: 0 0% 96%; /* #F5F5F5 */
     --card: 0 0% 4%;
-    --card-foreground: 0 0% 100%;
+    --card-foreground: 0 0% 96%;
     --popover: 0 0% 2%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 43 96% 56%; /* Gold #FBBF24 */
+    --popover-foreground: 0 0% 96%;
+    --primary: 45 64% 52%; /* Dourado #D4AF37 */
     --primary-foreground: 0 0% 0%;
-    --secondary: 25 100% 50%; /* Orange #F97316 */
+    --secondary: 25 100% 50%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 10%;
     --muted-foreground: 0 0% 60%;
-    --accent: 43 96% 56%;
+    --accent: 45 64% 52%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 15%;
     --input: 0 0% 10%;
-    --ring: 43 96% 56%;
+    --ring: 45 64% 52%;
     --radius: 1.5rem;
   }
 }
@@ -50,7 +50,7 @@
 }
 
 .text-shimmer {
-  background: linear-gradient(90deg, #facc15 0%, #ffffff 40%, #ffffff 60%, #f97316 100%);
+  background: linear-gradient(90deg, #D4AF37 0%, #F5F5F5 40%, #F5F5F5 60%, #D4AF37 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -105,7 +105,7 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: conic-gradient(from 0deg, transparent 0%, #facc15 40%, #f97316 50%, transparent 60%);
+  background: conic-gradient(from 0deg, transparent 0%, #D4AF37 40%, #F5F5F5 50%, transparent 60%);
   animation: spin-slow 4s linear infinite;
   z-index: 0;
 }
@@ -123,6 +123,6 @@
   width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(251, 191, 36, 0.5);
+  background: rgba(212, 175, 55, 0.5);
   border-radius: 10px;
 }
