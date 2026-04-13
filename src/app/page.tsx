@@ -8,14 +8,14 @@ export default function Home() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden pt-20">
+      <section className="relative min-h-screen flex flex-col justify-start items-center overflow-hidden pt-36">
         {/* Ambient Blurs - Dourado e Alaranjado */}
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/20 rounded-full blur-[120px] animate-float" />
         <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-secondary/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '2s' }} />
 
         <div className="container relative z-10 px-4 flex flex-col items-center text-center">
-          <div className="mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            <h1 className="text-[15vw] md:text-[10rem] font-anton leading-[0.85] text-white flex flex-col items-center uppercase tracking-tighter">
+          <div className="mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <h1 className="text-[18vw] md:text-[10rem] font-anton leading-[0.85] text-white flex flex-col items-center uppercase tracking-tighter">
               <span>GOLD</span>
               <span className="text-shimmer">BARBEARIA</span>
             </h1>
