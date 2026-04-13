@@ -32,16 +32,16 @@ export default function Home() {
             </div>
 
             {/* Nova Seção de Chamada para Assinatura Editorial */}
-            <div className="flex flex-col items-center gap-6 max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-700">
-              <h2 className="text-4xl md:text-6xl font-anton leading-[1.1] text-white uppercase tracking-tighter max-w-sm md:max-w-xl">
+            <div className="flex flex-col items-center gap-8 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-700">
+              <h2 className="text-4xl md:text-7xl font-anton leading-[1.1] text-white uppercase tracking-tighter max-w-sm md:max-w-4xl">
                 JA PENSOU <span className="text-[#F5F5F5]">CORTAR</span> O <span className="text-[#D4AF37]">CABELO</span> QUANTAS VEZES QUISER?
               </h2>
               
-              <div className="flex flex-col items-center gap-4">
-                <p className="text-primary text-[10px] md:text-[12px] uppercase tracking-[0.4em] font-black">
-                  POR APENAS 69,90 R$/MÊS É POSSÍVEL
+              <div className="flex flex-col items-center gap-6">
+                <p className="text-[#F5F5F5] text-2xl md:text-5xl font-anton uppercase tracking-tight leading-none">
+                  POR APENAS <span className="text-[#D4AF37]">69,90 R$/MÊS</span> É POSSIVEL
                 </p>
-                <Link href="#assinatura" className="mt-2 text-white/30 hover:text-white border border-white/10 hover:border-white/30 px-10 py-4 rounded-full text-[9px] uppercase tracking-[0.4em] transition-all duration-500 backdrop-blur-md">
+                <Link href="#assinatura" className="mt-2 text-white/30 hover:text-white border border-white/10 hover:border-white/30 px-12 py-5 rounded-full text-[10px] uppercase tracking-[0.4em] transition-all duration-500 backdrop-blur-md">
                   Saiba mais
                 </Link>
               </div>
@@ -102,7 +102,7 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Link href="#" className="flex-1">
+                <Link href="https://wa.me/554892465639" target="_blank" className="flex-1">
                   <button className="w-full bg-[#D4AF37] text-black h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:bg-[#C9A227] transition-all shadow-[0_0_30px_rgba(212,175,55,0.2)] active:scale-95">
                     Quero entrar | R$69/mês
                   </button>
