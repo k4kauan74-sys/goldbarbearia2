@@ -245,7 +245,7 @@ export function BookingForm() {
                         "text-[7px] font-bold uppercase",
                         isDisabled ? "text-destructive" : "text-emerald-500"
                       )}>
-                        {isTaken ? "OCUPADO" : !isWorkingHour ? "FECHADO" : "DISPONÍVEL"}
+                        {isTaken ? "INDISPONÍVEL" : !isWorkingHour ? "FECHADO" : "DISPONÍVEL"}
                       </span>
                       {time}
                     </button>
