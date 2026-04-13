@@ -328,16 +328,19 @@ export default function AdminDashboardPage() {
   const filteredAppointments = useMemo(() => {
     return appointments.filter(a => {
       const matchesSearch = a.clientName.toLowerCase().includes(search.toLowerCase()) || a.phone.includes(search);
-      const matchesProf = selectedProfFilter === "all" || a.professionalId === selectedProfFilter;
+      // Se for barbeiro, ignora selectedProfFilter "all" e força o próprio ID
+      const effectiveFilter = user?.role === 'barber' ? user.id : selectedProfFilter;
+      const matchesProf = effectiveFilter === "all" || a.professionalId === effectiveFilter;
       return matchesSearch && matchesProf;
     });
-  }, [appointments, search, selectedProfFilter]);
+  }, [appointments, search, selectedProfFilter, user]);
 
   const activeSlots = useMemo(() => {
-    if (selectedProfFilter === "all") return TIME_SLOTS;
-    const prof = professionals.find(p => p.id === selectedProfFilter);
+    const effectiveFilter = user?.role === 'barber' ? user.id : selectedProfFilter;
+    if (effectiveFilter === "all") return TIME_SLOTS;
+    const prof = professionals.find(p => p.id === effectiveFilter);
     return prof?.workingHours || [];
-  }, [selectedProfFilter, professionals]);
+  }, [selectedProfFilter, professionals, user]);
 
   const handlePrevDay = () => {
     const prev = subDays(new Date(agendaDate + 'T12:00:00'), 1);
@@ -387,7 +390,7 @@ export default function AdminDashboardPage() {
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Cliente</Label><Input value={aptClient} onChange={e=>setAptClient(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">WhatsApp</Label><Input value={aptPhone} onChange={e=>setAptPhone(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Serviço</Label><Select value={aptService} onValueChange={setAptService}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{services.map(s=><SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Barbeiro</Label><Select value={aptProf} onValueChange={setAptProf}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{professionals.map(p=><SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Barbeiro</Label><Select value={user.role === 'barber' ? user.id : aptProf} onValueChange={setAptProf} disabled={user.role === 'barber'}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{professionals.map(p=><SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Data</Label><Input type="date" value={aptDate} onChange={e=>setAptDate(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Hora</Label><Select value={aptTime} onValueChange={setAptTime}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{TIME_SLOTS.map(t=><SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select></div>
                   </div>
@@ -542,15 +545,17 @@ export default function AdminDashboardPage() {
                 </div>
                 <Button variant="ghost" size="icon" onClick={handleNextDay} className="h-7 w-7 text-[#F5F5F5]"><ChevronRight className="h-4 w-4" /></Button>
               </div>
-              <Select value={selectedProfFilter} onValueChange={setSelectedProfFilter}>
-                <SelectTrigger className="h-7 text-[8px] w-24 border-white/10 uppercase font-anton text-[#F5F5F5]">
-                  <SelectValue placeholder="FILTRO" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">TODOS</SelectItem>
-                  {professionals.map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              {isAdmin && (
+                <Select value={selectedProfFilter} onValueChange={setSelectedProfFilter}>
+                  <SelectTrigger className="h-7 text-[8px] w-24 border-white/10 uppercase font-anton text-[#F5F5F5]">
+                    <SelectValue placeholder="FILTRO" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">TODOS</SelectItem>
+                    {professionals.map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           )}
 
@@ -571,8 +576,12 @@ export default function AdminDashboardPage() {
                                   <div className="text-[11px] font-anton uppercase truncate text-[#D4AF37] leading-tight">{apt.clientName}</div>
                                   <div className="text-[8px] text-[#F5F5F5]/40 uppercase truncate flex items-center gap-1 mt-1">
                                     <Scissors className="h-2 w-2" /> {getServiceName(apt.serviceId)}
-                                    <span className="opacity-20 mx-1">|</span>
-                                    <Users className="h-2 w-2" /> {getProfName(apt.professionalId)}
+                                    {isAdmin && (
+                                      <>
+                                        <span className="opacity-20 mx-1">|</span>
+                                        <Users className="h-2 w-2" /> {getProfName(apt.professionalId)}
+                                      </>
+                                    )}
                                   </div>
                                 </div>
                                 <div className="flex gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
@@ -596,7 +605,9 @@ export default function AdminDashboardPage() {
 
             {viewMode === 'professionals' && (
               <div className="p-3 space-y-2">
-                {professionals.map(p => (
+                {professionals
+                  .filter(p => isAdmin || p.id === user.id)
+                  .map(p => (
                   <div key={p.id} className="flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 rounded-2xl">
                     <img src={p.photo} className="w-10 h-10 rounded-full object-cover grayscale" />
                     <div className="flex-1 min-w-0">
@@ -642,7 +653,7 @@ export default function AdminDashboardPage() {
             {viewMode === 'finance' && (
               <div className="p-3 space-y-3">
                 <div className="space-y-2">
-                  <div className="text-[8px] font-anton uppercase text-[#F5F5F5]/30 tracking-widest">Resumo por Barbeiro</div>
+                  <div className="text-[8px] font-anton uppercase text-[#F5F5F5]/30 tracking-widest">Resumo {isAdmin ? "por Barbeiro" : "Pessoal"}</div>
                   {financeData.profBreakdown.map(row => (
                     <div key={row.id} className="flex justify-between items-center p-3 bg-white/[0.02] rounded-2xl border border-white/5">
                       <div className="text-[10px] font-anton uppercase text-[#F5F5F5]">{row.name}</div>
