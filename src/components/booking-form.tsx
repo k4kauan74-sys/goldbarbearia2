@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { CustomCalendar } from "@/components/custom-calendar";
 
-type Step = 'service' | 'professional' | 'datetime' | 'contact' | 'success';
+type Step = 'service' | 'professional' | 'date' | 'time' | 'contact' | 'success';
 
 export function BookingForm() {
   const [step, setStep] = useState<Step>('service');
@@ -40,7 +40,6 @@ export function BookingForm() {
     setSelectedDate(now);
     setToday(now);
 
-    // Load dynamic data from localStorage
     const savedServices = JSON.parse(localStorage.getItem('gold_services') || '[]');
     const savedProfs = JSON.parse(localStorage.getItem('gold_professionals') || '[]');
 
@@ -57,7 +56,7 @@ export function BookingForm() {
     }
   }, []);
 
-  const steps: Step[] = ['service', 'professional', 'datetime', 'contact', 'success'];
+  const steps: Step[] = ['service', 'professional', 'date', 'time', 'contact', 'success'];
   const currentStepIndex = steps.indexOf(step);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,7 +93,6 @@ export function BookingForm() {
   return (
     <div className="w-full max-w-5xl mx-auto py-6 md:py-12 px-4">
       <div className="glass rounded-[2rem] md:rounded-[3rem] p-6 md:p-16 shadow-2xl shadow-primary/5 border-white/5 relative overflow-hidden">
-        {/* Background Accent */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] pointer-events-none" />
 
         {step === 'service' && (
@@ -137,7 +135,7 @@ export function BookingForm() {
               {professionals.map((p) => (
                 <button
                   key={p.id}
-                  onClick={() => { setSelectedProfessional(p); setStep('datetime'); }}
+                  onClick={() => { setSelectedProfessional(p); setStep('date'); }}
                   className="group flex flex-col items-center gap-4 transition-all duration-300"
                 >
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-white/5 group-hover:border-primary transition-colors bg-neutral-900 shadow-xl group-hover:shadow-primary/20">
@@ -156,61 +154,70 @@ export function BookingForm() {
           </div>
         )}
 
-        {step === 'datetime' && (
+        {step === 'date' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-4">
               <h2 className="text-3xl md:text-6xl font-anton text-white uppercase tracking-tighter">
-                DATA E <span className="text-shimmer">HORA</span>
+                ESCOLHA A <span className="text-shimmer">DATA</span>
               </h2>
               <Button variant="ghost" onClick={prevStep} className="text-neutral-500 hover:text-white uppercase tracking-widest font-anton text-[10px] gap-2 self-end">
                 <ChevronLeft className="h-4 w-4" /> Voltar
               </Button>
             </div>
 
-            <div className="space-y-10">
-              {/* Seção do Calendário */}
-              <div className="glass rounded-[2rem] p-6 md:p-10 border-white/5 shadow-inner">
-                <div className="flex items-center gap-2 mb-6 justify-center">
-                  <CalendarIcon className="w-3 h-3 text-primary" />
-                  <p className="text-[9px] font-mono text-primary uppercase tracking-[0.3em]">01. Selecione o Dia</p>
-                </div>
-                <CustomCalendar
-                  selectedDate={selectedDate}
-                  onSelect={(date) => setSelectedDate(date)}
-                  disabledDays={(date) => {
-                    if (!today) return false;
-                    const compareDate = new Date(date);
-                    compareDate.setHours(0, 0, 0, 0);
-                    const todayCompare = new Date(today);
-                    todayCompare.setHours(0, 0, 0, 0);
-                    return compareDate < todayCompare || date.getDay() === 0;
-                  }}
-                />
+            <div className="glass rounded-[2rem] p-6 md:p-10 border-white/5 shadow-inner">
+              <div className="flex items-center gap-2 mb-6 justify-center">
+                <CalendarIcon className="w-3 h-3 text-primary" />
+                <p className="text-[9px] font-mono text-primary uppercase tracking-[0.3em]">01. Selecione o Dia</p>
               </div>
+              <CustomCalendar
+                selectedDate={selectedDate}
+                onSelect={(date) => { setSelectedDate(date); setStep('time'); }}
+                disabledDays={(date) => {
+                  if (!today) return false;
+                  const compareDate = new Date(date);
+                  compareDate.setHours(0, 0, 0, 0);
+                  const todayCompare = new Date(today);
+                  todayCompare.setHours(0, 0, 0, 0);
+                  return compareDate < todayCompare || date.getDay() === 0;
+                }}
+              />
+            </div>
+          </div>
+        )}
 
-              {/* Seção dos Horários (Flashcards) */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-2 mb-6 justify-center">
-                  <Clock className="w-3 h-3 text-primary" />
-                  <p className="text-[9px] font-mono text-primary uppercase tracking-[0.3em]">02. Selecione o Horário</p>
-                </div>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                  {TIME_SLOTS.map((time) => (
-                    <button
-                      key={time}
-                      onClick={() => { setSelectedTime(time); setStep('contact'); }}
-                      className={cn(
-                        "py-5 px-2 text-[11px] md:text-xs font-mono border rounded-2xl transition-all uppercase tracking-widest flex flex-col items-center justify-center gap-1",
-                        selectedTime === time 
-                          ? "bg-primary text-black border-primary shadow-[0_0_25px_rgba(251,191,36,0.3)] scale-105" 
-                          : "glass border-white/5 text-neutral-400 hover:border-primary/40 hover:text-white"
-                      )}
-                    >
-                      <span className="opacity-20 text-[7px] font-bold">DISPONÍVEL</span>
-                      {time}
-                    </button>
-                  ))}
-                </div>
+        {step === 'time' && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-4">
+              <h2 className="text-3xl md:text-6xl font-anton text-white uppercase tracking-tighter">
+                ESCOLHA O <span className="text-shimmer">HORÁRIO</span>
+              </h2>
+              <Button variant="ghost" onClick={prevStep} className="text-neutral-500 hover:text-white uppercase tracking-widest font-anton text-[10px] gap-2 self-end">
+                <ChevronLeft className="h-4 w-4" /> Voltar
+              </Button>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex items-center gap-2 mb-6 justify-center">
+                <Clock className="w-3 h-3 text-primary" />
+                <p className="text-[9px] font-mono text-primary uppercase tracking-[0.3em]">02. Selecione o Horário</p>
+              </div>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                {TIME_SLOTS.map((time) => (
+                  <button
+                    key={time}
+                    onClick={() => { setSelectedTime(time); setStep('contact'); }}
+                    className={cn(
+                      "py-5 px-2 text-[11px] md:text-xs font-mono border rounded-2xl transition-all uppercase tracking-widest flex flex-col items-center justify-center gap-1",
+                      selectedTime === time 
+                        ? "bg-primary text-black border-primary shadow-[0_0_25px_rgba(251,191,36,0.3)] scale-105" 
+                        : "glass border-white/5 text-neutral-400 hover:border-primary/40 hover:text-white"
+                    )}
+                  >
+                    <span className="opacity-20 text-[7px] font-bold">DISPONÍVEL</span>
+                    {time}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
