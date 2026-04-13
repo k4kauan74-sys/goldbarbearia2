@@ -22,7 +22,9 @@ import {
   DollarSign,
   PieChart,
   Percent,
-  Scissors
+  Scissors,
+  ShieldAlert,
+  Calendar
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -43,13 +45,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { MOCK_SERVICES, MOCK_PROFESSIONALS, TIME_SLOTS } from "@/lib/mock-data";
-import { Professional, Appointment, Service } from "@/lib/types";
+import { Professional, Appointment, Service, AuthUser } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 type ViewMode = 'appointments' | 'professionals' | 'services' | 'finance';
 
 export default function AdminDashboardPage() {
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('appointments');
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
@@ -67,6 +70,8 @@ export default function AdminDashboardPage() {
   const [editingService, setEditingService] = useState<Service | null>(null);
   
   const [profName, setProfName] = useState("");
+  const [profEmail, setProfEmail] = useState("");
+  const [profPassword, setProfPassword] = useState("123");
   const [profSpecialty, setProfSpecialty] = useState("");
   const [profPhoto, setProfPhoto] = useState("");
   const [profCommission, setProfCommission] = useState("50");
@@ -87,10 +92,16 @@ export default function AdminDashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const isLogged = localStorage.getItem("gold_admin_logged");
-    if (!isLogged) {
+    const loggedUser = localStorage.getItem("gold_user");
+    if (!loggedUser) {
       router.push("/admin/login");
       return;
+    }
+    const parsedUser: AuthUser = JSON.parse(loggedUser);
+    setUser(parsedUser);
+
+    if (parsedUser.role === 'barber') {
+      setSelectedProfFilter(parsedUser.id);
     }
 
     const savedApts = JSON.parse(localStorage.getItem('gold_appointments') || '[]');
@@ -113,37 +124,45 @@ export default function AdminDashboardPage() {
     }
   }, [router]);
 
-  // Finance Calculations
+  const isAdmin = user?.role === 'admin';
+
   const financeData = useMemo(() => {
-    const totalRevenue = appointments.reduce((acc, curr) => {
+    // Filter appointments based on user role
+    const relevantApts = user?.role === 'barber' 
+      ? appointments.filter(a => a.professionalId === user.id)
+      : appointments;
+
+    const totalRevenue = relevantApts.reduce((acc, curr) => {
       const service = services.find(s => s.id === curr.serviceId);
       return acc + (service?.price || 0);
     }, 0);
 
-    const totalCommissions = appointments.reduce((acc, curr) => {
+    const totalCommissions = relevantApts.reduce((acc, curr) => {
       const service = services.find(s => s.id === curr.serviceId);
       const prof = professionals.find(p => p.id === curr.professionalId);
       const commissionAmount = ((service?.price || 0) * (prof?.commission ?? 0)) / 100;
       return acc + commissionAmount;
     }, 0);
 
-    const profBreakdown = professionals.map(p => {
-      const profApts = appointments.filter(a => a.professionalId === p.id);
-      const revenue = profApts.reduce((acc, curr) => {
-        const service = services.find(s => s.id === curr.serviceId);
-        return acc + (service?.price || 0);
-      }, 0);
-      const commission = (revenue * (p.commission ?? 0)) / 100;
+    const profBreakdown = professionals
+      .filter(p => user?.role === 'admin' || p.id === user?.id)
+      .map(p => {
+        const profApts = appointments.filter(a => a.professionalId === p.id);
+        const revenue = profApts.reduce((acc, curr) => {
+          const service = services.find(s => s.id === curr.serviceId);
+          return acc + (service?.price || 0);
+        }, 0);
+        const commission = (revenue * (p.commission ?? 0)) / 100;
 
-      return {
-        id: p.id,
-        name: p.name,
-        revenue,
-        commission,
-        percentage: p.commission ?? 0,
-        aptsCount: profApts.length
-      };
-    });
+        return {
+          id: p.id,
+          name: p.name,
+          revenue,
+          commission,
+          percentage: p.commission ?? 0,
+          aptsCount: profApts.length
+        };
+      });
 
     return {
       totalRevenue,
@@ -151,15 +170,17 @@ export default function AdminDashboardPage() {
       netProfit: totalRevenue - totalCommissions,
       profBreakdown
     };
-  }, [appointments, professionals, services]);
+  }, [appointments, professionals, services, user]);
 
   const handleLogout = () => {
-    localStorage.removeItem("gold_admin_logged");
+    localStorage.removeItem("gold_user");
     router.push("/admin/login");
   };
 
   const handleSaveAppointment = () => {
-    if (!aptClient || !aptPhone || !aptService || !aptProf || !aptDate || !aptTime) {
+    const profIdToSave = user?.role === 'barber' ? user.id : aptProf;
+    
+    if (!aptClient || !aptPhone || !aptService || !profIdToSave || !aptDate || !aptTime) {
       toast({ title: "Erro", description: "Preencha todos os campos.", variant: "destructive" });
       return;
     }
@@ -168,13 +189,13 @@ export default function AdminDashboardPage() {
     if (editingApt) {
       updatedApts = appointments.map(a => a.id === editingApt.id ? { 
         ...a, clientName: aptClient, phone: aptPhone, serviceId: aptService, 
-        professionalId: aptProf, date: aptDate, time: aptTime 
+        professionalId: profIdToSave, date: aptDate, time: aptTime 
       } : a);
     } else {
       const newApt: Appointment = {
         id: Math.random().toString(36).substr(2, 9),
         clientName: aptClient, phone: aptPhone, serviceId: aptService,
-        professionalId: aptProf, date: aptDate, time: aptTime, status: 'confirmed'
+        professionalId: profIdToSave, date: aptDate, time: aptTime, status: 'confirmed'
       };
       updatedApts = [...appointments, newApt];
     }
@@ -233,14 +254,16 @@ export default function AdminDashboardPage() {
     if (editingProf) {
       updatedProfs = professionals.map(p => p.id === editingProf.id ? { 
         ...p, name: profName, specialty: profSpecialty, 
-        photo: profPhoto || p.photo, commission: Number(profCommission) 
+        photo: profPhoto || p.photo, commission: Number(profCommission),
+        email: profEmail, password: profPassword
       } : p);
     } else {
       const newProf: Professional = {
         id: Math.random().toString(36).substr(2, 9),
         name: profName, specialty: profSpecialty,
         photo: profPhoto || "https://picsum.photos/seed/newprof/400/500",
-        commission: Number(profCommission), active: true
+        commission: Number(profCommission), active: true,
+        email: profEmail, password: profPassword
       };
       updatedProfs = [...professionals, newProf];
     }
@@ -262,6 +285,8 @@ export default function AdminDashboardPage() {
   const resetProfForm = () => {
     setEditingProf(null);
     setProfName("");
+    setProfEmail("");
+    setProfPassword("123");
     setProfSpecialty("");
     setProfPhoto("");
     setProfCommission("50");
@@ -270,6 +295,8 @@ export default function AdminDashboardPage() {
   const openEditProf = (prof: Professional) => {
     setEditingProf(prof);
     setProfName(prof.name);
+    setProfEmail(prof.email || "");
+    setProfPassword(prof.password || "123");
     setProfSpecialty(prof.specialty);
     setProfPhoto(prof.photo);
     setProfCommission(prof.commission?.toString() ?? "50");
@@ -339,12 +366,14 @@ export default function AdminDashboardPage() {
     return matchesSearch && matchesProf;
   }).sort((a, b) => new Date(b.date + 'T' + b.time).getTime() - new Date(a.date + 'T' + a.time).getTime());
 
+  if (!user) return null;
+
   return (
     <div className="min-h-screen bg-[#030303] flex flex-col md:flex-row text-white font-body">
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-[#0a0a0a] border-r border-white/5 flex flex-col">
         <div className="p-8 border-b border-white/5 flex items-center gap-3">
-          <span className="font-anton text-2xl tracking-tighter uppercase">GOLD<span className="text-primary">ADMIN</span></span>
+          <span className="font-anton text-2xl tracking-tighter uppercase">GOLD<span className="text-primary">{user.role === 'admin' ? 'ADMIN' : 'STAFF'}</span></span>
         </div>
         <nav className="flex-1 p-6 space-y-3">
           <Button 
@@ -355,28 +384,34 @@ export default function AdminDashboardPage() {
               viewMode === 'appointments' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
             )}
           >
-            <CalendarIcon className="h-4 w-4" /> Agendamentos
+            <CalendarIcon className="h-4 w-4" /> {user.role === 'admin' ? 'Agendamentos' : 'Minha Agenda'}
           </Button>
-          <Button 
-            variant="ghost" 
-            onClick={() => setViewMode('professionals')}
-            className={cn(
-              "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-6",
-              viewMode === 'professionals' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
-            )}
-          >
-            <Users className="h-4 w-4" /> Equipe
-          </Button>
-          <Button 
-            variant="ghost" 
-            onClick={() => setViewMode('services')}
-            className={cn(
-              "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-6",
-              viewMode === 'services' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
-            )}
-          >
-            <Scissors className="h-4 w-4" /> Serviços
-          </Button>
+          
+          {isAdmin && (
+            <>
+              <Button 
+                variant="ghost" 
+                onClick={() => setViewMode('professionals')}
+                className={cn(
+                  "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-6",
+                  viewMode === 'professionals' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
+                )}
+              >
+                <Users className="h-4 w-4" /> Equipe
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => setViewMode('services')}
+                className={cn(
+                  "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-6",
+                  viewMode === 'services' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
+                )}
+              >
+                <Scissors className="h-4 w-4" /> Serviços
+              </Button>
+            </>
+          )}
+
           <Button 
             variant="ghost" 
             onClick={() => setViewMode('finance')}
@@ -385,7 +420,7 @@ export default function AdminDashboardPage() {
               viewMode === 'finance' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
             )}
           >
-            <DollarSign className="h-4 w-4" /> Gestão de Caixa
+            <DollarSign className="h-4 w-4" /> {user.role === 'admin' ? 'Gestão de Caixa' : 'Meu Financeiro'}
           </Button>
           
           <div className="pt-6 mt-6 border-t border-white/5">
@@ -397,6 +432,10 @@ export default function AdminDashboardPage() {
           </div>
         </nav>
         <div className="p-6 border-t border-white/5">
+          <div className="mb-4 px-3 flex flex-col">
+            <span className="text-[8px] text-white/20 uppercase tracking-widest">Logado como</span>
+            <span className="text-[10px] font-anton text-primary uppercase">{user.name}</span>
+          </div>
           <Button variant="ghost" onClick={handleLogout} className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 font-anton uppercase tracking-widest text-[10px]">
             <LogOut className="h-4 w-4" /> Sair
           </Button>
@@ -408,15 +447,15 @@ export default function AdminDashboardPage() {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div>
             <h1 className="text-5xl font-anton uppercase tracking-tighter">
-              {viewMode === 'appointments' && "PAINEL DE "}
+              {viewMode === 'appointments' && (user.role === 'admin' ? "PAINEL DE " : "MINHA ")}
               {viewMode === 'professionals' && "GESTÃO DE "}
               {viewMode === 'services' && "TABELA DE "}
-              {viewMode === 'finance' && "GESTÃO DE "}
+              {viewMode === 'finance' && (user.role === 'admin' ? "GESTÃO DE " : "MEU ")}
               <span className="text-shimmer">
-                {viewMode === 'appointments' && "AGENDAMENTOS"}
+                {viewMode === 'appointments' && (user.role === 'admin' ? "AGENDAMENTOS" : "AGENDA")}
                 {viewMode === 'professionals' && "PROFISSIONAIS"}
                 {viewMode === 'services' && "SERVIÇOS"}
-                {viewMode === 'finance' && "CAIXA & COMISSÕES"}
+                {viewMode === 'finance' && (user.role === 'admin' ? "CAIXA & COMISSÕES" : "FECHAMENTO")}
               </span>
             </h1>
             <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mt-3">Sincronização editorial em tempo real</p>
@@ -424,18 +463,20 @@ export default function AdminDashboardPage() {
           
           {viewMode === 'appointments' && (
             <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-3">
-                <Filter className="h-4 w-4 text-white/20" />
-                <Select value={selectedProfFilter} onValueChange={setSelectedProfFilter}>
-                  <SelectTrigger className="bg-[#0a0a0a] border-white/10 w-[180px] h-12 text-[10px] font-anton tracking-widest uppercase">
-                    <SelectValue placeholder="FILTRAR..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0a0a0a] border-white/10 text-white">
-                    <SelectItem value="all">TODOS OS BARBEIROS</SelectItem>
-                    {professionals.map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
+              {isAdmin && (
+                <div className="flex items-center gap-3">
+                  <Filter className="h-4 w-4 text-white/20" />
+                  <Select value={selectedProfFilter} onValueChange={setSelectedProfFilter}>
+                    <SelectTrigger className="bg-[#0a0a0a] border-white/10 w-[180px] h-12 text-[10px] font-anton tracking-widest uppercase">
+                      <SelectValue placeholder="FILTRAR..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0a0a0a] border-white/10 text-white">
+                      <SelectItem value="all">TODOS OS BARBEIROS</SelectItem>
+                      {professionals.map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <Dialog open={isAptDialogOpen} onOpenChange={(open) => { setIsAptDialogOpen(open); if(!open) resetAptForm(); }}>
                 <DialogTrigger asChild>
                   <Button className="bg-white text-black hover:bg-primary font-anton uppercase tracking-widest text-[10px] px-8 py-6 rounded-full">
@@ -467,12 +508,16 @@ export default function AdminDashboardPage() {
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] uppercase text-white/40">Barbeiro</Label>
-                        <Select value={aptProf} onValueChange={setAptProf}>
-                          <SelectTrigger className="bg-transparent border-white/10 border-b rounded-none h-12"><SelectValue /></SelectTrigger>
-                          <SelectContent className="bg-[#0a0a0a] text-white">
-                            {professionals.map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
+                        {user.role === 'barber' ? (
+                          <div className="h-12 flex items-center px-4 border-b border-white/10 text-primary font-anton text-xs uppercase">{user.name}</div>
+                        ) : (
+                          <Select value={aptProf} onValueChange={setAptProf}>
+                            <SelectTrigger className="bg-transparent border-white/10 border-b rounded-none h-12"><SelectValue /></SelectTrigger>
+                            <SelectContent className="bg-[#0a0a0a] text-white">
+                              {professionals.map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        )}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -499,7 +544,7 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          {viewMode === 'professionals' && (
+          {viewMode === 'professionals' && isAdmin && (
             <Dialog open={isProfDialogOpen} onOpenChange={(open) => { setIsProfDialogOpen(open); if(!open) resetProfForm(); }}>
               <DialogTrigger asChild>
                 <Button className="bg-primary text-black hover:bg-white font-anton uppercase tracking-widest text-[10px] px-8 py-6 rounded-full">
@@ -516,13 +561,25 @@ export default function AdminDashboardPage() {
                     </div>
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handlePhotoUpload} />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] uppercase text-white/40">Nome</Label>
-                    <Input value={profName} onChange={(e) => setProfName(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none uppercase" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase text-white/40">Nome</Label>
+                      <Input value={profName} onChange={(e) => setProfName(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none uppercase" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase text-white/40">Especialidade</Label>
+                      <Input value={profSpecialty} onChange={(e) => setProfSpecialty(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none uppercase" />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] uppercase text-white/40">Especialidade</Label>
-                    <Input value={profSpecialty} onChange={(e) => setProfSpecialty(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none uppercase" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase text-white/40">E-mail (Login)</Label>
+                      <Input value={profEmail} onChange={(e) => setProfEmail(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase text-white/40">Senha</Label>
+                      <Input value={profPassword} onChange={(e) => setProfPassword(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] uppercase text-white/40">Comissão (%)</Label>
@@ -539,7 +596,7 @@ export default function AdminDashboardPage() {
             </Dialog>
           )}
 
-          {viewMode === 'services' && (
+          {viewMode === 'services' && isAdmin && (
             <Dialog open={isServiceDialogOpen} onOpenChange={(open) => { setIsServiceDialogOpen(open); if(!open) resetServiceForm(); }}>
               <DialogTrigger asChild>
                 <Button className="bg-primary text-black hover:bg-white font-anton uppercase tracking-widest text-[10px] px-8 py-6 rounded-full">
@@ -600,10 +657,10 @@ export default function AdminDashboardPage() {
               <Card className="bg-[#0a0a0a] border-white/5 p-4 rounded-3xl">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Net Profit</span>
+                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">{user.role === 'admin' ? 'Net Profit' : 'My Commission'}</span>
                     <CheckCircle className="text-emerald-500 h-4 w-4" />
                   </div>
-                  <div className="text-4xl font-anton tracking-tighter text-primary">R$ {financeData.netProfit.toFixed(0)}</div>
+                  <div className="text-4xl font-anton tracking-tighter text-primary">R$ {(user.role === 'admin' ? financeData.netProfit : financeData.totalCommissions).toFixed(0)}</div>
                 </CardContent>
               </Card>
             </div>
@@ -645,7 +702,7 @@ export default function AdminDashboardPage() {
           </>
         )}
 
-        {viewMode === 'professionals' && (
+        {viewMode === 'professionals' && isAdmin && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {professionals.map((prof) => (
               <Card key={prof.id} className="bg-[#0a0a0a] border-white/5 rounded-[2rem] overflow-hidden group">
@@ -660,6 +717,7 @@ export default function AdminDashboardPage() {
                         <Badge className="bg-primary/20 text-primary border-none text-[9px] uppercase px-3">{(prof.commission ?? 0)}% COMISSÃO</Badge>
                       </div>
                       <p className="text-[10px] font-mono text-primary uppercase tracking-widest">{prof.specialty}</p>
+                      <p className="text-[8px] text-white/20 mt-2 uppercase tracking-widest">Login: {prof.email || 'N/A'}</p>
                     </div>
                     <div className="flex gap-3 mt-10">
                       <Button variant="ghost" onClick={() => openEditProf(prof)} className="flex-1 border border-white/10 text-white/40 hover:text-white uppercase text-[9px] h-12 rounded-xl"><Edit2 className="mr-2 h-3 w-3" /> Editar Perfil</Button>
@@ -672,7 +730,7 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {viewMode === 'services' && (
+        {viewMode === 'services' && isAdmin && (
           <Card className="bg-[#0a0a0a] border-white/5 rounded-[2rem] overflow-hidden">
             <Table>
               <TableHeader className="bg-black/40">
@@ -719,7 +777,7 @@ export default function AdminDashboardPage() {
               <Card className="bg-[#0a0a0a] border-white/5 p-8 rounded-[2.5rem]">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-primary/10 rounded-2xl"><TrendingUp className="text-primary h-6 w-6" /></div>
-                  <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Faturamento Bruto</span>
+                  <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Valor Total Gerado</span>
                 </div>
                 <div className="text-5xl font-anton">R$ {financeData.totalRevenue.toFixed(2)}</div>
               </Card>
@@ -733,21 +791,21 @@ export default function AdminDashboardPage() {
               <Card className="bg-[#0a0a0a] border-white/5 p-8 rounded-[2.5rem] bg-gradient-to-br from-primary/5 to-transparent">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-emerald-500/10 rounded-2xl"><CheckCircle className="text-emerald-500 h-6 w-6" /></div>
-                  <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Lucro Líquido (Box)</span>
+                  <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">{user.role === 'admin' ? 'Lucro Líquido' : 'Meu Saldo'}</span>
                 </div>
-                <div className="text-5xl font-anton text-emerald-500">R$ {financeData.netProfit.toFixed(2)}</div>
+                <div className="text-5xl font-anton text-emerald-500">R$ {(user.role === 'admin' ? financeData.netProfit : financeData.totalCommissions).toFixed(2)}</div>
               </Card>
             </div>
 
             {/* Commissions Table */}
             <Card className="bg-[#0a0a0a] border-white/5 rounded-[2rem] overflow-hidden">
               <CardHeader className="p-8 border-b border-white/5">
-                <CardTitle className="text-xs font-anton uppercase tracking-[0.4em] text-white/60">Fechamento por Colaborador</CardTitle>
+                <CardTitle className="text-xs font-anton uppercase tracking-[0.4em] text-white/60">{user.role === 'admin' ? 'Fechamento por Colaborador' : 'Detalhamento de Atendimentos'}</CardTitle>
               </CardHeader>
               <Table>
                 <TableHeader className="bg-black/20">
                   <TableRow className="border-white/5">
-                    <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30 h-16">Especialista</TableHead>
+                    <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30 h-16">{user.role === 'admin' ? 'Especialista' : 'Descrição'}</TableHead>
                     <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30">Cortes / Serv.</TableHead>
                     <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30">Valor Gerado</TableHead>
                     <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30">Sua %</TableHead>

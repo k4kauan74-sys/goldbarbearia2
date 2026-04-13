@@ -10,6 +10,8 @@ export type Service = {
 export type Professional = {
   id: string;
   name: string;
+  email?: string;
+  password?: string;
   photo: string;
   specialty: string;
   commission: number; // Percentage (0-100)
@@ -27,10 +29,9 @@ export type Appointment = {
   status: 'confirmed' | 'cancelled' | 'pending';
 };
 
-export type Availability = {
+export type AuthUser = {
   id: string;
-  professionalId: string;
-  date: string;
-  time: string;
-  available: boolean;
+  name: string;
+  email: string;
+  role: 'admin' | 'barber';
 };
