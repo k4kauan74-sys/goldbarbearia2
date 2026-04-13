@@ -10,21 +10,18 @@ import {
   LogOut, 
   Search, 
   Trash2, 
-  CheckCircle, 
-  Clock, 
+  Edit2, 
+  UserPlus, 
+  Upload, 
+  DollarSign, 
+  PieChart, 
   TrendingUp,
+  CheckCircle,
+  Clock,
   Home,
   Plus,
-  Edit2,
-  UserPlus,
-  Filter,
-  Upload,
-  DollarSign,
-  PieChart,
-  Percent,
   Scissors,
-  ShieldAlert,
-  Calendar
+  Percent
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -178,12 +175,10 @@ export default function AdminDashboardPage() {
 
   const handleSaveAppointment = () => {
     const profIdToSave = user?.role === 'barber' ? user.id : aptProf;
-    
     if (!aptClient || !aptPhone || !aptService || !profIdToSave || !aptDate || !aptTime) {
       toast({ title: "Erro", description: "Preencha todos os campos.", variant: "destructive" });
       return;
     }
-
     let updatedApts;
     if (editingApt) {
       updatedApts = appointments.map(a => a.id === editingApt.id ? { 
@@ -198,39 +193,26 @@ export default function AdminDashboardPage() {
       };
       updatedApts = [...appointments, newApt];
     }
-    
     setAppointments(updatedApts);
     localStorage.setItem('gold_appointments', JSON.stringify(updatedApts));
     setIsAptDialogOpen(false);
     resetAptForm();
-    toast({ title: "Sucesso", description: "Agendamento salvo." });
   };
 
   const deleteAppointment = (id: string) => {
     const updated = appointments.filter(a => a.id !== id);
     setAppointments(updated);
     localStorage.setItem('gold_appointments', JSON.stringify(updated));
-    toast({ title: "Removido", description: "Agendamento excluído." });
   };
 
   const resetAptForm = () => {
-    setEditingApt(null);
-    setAptClient("");
-    setAptPhone("");
-    setAptService("");
-    setAptProf("");
-    setAptDate(format(new Date(), "yyyy-MM-dd"));
-    setAptTime("");
+    setEditingApt(null); setAptClient(""); setAptPhone(""); setAptService("");
+    setAptProf(""); setAptDate(format(new Date(), "yyyy-MM-dd")); setAptTime("");
   };
 
   const openEditApt = (apt: Appointment) => {
-    setEditingApt(apt);
-    setAptClient(apt.clientName);
-    setAptPhone(apt.phone);
-    setAptService(apt.serviceId);
-    setAptProf(apt.professionalId);
-    setAptDate(apt.date);
-    setAptTime(apt.time);
+    setEditingApt(apt); setAptClient(apt.clientName); setAptPhone(apt.phone);
+    setAptService(apt.serviceId); setAptProf(apt.professionalId); setAptDate(apt.date); setAptTime(apt.time);
     setIsAptDialogOpen(true);
   };
 
@@ -244,115 +226,78 @@ export default function AdminDashboardPage() {
   };
 
   const handleSaveProfessional = () => {
-    if (!profName || !profSpecialty) {
-      toast({ title: "Erro", description: "Campos obrigatórios.", variant: "destructive" });
-      return;
-    }
-
+    if (!profName || !profSpecialty) return;
     let updatedProfs;
     if (editingProf) {
       updatedProfs = professionals.map(p => p.id === editingProf.id ? { 
-        ...p, name: profName, specialty: profSpecialty, 
-        photo: profPhoto || p.photo, commission: Number(profCommission),
-        email: profEmail, password: profPassword
+        ...p, name: profName, specialty: profSpecialty, photo: profPhoto || p.photo, 
+        commission: Number(profCommission), email: profEmail, password: profPassword
       } : p);
     } else {
       const newProf: Professional = {
         id: Math.random().toString(36).substr(2, 9),
-        name: profName, specialty: profSpecialty,
-        photo: profPhoto || "https://picsum.photos/seed/newprof/400/500",
-        commission: Number(profCommission), active: true,
-        email: profEmail, password: profPassword
+        name: profName, specialty: profSpecialty, photo: profPhoto || "https://picsum.photos/seed/new/400",
+        commission: Number(profCommission), active: true, email: profEmail, password: profPassword
       };
       updatedProfs = [...professionals, newProf];
     }
-    
     setProfessionals(updatedProfs);
     localStorage.setItem('gold_professionals', JSON.stringify(updatedProfs));
     setIsProfDialogOpen(false);
     resetProfForm();
-    toast({ title: "Sucesso", description: "Profissional salvo." });
   };
 
   const deleteProfessional = (id: string) => {
     const updated = professionals.filter(p => p.id !== id);
     setProfessionals(updated);
     localStorage.setItem('gold_professionals', JSON.stringify(updated));
-    toast({ title: "Removido", description: "Profissional excluído." });
   };
 
   const resetProfForm = () => {
-    setEditingProf(null);
-    setProfName("");
-    setProfEmail("");
-    setProfPassword("123");
-    setProfSpecialty("");
-    setProfPhoto("");
-    setProfCommission("50");
+    setEditingProf(null); setProfName(""); setProfEmail(""); setProfPassword("123");
+    setProfSpecialty(""); setProfPhoto(""); setProfCommission("50");
   };
 
   const openEditProf = (prof: Professional) => {
-    setEditingProf(prof);
-    setProfName(prof.name);
-    setProfEmail(prof.email || "");
-    setProfPassword(prof.password || "123");
-    setProfSpecialty(prof.specialty);
-    setProfPhoto(prof.photo);
-    setProfCommission(prof.commission?.toString() ?? "50");
+    setEditingProf(prof); setProfName(prof.name); setProfEmail(prof.email || "");
+    setProfPassword(prof.password || "123"); setProfSpecialty(prof.specialty);
+    setProfPhoto(prof.photo); setProfCommission(prof.commission?.toString() ?? "50");
     setIsProfDialogOpen(true);
   };
 
   const handleSaveService = () => {
-    if (!srvName || !srvPrice || !srvDuration) {
-      toast({ title: "Erro", description: "Preencha os campos obrigatórios.", variant: "destructive" });
-      return;
-    }
-
+    if (!srvName || !srvPrice || !srvDuration) return;
     let updatedServices;
     if (editingService) {
       updatedServices = services.map(s => s.id === editingService.id ? { 
-        ...s, name: srvName, price: Number(srvPrice), 
-        duration: Number(srvDuration), description: srvDescription 
+        ...s, name: srvName, price: Number(srvPrice), duration: Number(srvDuration), description: srvDescription 
       } : s);
     } else {
       const newService: Service = {
-        id: Math.random().toString(36).substr(2, 9),
-        name: srvName,
-        price: Number(srvPrice),
-        duration: Number(srvDuration),
-        description: srvDescription
+        id: Math.random().toString(36).substr(2, 9), name: srvName,
+        price: Number(srvPrice), duration: Number(srvDuration), description: srvDescription
       };
       updatedServices = [...services, newService];
     }
-    
     setServices(updatedServices);
     localStorage.setItem('gold_services', JSON.stringify(updatedServices));
     setIsServiceDialogOpen(false);
     resetServiceForm();
-    toast({ title: "Sucesso", description: "Serviço salvo." });
   };
 
   const deleteService = (id: string) => {
     const updated = services.filter(s => s.id !== id);
     setServices(updated);
     localStorage.setItem('gold_services', JSON.stringify(updated));
-    toast({ title: "Removido", description: "Serviço excluído." });
   };
 
   const resetServiceForm = () => {
-    setEditingService(null);
-    setSrvName("");
-    setSrvPrice("");
-    setSrvDuration("");
-    setSrvDescription("");
+    setEditingService(null); setSrvName(""); setSrvPrice(""); setSrvDuration(""); setSrvDescription("");
   };
 
   const openEditService = (service: Service) => {
-    setEditingService(service);
-    setSrvName(service.name);
-    setSrvPrice(service.price.toString());
-    setSrvDuration(service.duration.toString());
-    setSrvDescription(service.description || "");
+    setEditingService(service); setSrvName(service.name); setSrvPrice(service.price.toString());
+    setSrvDuration(service.duration.toString()); setSrvDescription(service.description || "");
     setIsServiceDialogOpen(true);
   };
 
@@ -368,493 +313,188 @@ export default function AdminDashboardPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#030303] flex flex-col md:flex-row text-white font-body">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-[#0a0a0a] border-r border-white/5 flex flex-col z-50">
-        <div className="p-6 md:p-8 border-b border-white/5 flex items-center justify-between md:justify-start gap-3">
-          <span className="font-anton text-xl md:text-2xl tracking-tighter uppercase">GOLD<span className="text-primary">{user.role === 'admin' ? 'ADMIN' : 'STAFF'}</span></span>
-        </div>
-        <nav className="flex-1 p-4 md:p-6 space-y-2 md:space-y-3">
-          <Button 
-            variant="ghost" 
-            onClick={() => setViewMode('appointments')}
-            className={cn(
-              "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-4 md:py-6",
-              viewMode === 'appointments' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
-            )}
-          >
-            <CalendarIcon className="h-4 w-4" /> {user.role === 'admin' ? 'Agendamentos' : 'Minha Agenda'}
-          </Button>
-          
+    <div className="h-[872px] w-[460px] mx-auto bg-[#030303] flex flex-col text-white font-body overflow-hidden border-x border-white/5 relative">
+      {/* Mini Sidebar/Top Nav Otimizada */}
+      <header className="h-14 flex items-center justify-between px-4 border-b border-white/5 bg-[#0a0a0a] z-50">
+        <div className="font-anton text-lg tracking-tighter uppercase">GOLD<span className="text-primary">{user.role === 'admin' ? 'ADMIN' : 'STAFF'}</span></div>
+        <div className="flex gap-1">
+          <Button variant="ghost" size="icon" onClick={() => setViewMode('appointments')} className={cn("h-8 w-8", viewMode === 'appointments' && "text-primary")}><CalendarIcon className="h-4 w-4" /></Button>
           {isAdmin && (
             <>
-              <Button 
-                variant="ghost" 
-                onClick={() => setViewMode('professionals')}
-                className={cn(
-                  "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-4 md:py-6",
-                  viewMode === 'professionals' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
-                )}
-              >
-                <Users className="h-4 w-4" /> Equipe
-              </Button>
-              <Button 
-                variant="ghost" 
-                onClick={() => setViewMode('services')}
-                className={cn(
-                  "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-4 md:py-6",
-                  viewMode === 'services' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
-                )}
-              >
-                <Scissors className="h-4 w-4" /> Serviços
-              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setViewMode('professionals')} className={cn("h-8 w-8", viewMode === 'professionals' && "text-primary")}><Users className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => setViewMode('services')} className={cn("h-8 w-8", viewMode === 'services' && "text-primary")}><Scissors className="h-4 w-4" /></Button>
             </>
           )}
-
-          <Button 
-            variant="ghost" 
-            onClick={() => setViewMode('finance')}
-            className={cn(
-              "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-4 md:py-6",
-              viewMode === 'finance' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
-            )}
-          >
-            <DollarSign className="h-4 w-4" /> {user.role === 'admin' ? 'Gestão de Caixa' : 'Meu Financeiro'}
-          </Button>
-          
-          <div className="pt-4 mt-4 border-t border-white/5">
-            <Link href="/">
-              <Button variant="ghost" className="w-full justify-start gap-3 text-white/40 hover:text-white font-anton uppercase tracking-widest text-[10px]">
-                <Home className="h-4 w-4" /> Voltar ao Site
-              </Button>
-            </Link>
-          </div>
-        </nav>
-        <div className="p-4 md:p-6 border-t border-white/5">
-          <div className="mb-4 px-3 flex flex-col">
-            <span className="text-[8px] text-white/20 uppercase tracking-widest">Logado como</span>
-            <span className="text-[10px] font-anton text-primary uppercase truncate">{user.name}</span>
-          </div>
-          <Button variant="ghost" onClick={handleLogout} className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 font-anton uppercase tracking-widest text-[10px]">
-            <LogOut className="h-4 w-4" /> Sair
-          </Button>
+          <Button variant="ghost" size="icon" onClick={() => setViewMode('finance')} className={cn("h-8 w-8", viewMode === 'finance' && "text-primary")}><DollarSign className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={handleLogout} className="h-8 w-8 text-destructive"><LogOut className="h-4 w-4" /></Button>
         </div>
-      </aside>
+      </header>
 
-      {/* Main Content */}
-      <main className="flex-1 p-4 md:p-12 overflow-y-auto bg-[#030303]">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-12">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-anton uppercase tracking-tighter leading-none">
-              {viewMode === 'appointments' && (user.role === 'admin' ? "PAINEL DE " : "MINHA ")}
-              {viewMode === 'professionals' && "GESTÃO DE "}
-              {viewMode === 'services' && "TABELA DE "}
-              {viewMode === 'finance' && (user.role === 'admin' ? "GESTÃO DE " : "MEU ")}
-              <span className="text-shimmer block md:inline">
-                {viewMode === 'appointments' && (user.role === 'admin' ? "AGENDAMENTOS" : "AGENDA")}
-                {viewMode === 'professionals' && "PROFISSIONAIS"}
-                {viewMode === 'services' && "SERVIÇOS"}
-                {viewMode === 'finance' && (user.role === 'admin' ? "CAIXA & COMISSÕES" : "FECHAMENTO")}
-              </span>
-            </h1>
-            <p className="text-white/40 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] md:tracking-[0.4em] mt-2 md:mt-3">Sincronização editorial em tempo real</p>
-          </div>
+      {/* Main Content Area - Sem Scroll Global */}
+      <main className="flex-1 flex flex-col overflow-hidden p-4 pt-6">
+        <div className="flex justify-between items-end mb-4">
+          <h1 className="text-2xl font-anton uppercase tracking-tight leading-none">
+            {viewMode === 'appointments' && "AGENDA"}
+            {viewMode === 'professionals' && "EQUIPE"}
+            {viewMode === 'services' && "SERVIÇOS"}
+            {viewMode === 'finance' && "CAIXA"}
+          </h1>
           
-          <div className="flex flex-wrap items-center gap-3">
+          {/* Ações Rápidas por View */}
+          <div className="flex gap-2">
             {viewMode === 'appointments' && (
-              <>
-                {isAdmin && (
-                  <div className="flex items-center gap-2">
-                    <Select value={selectedProfFilter} onValueChange={setSelectedProfFilter}>
-                      <SelectTrigger className="bg-[#0a0a0a] border-white/10 w-[140px] md:w-[180px] h-10 md:h-12 text-[9px] md:text-[10px] font-anton tracking-widest uppercase">
-                        <SelectValue placeholder="FILTRAR..." />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0a0a0a] border-white/10 text-white">
-                        <SelectItem value="all">TODOS OS BARBEIROS</SelectItem>
-                        {professionals.map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
+              <Dialog open={isAptDialogOpen} onOpenChange={setIsAptDialogOpen}>
+                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-white text-black font-anton uppercase rounded-full"><Plus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
+                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase">Reserva</DialogTitle></DialogHeader>
+                  <div className="grid grid-cols-2 gap-3 py-2">
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Cliente</Label><Input value={aptClient} onChange={e=>setAptClient(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">WhatsApp</Label><Input value={aptPhone} onChange={e=>setAptPhone(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Serviço</Label><Select value={aptService} onValueChange={setAptService}><SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger><SelectContent>{services.map(s=><SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Barbeiro</Label><Select value={aptProf} onValueChange={setAptProf}><SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger><SelectContent>{professionals.map(p=><SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Data</Label><Input type="date" value={aptDate} onChange={e=>setAptDate(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Hora</Label><Select value={aptTime} onValueChange={setAptTime}><SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger><SelectContent>{TIME_SLOTS.map(t=><SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select></div>
                   </div>
-                )}
-                <Dialog open={isAptDialogOpen} onOpenChange={(open) => { setIsAptDialogOpen(open); if(!open) resetAptForm(); }}>
-                  <DialogTrigger asChild>
-                    <Button className="bg-white text-black hover:bg-primary font-anton uppercase tracking-widest text-[9px] md:text-[10px] px-4 md:px-8 py-4 md:py-6 h-auto rounded-full">
-                      <Plus className="mr-2 h-3 w-3 md:h-4 md:w-4" /> Novo Horário
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-[#0a0a0a] border-white/10 text-white sm:max-w-[425px]">
-                    <DialogHeader><DialogTitle className="font-anton text-2xl uppercase tracking-widest text-left">Reserva</DialogTitle></DialogHeader>
-                    <div className="space-y-4 md:space-y-6 py-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-[10px] uppercase text-white/40">Cliente</Label>
-                          <Input value={aptClient} onChange={(e) => setAptClient(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none uppercase" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-[10px] uppercase text-white/40">WhatsApp</Label>
-                          <Input value={aptPhone} onChange={(e) => setAptPhone(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-[10px] uppercase text-white/40">Serviço</Label>
-                          <Select value={aptService} onValueChange={setAptService}>
-                            <SelectTrigger className="bg-transparent border-white/10 border-b rounded-none h-12"><SelectValue /></SelectTrigger>
-                            <SelectContent className="bg-[#0a0a0a] text-white">
-                              {services.map(s => <SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-[10px] uppercase text-white/40">Barbeiro</Label>
-                          {user.role === 'barber' ? (
-                            <div className="h-12 flex items-center px-4 border-b border-white/10 text-primary font-anton text-xs uppercase">{user.name}</div>
-                          ) : (
-                            <Select value={aptProf} onValueChange={setAptProf}>
-                              <SelectTrigger className="bg-transparent border-white/10 border-b rounded-none h-12"><SelectValue /></SelectTrigger>
-                              <SelectContent className="bg-[#0a0a0a] text-white">
-                                {professionals.map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
-                              </SelectContent>
-                            </Select>
-                          )}
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-[10px] uppercase text-white/40">Data</Label>
-                          <Input type="date" value={aptDate} onChange={(e) => setAptDate(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-[10px] uppercase text-white/40">Hora</Label>
-                          <Select value={aptTime} onValueChange={setAptTime}>
-                            <SelectTrigger className="bg-transparent border-white/10 border-b rounded-none h-12"><SelectValue /></SelectTrigger>
-                            <SelectContent className="bg-[#0a0a0a] text-white">
-                              {TIME_SLOTS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button onClick={handleSaveAppointment} className="w-full bg-primary text-black font-anton uppercase h-12">Salvar Reserva</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </>
+                  <Button onClick={handleSaveAppointment} className="w-full bg-primary text-black font-anton uppercase h-10 mt-2">Salvar</Button>
+                </DialogContent>
+              </Dialog>
             )}
-
             {viewMode === 'professionals' && isAdmin && (
-              <Dialog open={isProfDialogOpen} onOpenChange={(open) => { setIsProfDialogOpen(open); if(!open) resetProfForm(); }}>
-                <DialogTrigger asChild>
-                  <Button className="bg-primary text-black hover:bg-white font-anton uppercase tracking-widest text-[9px] md:text-[10px] px-4 md:px-8 py-4 md:py-6 h-auto rounded-full">
-                    <UserPlus className="mr-2 h-3 w-3 md:h-4 md:w-4" /> Novo Especialista
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white sm:max-w-[425px]">
-                  <DialogHeader><DialogTitle className="font-anton text-2xl uppercase tracking-widest text-left">{editingProf ? 'Editar Especialista' : 'Novo Especialista'}</DialogTitle></DialogHeader>
-                  <div className="space-y-4 md:space-y-6 py-4">
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-white/10 bg-neutral-900 group relative">
-                        {profPhoto ? <img src={profPhoto} alt="Preview" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-white/10"><Users /></div>}
-                        <button onClick={() => fileInputRef.current?.click()} className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center"><Upload className="h-5 w-5" /></button>
-                      </div>
-                      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handlePhotoUpload} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-[10px] uppercase text-white/40">Nome</Label>
-                        <Input value={profName} onChange={(e) => setProfName(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none uppercase" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] uppercase text-white/40">Especialidade</Label>
-                        <Input value={profSpecialty} onChange={(e) => setProfSpecialty(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none uppercase" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-[10px] uppercase text-white/40">E-mail (Login)</Label>
-                        <Input value={profEmail} onChange={(e) => setProfEmail(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] uppercase text-white/40">Senha</Label>
-                        <Input value={profPassword} onChange={(e) => setProfPassword(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-[10px] uppercase text-white/40">Comissão (%)</Label>
-                      <div className="relative">
-                        <Percent className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                        <Input type="number" value={profCommission} onChange={(e) => setProfCommission(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
-                      </div>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase py-4 md:py-6 h-auto">Salvar Perfil</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+               <Dialog open={isProfDialogOpen} onOpenChange={setIsProfDialogOpen}>
+               <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-primary text-black font-anton uppercase rounded-full"><UserPlus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
+               <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase">Especialista</DialogTitle></DialogHeader>
+                 <div className="grid grid-cols-2 gap-3 py-2">
+                   <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                   <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Especialidade</Label><Input value={profSpecialty} onChange={e=>setProfSpecialty(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                   <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                   <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Comissão %</Label><Input type="number" value={profCommission} onChange={e=>setProfCommission(e.target.value)} className="h-8 text-xs bg-transparent border-white/10" /></div>
+                 </div>
+                 <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase h-10 mt-2">Salvar</Button>
+               </DialogContent>
+             </Dialog>
             )}
-
             {viewMode === 'services' && isAdmin && (
-              <Dialog open={isServiceDialogOpen} onOpenChange={(open) => { setIsServiceDialogOpen(open); if(!open) resetServiceForm(); }}>
-                <DialogTrigger asChild>
-                  <Button className="bg-primary text-black hover:bg-white font-anton uppercase tracking-widest text-[9px] md:text-[10px] px-4 md:px-8 py-4 md:py-6 h-auto rounded-full">
-                    <Plus className="mr-2 h-3 w-3 md:h-4 md:w-4" /> Novo Serviço
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white sm:max-w-[425px]">
-                  <DialogHeader><DialogTitle className="font-anton text-2xl uppercase tracking-widest text-left">{editingService ? 'Editar Serviço' : 'Novo Serviço'}</DialogTitle></DialogHeader>
-                  <div className="space-y-4 md:space-y-6 py-4">
-                    <div className="space-y-2">
-                      <Label className="text-[10px] uppercase text-white/40">Nome do Serviço</Label>
-                      <Input value={srvName} onChange={(e) => setSrvName(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none uppercase" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-[10px] uppercase text-white/40">Preço (R$)</Label>
-                        <Input type="number" value={srvPrice} onChange={(e) => setSrvPrice(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] uppercase text-white/40">Duração (Min)</Label>
-                        <Input type="number" value={srvDuration} onChange={(e) => setSrvDuration(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-[10px] uppercase text-white/40">Descrição</Label>
-                      <Textarea value={srvDescription} onChange={(e) => setSrvDescription(e.target.value)} className="bg-transparent border-white/10 rounded-xl min-h-[80px] md:min-h-[100px]" placeholder="Breve descrição do serviço..." />
+              <Dialog open={isServiceDialogOpen} onOpenChange={setIsServiceDialogOpen}>
+                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-primary text-black font-anton uppercase rounded-full"><Plus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
+                <DialogContent className="bg-[#0a0a0a] border-white/10 text-white w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase">Serviço</DialogTitle></DialogHeader>
+                  <div className="space-y-3 py-2">
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Nome</Label><Input value={srvName} onChange={e=>setSrvName(e.target.value)} className="h-8 text-xs" /></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Preço</Label><Input type="number" value={srvPrice} onChange={e=>setSrvPrice(e.target.value)} className="h-8 text-xs" /></div>
+                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40">Minutos</Label><Input type="number" value={srvDuration} onChange={e=>setSrvDuration(e.target.value)} className="h-8 text-xs" /></div>
                     </div>
                   </div>
-                  <DialogFooter>
-                    <Button onClick={handleSaveService} className="w-full bg-primary text-black font-anton uppercase py-4 md:py-6 h-auto">Salvar Serviço</Button>
-                  </DialogFooter>
+                  <Button onClick={handleSaveService} className="w-full bg-primary text-black font-anton uppercase h-10 mt-2">Salvar</Button>
                 </DialogContent>
               </Dialog>
             )}
           </div>
-        </header>
+        </div>
 
-        {viewMode === 'appointments' && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
-              <Card className="bg-[#0a0a0a] border-white/5 p-4 rounded-3xl">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-white/40 text-[9px] md:text-[10px] font-bold uppercase tracking-widest">Revenue</span>
-                    <TrendingUp className="text-primary h-4 w-4" />
-                  </div>
-                  <div className="text-2xl md:text-4xl font-anton tracking-tighter">R$ {financeData.totalRevenue.toFixed(0)}</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-[#0a0a0a] border-white/5 p-4 rounded-3xl">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-white/40 text-[9px] md:text-[10px] font-bold uppercase tracking-widest">Appointments</span>
-                    <Clock className="text-primary h-4 w-4" />
-                  </div>
-                  <div className="text-2xl md:text-4xl font-anton tracking-tighter">{filteredAppointments.length}</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-[#0a0a0a] border-white/5 p-4 rounded-3xl">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-white/40 text-[9px] md:text-[10px] font-bold uppercase tracking-widest">{user.role === 'admin' ? 'Net Profit' : 'My Commission'}</span>
-                    <CheckCircle className="text-emerald-500 h-4 w-4" />
-                  </div>
-                  <div className="text-2xl md:text-4xl font-anton tracking-tighter text-primary">R$ {(user.role === 'admin' ? financeData.netProfit : financeData.totalCommissions).toFixed(0)}</div>
-                </CardContent>
-              </Card>
-            </div>
+        {/* Dash Summary - Super Compacto */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          <Card className="bg-[#0a0a0a] border-white/5 p-2 rounded-2xl">
+            <div className="text-[7px] font-bold text-white/40 uppercase">Geração</div>
+            <div className="text-sm font-anton text-primary">R$ {financeData.totalRevenue.toFixed(0)}</div>
+          </Card>
+          <Card className="bg-[#0a0a0a] border-white/5 p-2 rounded-2xl">
+            <div className="text-[7px] font-bold text-white/40 uppercase">Agenda</div>
+            <div className="text-sm font-anton">{filteredAppointments.length}</div>
+          </Card>
+          <Card className="bg-[#0a0a0a] border-white/5 p-2 rounded-2xl">
+            <div className="text-[7px] font-bold text-white/40 uppercase">Saldo</div>
+            <div className="text-sm font-anton text-emerald-500">R$ {(user.role === 'admin' ? financeData.netProfit : financeData.totalCommissions).toFixed(0)}</div>
+          </Card>
+        </div>
 
-            <Card className="bg-[#0a0a0a] border-white/5 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader className="bg-black/40">
-                    <TableRow className="border-white/5">
-                      <TableHead className="font-anton uppercase text-[9px] md:text-[10px] tracking-widest text-white/30 h-14 md:h-16">Data / Hora</TableHead>
-                      <TableHead className="font-anton uppercase text-[9px] md:text-[10px] tracking-widest text-white/30">Cliente</TableHead>
-                      <TableHead className="font-anton uppercase text-[9px] md:text-[10px] tracking-widest text-white/30 hidden sm:table-cell">Serviço</TableHead>
-                      <TableHead className="font-anton uppercase text-[9px] md:text-[10px] tracking-widest text-white/30 hidden md:table-cell">Barbeiro</TableHead>
-                      <TableHead className="font-anton uppercase text-[9px] md:text-[10px] tracking-widest text-white/30 text-right pr-6 md:pr-12">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredAppointments.map((apt) => (
-                      <TableRow key={apt.id} className="border-white/5 hover:bg-white/[0.03] transition-colors">
-                        <TableCell className="py-4 md:py-6">
-                          <div className="flex flex-col">
-                            <span className="font-anton text-[11px] md:text-sm">{format(new Date(apt.date + 'T12:00:00'), "dd/MM/yy")}</span>
-                            <span className="text-[9px] md:text-[10px] text-primary uppercase">{apt.time}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-anton text-[11px] md:text-sm uppercase max-w-[80px] md:max-w-none truncate">{apt.clientName}</TableCell>
-                        <TableCell className="hidden sm:table-cell"><Badge variant="outline" className="text-[8px] md:text-[9px] uppercase px-2 py-0">{getServiceName(apt.serviceId)}</Badge></TableCell>
-                        <TableCell className="font-anton text-[9px] text-white/60 uppercase hidden md:table-cell">{getProfName(apt.professionalId)}</TableCell>
-                        <TableCell className="text-right pr-4 md:pr-8">
-                          <div className="flex justify-end gap-1 md:gap-2">
-                            <Button variant="ghost" size="icon" onClick={() => openEditApt(apt)} className="text-white/20 hover:text-primary h-8 w-8"><Edit2 className="h-3 w-3 md:h-4 md:w-4" /></Button>
-                            <Button variant="ghost" size="icon" onClick={() => deleteAppointment(apt.id)} className="text-white/20 hover:text-destructive h-8 w-8"><Trash2 className="h-3 w-3 md:h-4 md:w-4" /></Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </Card>
-          </>
-        )}
-
-        {viewMode === 'professionals' && isAdmin && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-            {professionals.map((prof) => (
-              <Card key={prof.id} className="bg-[#0a0a0a] border-white/5 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden group">
-                <div className="flex flex-col md:flex-row h-full">
-                  <div className="w-full md:w-40 h-48 md:h-auto overflow-hidden">
-                    <img src={prof.photo} alt={prof.name} className="w-full h-full object-cover grayscale opacity-50 md:opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
-                  </div>
-                  <div className="flex-1 p-6 md:p-8 flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-anton text-xl md:text-2xl uppercase tracking-widest truncate">{prof.name}</h3>
-                        <Badge className="bg-primary/20 text-primary border-none text-[8px] md:text-[9px] uppercase px-2 md:px-3">{(prof.commission ?? 0)}%</Badge>
-                      </div>
-                      <p className="text-[9px] md:text-[10px] font-mono text-primary uppercase tracking-widest">{prof.specialty}</p>
-                      <p className="text-[8px] text-white/20 mt-2 uppercase tracking-widest truncate">Login: {prof.email || 'N/A'}</p>
-                    </div>
-                    <div className="flex gap-2 md:gap-3 mt-6 md:mt-10">
-                      <Button variant="ghost" onClick={() => openEditProf(prof)} className="flex-1 border border-white/10 text-white/40 hover:text-white uppercase text-[8px] md:text-[9px] h-10 md:h-12 rounded-xl"><Edit2 className="mr-2 h-3 w-3" /> Editar</Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteProfessional(prof.id)} className="border border-white/10 text-white/20 hover:text-destructive h-10 w-10 md:h-12 md:w-12 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {viewMode === 'services' && isAdmin && (
-          <div className="space-y-4">
-            {/* Mobile Cards (460px optimization) */}
-            <div className="grid grid-cols-1 gap-4 md:hidden">
-              {services.map((service) => (
-                <Card key={service.id} className="bg-[#0a0a0a] border-white/5 p-5 rounded-[1.5rem]">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="max-w-[70%]">
-                      <h3 className="font-anton text-lg uppercase tracking-widest text-white leading-tight">{service.name}</h3>
-                      <Badge variant="outline" className="mt-1 text-[7px] border-white/10 text-white/40">{service.duration} MIN</Badge>
-                    </div>
-                    <span className="font-anton text-lg text-primary">R$ {service.price.toFixed(0)}</span>
-                  </div>
-                  <p className="text-[9px] text-white/30 line-clamp-2 mb-4 h-6 uppercase font-mono">{service.description || "Sem descrição"}</p>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" onClick={() => openEditService(service)} className="flex-1 bg-white/5 border border-white/5 text-white/60 hover:text-white text-[8px] uppercase font-anton h-10 rounded-xl"><Edit2 className="mr-2 h-3 w-3" /> Editar</Button>
-                    <Button variant="ghost" size="icon" onClick={() => deleteService(service.id)} className="bg-destructive/10 border border-destructive/10 text-destructive/60 hover:text-destructive h-10 w-10 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            {/* Desktop Table (kept for larger screens) */}
-            <Card className="hidden md:block bg-[#0a0a0a] border-white/5 rounded-[2rem] overflow-hidden">
+        {/* Content Area com Scroll Interno Limitado */}
+        <div className="flex-1 overflow-hidden bg-[#0a0a0a] border border-white/5 rounded-3xl">
+          <div className="h-full overflow-y-auto custom-scrollbar">
+            {viewMode === 'appointments' && (
               <Table>
-                <TableHeader className="bg-black/40">
-                  <TableRow className="border-white/5">
-                    <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30 h-16">Serviço</TableHead>
-                    <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30">Descrição</TableHead>
-                    <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30">Duração</TableHead>
-                    <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30">Preço</TableHead>
-                    <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30 text-right pr-12">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
                 <TableBody>
-                  {services.map((service) => (
-                    <TableRow key={service.id} className="border-white/5 hover:bg-white/[0.03] transition-colors">
-                      <TableCell className="py-6">
-                        <span className="font-anton text-sm uppercase tracking-widest">{service.name}</span>
+                  {filteredAppointments.map((apt) => (
+                    <TableRow key={apt.id} className="border-white/5">
+                      <TableCell className="p-3">
+                        <div className="text-[10px] font-anton leading-tight">{format(new Date(apt.date + 'T12:00:00'), "dd/MM")} <span className="text-primary">{apt.time}</span></div>
+                        <div className="text-[10px] uppercase truncate max-w-[80px] text-white/60">{apt.clientName}</div>
                       </TableCell>
-                      <TableCell className="max-w-[300px]">
-                        <p className="text-[10px] text-white/40 truncate">{service.description || "Sem descrição"}</p>
+                      <TableCell className="p-3 hidden sm:table-cell">
+                        <Badge variant="outline" className="text-[7px] uppercase px-1 py-0">{getServiceName(apt.serviceId)}</Badge>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-[9px] border-white/10 text-white/60">{service.duration} MIN</Badge>
-                      </TableCell>
-                      <TableCell className="font-anton text-lg text-primary">
-                        R$ {service.price.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right pr-8">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => openEditService(service)} className="text-white/20 hover:text-primary"><Edit2 className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => deleteService(service.id)} className="text-white/20 hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                      <TableCell className="p-3 text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => openEditApt(apt)} className="h-7 w-7 text-white/20"><Edit2 className="h-3 w-3" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => deleteAppointment(apt.id)} className="h-7 w-7 text-white/20"><Trash2 className="h-3 w-3" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </Card>
-          </div>
-        )}
+            )}
 
-        {viewMode === 'finance' && (
-          <div className="space-y-6 md:space-y-12">
-            {/* Global Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-              <Card className="bg-[#0a0a0a] border-white/5 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem]">
-                <div className="flex items-center gap-3 md:gap-4 mb-4">
-                  <div className="p-2 md:p-3 bg-primary/10 rounded-xl md:rounded-2xl"><TrendingUp className="text-primary h-5 w-5 md:h-6 md:w-6" /></div>
-                  <span className="text-white/40 text-[8px] md:text-[10px] font-bold uppercase tracking-widest">Valor Gerado</span>
-                </div>
-                <div className="text-3xl md:text-5xl font-anton">R$ {financeData.totalRevenue.toFixed(2)}</div>
-              </Card>
-              <Card className="bg-[#0a0a0a] border-white/5 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem]">
-                <div className="flex items-center gap-3 md:gap-4 mb-4">
-                  <div className="p-2 md:p-3 bg-secondary/10 rounded-xl md:rounded-2xl"><PieChart className="text-secondary h-5 w-5 md:h-6 md:w-6" /></div>
-                  <span className="text-white/40 text-[8px] md:text-[10px] font-bold uppercase tracking-widest">Total Comissões</span>
-                </div>
-                <div className="text-3xl md:text-5xl font-anton text-secondary">R$ {financeData.totalCommissions.toFixed(2)}</div>
-              </Card>
-              <Card className="bg-[#0a0a0a] border-white/5 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] bg-gradient-to-br from-primary/5 to-transparent">
-                <div className="flex items-center gap-3 md:gap-4 mb-4">
-                  <div className="p-2 md:p-3 bg-emerald-500/10 rounded-xl md:rounded-2xl"><CheckCircle className="text-emerald-500 h-5 w-5 md:h-6 md:w-6" /></div>
-                  <span className="text-white/40 text-[8px] md:text-[10px] font-bold uppercase tracking-widest">{user.role === 'admin' ? 'Lucro Líquido' : 'Meu Saldo'}</span>
-                </div>
-                <div className="text-3xl md:text-5xl font-anton text-emerald-500">R$ {(user.role === 'admin' ? financeData.netProfit : financeData.totalCommissions).toFixed(2)}</div>
-              </Card>
-            </div>
-
-            {/* Commissions Table */}
-            <Card className="bg-[#0a0a0a] border-white/5 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden">
-              <CardHeader className="p-6 md:p-8 border-b border-white/5">
-                <CardTitle className="text-[10px] md:text-xs font-anton uppercase tracking-[0.2em] md:tracking-[0.4em] text-white/60">{user.role === 'admin' ? 'Fechamento por Colaborador' : 'Detalhamento de Atendimentos'}</CardTitle>
-              </CardHeader>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader className="bg-black/20">
-                    <TableRow className="border-white/5">
-                      <TableHead className="font-anton uppercase text-[9px] md:text-[10px] tracking-widest text-white/30 h-14 md:h-16">{user.role === 'admin' ? 'Especialista' : 'Descrição'}</TableHead>
-                      <TableHead className="font-anton uppercase text-[9px] md:text-[10px] tracking-widest text-white/30">Cortes / Serv.</TableHead>
-                      <TableHead className="font-anton uppercase text-[9px] md:text-[10px] tracking-widest text-white/30">Valor Gerado</TableHead>
-                      <TableHead className="font-anton uppercase text-[9px] md:text-[10px] tracking-widest text-white/30 hidden sm:table-cell">Sua %</TableHead>
-                      <TableHead className="font-anton uppercase text-[9px] md:text-[10px] tracking-widest text-white/30 text-right pr-6 md:pr-12">Comissão Devida</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {financeData.profBreakdown.map((row) => (
-                      <TableRow key={row.id} className="border-white/5 hover:bg-white/[0.02]">
-                        <TableCell className="py-6 md:py-8 font-anton uppercase tracking-widest text-[11px] md:text-sm">{row.name}</TableCell>
-                        <TableCell className="font-mono text-[10px]">{row.aptsCount} un</TableCell>
-                        <TableCell className="font-anton text-sm md:text-lg">R$ {row.revenue.toFixed(2)}</TableCell>
-                        <TableCell className="hidden sm:table-cell"><Badge variant="outline" className="border-white/10 text-white/40 text-[8px] uppercase">{row.percentage}%</Badge></TableCell>
-                        <TableCell className="text-right pr-6 md:pr-12 font-anton text-lg md:text-2xl text-primary">R$ {row.commission.toFixed(2)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+            {viewMode === 'professionals' && (
+              <div className="p-3 space-y-2">
+                {professionals.map(p => (
+                  <div key={p.id} className="flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 rounded-2xl">
+                    <img src={p.photo} className="w-10 h-10 rounded-full object-cover grayscale" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[10px] font-anton uppercase truncate">{p.name}</div>
+                      <div className="text-[8px] text-primary uppercase">{p.specialty}</div>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => openEditProf(p)} className="h-7 w-7 border border-white/5"><Edit2 className="h-3 w-3" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => deleteProfessional(p.id)} className="h-7 w-7 border border-white/5 text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </Card>
+            )}
+
+            {viewMode === 'services' && (
+              <div className="p-3 space-y-2">
+                {services.map(s => (
+                  <div key={s.id} className="p-3 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="text-[10px] font-anton uppercase">{s.name}</div>
+                      <div className="text-[8px] text-white/40">{s.duration} MIN • <span className="text-primary font-bold">R$ {s.price}</span></div>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => openEditService(s)} className="h-7 w-7"><Edit2 className="h-3 w-3" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => deleteService(s.id)} className="h-7 w-7 text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {viewMode === 'finance' && (
+              <div className="p-3 space-y-3">
+                <div className="space-y-2">
+                  <div className="text-[8px] font-anton uppercase text-white/30 tracking-widest">Resumo por Barbeiro</div>
+                  {financeData.profBreakdown.map(row => (
+                    <div key={row.id} className="flex justify-between items-center p-3 bg-white/[0.02] rounded-2xl border border-white/5">
+                      <div className="text-[10px] font-anton uppercase">{row.name}</div>
+                      <div className="text-right">
+                        <div className="text-[10px] font-anton text-primary">R$ {row.commission.toFixed(0)}</div>
+                        <div className="text-[7px] text-white/40 uppercase">{row.aptsCount} atendimentos</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </main>
+
+      {/* Footer Nav Compacta */}
+      <footer className="h-10 border-t border-white/5 flex items-center justify-center px-4 bg-black">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[7px] font-mono text-white/20 uppercase tracking-widest">System Synced • 460x872 Optimized</span>
+        </div>
+      </footer>
     </div>
   );
 }
