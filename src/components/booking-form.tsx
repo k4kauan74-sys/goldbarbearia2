@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Scissors, CheckCircle2, ChevronLeft, ArrowRight, Circle, Clock, Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 import { TIME_SLOTS } from "@/lib/mock-data";
-import { Service, Professional } from "@/lib/types";
+import { Service, Professional, Appointment } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +31,7 @@ export function BookingForm() {
   
   const [services, setServices] = useState<Service[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   
   const { toast } = useToast();
   const router = useRouter();
@@ -42,6 +43,9 @@ export function BookingForm() {
 
     const savedServices = JSON.parse(localStorage.getItem('gold_services') || '[]');
     const savedProfs = JSON.parse(localStorage.getItem('gold_professionals') || '[]');
+    const savedApts = JSON.parse(localStorage.getItem('gold_appointments') || '[]');
+
+    setAppointments(savedApts);
 
     if (savedServices.length > 0) {
       setServices(savedServices);
@@ -59,6 +63,21 @@ export function BookingForm() {
   const steps: Step[] = ['service', 'professional', 'date', 'time', 'contact', 'success'];
   const currentStepIndex = steps.indexOf(step);
 
+  // Calcula quais horários estão ocupados para o barbeiro e data selecionados
+  const takenSlots = useMemo(() => {
+    if (!selectedProfessional || !selectedDate) return [];
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    return appointments
+      .filter(a => a.date === dateStr && a.professionalId === selectedProfessional.id && a.status !== 'cancelled')
+      .map(a => a.time);
+  }, [appointments, selectedProfessional, selectedDate]);
+
+  // Horários de expediente do barbeiro (se não houver, usa o padrão)
+  const profWorkingHours = useMemo(() => {
+    if (!selectedProfessional) return TIME_SLOTS;
+    return selectedProfessional.workingHours || TIME_SLOTS;
+  }, [selectedProfessional]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!clientName || !clientPhone) {
@@ -70,14 +89,14 @@ export function BookingForm() {
     setTimeout(() => {
       setIsSubmitting(false);
       setStep('success');
-      const newAppointment = {
+      const newAppointment: Appointment = {
         id: Math.random().toString(36).substr(2, 9),
         clientName,
         phone: clientPhone,
-        serviceId: selectedService?.id,
-        professionalId: selectedProfessional?.id,
+        serviceId: selectedService?.id || '',
+        professionalId: selectedProfessional?.id || '',
         date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
-        time: selectedTime,
+        time: selectedTime || '',
         status: 'confirmed'
       };
       
@@ -203,21 +222,35 @@ export function BookingForm() {
                 <p className="text-[9px] font-mono text-primary uppercase tracking-[0.3em]">02. Selecione o Horário</p>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                {TIME_SLOTS.map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => { setSelectedTime(time); setStep('contact'); }}
-                    className={cn(
-                      "py-5 px-2 text-[11px] md:text-xs font-mono border rounded-2xl transition-all uppercase tracking-widest flex flex-col items-center justify-center gap-1",
-                      selectedTime === time 
-                        ? "bg-primary text-black border-primary shadow-[0_0_25px_rgba(251,191,36,0.3)] scale-105" 
-                        : "glass border-white/5 text-neutral-400 hover:border-primary/40 hover:text-white"
-                    )}
-                  >
-                    <span className="text-emerald-500 text-[7px] font-bold uppercase">DISPONÍVEL</span>
-                    {time}
-                  </button>
-                ))}
+                {TIME_SLOTS.map((time) => {
+                  const isTaken = takenSlots.includes(time);
+                  const isWorkingHour = profWorkingHours.includes(time);
+                  const isDisabled = isTaken || !isWorkingHour;
+
+                  return (
+                    <button
+                      key={time}
+                      disabled={isDisabled}
+                      onClick={() => { setSelectedTime(time); setStep('contact'); }}
+                      className={cn(
+                        "py-5 px-2 text-[11px] md:text-xs font-mono border rounded-2xl transition-all uppercase tracking-widest flex flex-col items-center justify-center gap-1",
+                        isDisabled 
+                          ? "bg-white/[0.02] border-white/5 text-white/10 cursor-not-allowed line-through" 
+                          : selectedTime === time 
+                            ? "bg-primary text-black border-primary shadow-[0_0_25px_rgba(251,191,36,0.3)] scale-105" 
+                            : "glass border-white/5 text-neutral-400 hover:border-primary/40 hover:text-white"
+                      )}
+                    >
+                      <span className={cn(
+                        "text-[7px] font-bold uppercase",
+                        isDisabled ? "text-destructive" : "text-emerald-500"
+                      )}>
+                        {isTaken ? "OCUPADO" : !isWorkingHour ? "FECHADO" : "DISPONÍVEL"}
+                      </span>
+                      {time}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
