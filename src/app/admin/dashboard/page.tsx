@@ -22,9 +22,12 @@ import {
   Plus,
   Scissors,
   Percent,
-  Key
+  Key,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, addDays, subDays } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 import { 
   Table, 
@@ -57,6 +60,7 @@ export default function AdminDashboardPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [search, setSearch] = useState("");
   const [selectedProfFilter, setSelectedProfFilter] = useState<string>("all");
+  const [agendaDate, setAgendaDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const { toast } = useToast();
   
   const [isProfDialogOpen, setIsProfDialogOpen] = useState(false);
@@ -235,7 +239,6 @@ export default function AdminDashboardPage() {
         commission: Number(profCommission), email: profEmail, password: profPassword
       } : p);
       
-      // Se o profissional editou seu próprio perfil, atualize a sessão local
       if (editingProf.id === user?.id) {
         const updatedUser = { ...user, name: profName, email: profEmail };
         setUser(updatedUser);
@@ -313,24 +316,33 @@ export default function AdminDashboardPage() {
   const getServiceName = (id: string) => services.find(s => s.id === id)?.name || "N/A";
   const getProfName = (id: string) => professionals.find(p => p.id === id)?.name || "N/A";
 
-  const filteredAppointments = appointments.filter(a => {
-    const matchesSearch = a.clientName.toLowerCase().includes(search.toLowerCase()) || a.phone.includes(search);
-    const matchesProf = selectedProfFilter === "all" || a.professionalId === selectedProfFilter;
-    return matchesSearch && matchesProf;
-  }).sort((a, b) => new Date(b.date + 'T' + b.time).getTime() - new Date(a.date + 'T' + a.time).getTime());
+  const filteredAppointments = useMemo(() => {
+    return appointments.filter(a => {
+      const matchesSearch = a.clientName.toLowerCase().includes(search.toLowerCase()) || a.phone.includes(search);
+      const matchesProf = selectedProfFilter === "all" || a.professionalId === selectedProfFilter;
+      return matchesSearch && matchesProf;
+    });
+  }, [appointments, search, selectedProfFilter]);
+
+  const handlePrevDay = () => {
+    const prev = subDays(new Date(agendaDate + 'T12:00:00'), 1);
+    setAgendaDate(format(prev, "yyyy-MM-dd"));
+  };
+
+  const handleNextDay = () => {
+    const next = addDays(new Date(agendaDate + 'T12:00:00'), 1);
+    setAgendaDate(format(next, "yyyy-MM-dd"));
+  };
 
   if (!user) return null;
 
   return (
     <div className="h-[872px] w-[460px] mx-auto bg-[#030303] flex flex-col text-white font-body overflow-hidden border-x border-white/5 relative">
-      {/* Mini Sidebar/Top Nav Otimizada */}
       <header className="h-14 flex items-center justify-between px-4 border-b border-white/5 bg-[#0a0a0a] z-50">
         <div className="font-anton text-lg tracking-tighter uppercase">GOLD<span className="text-primary">{user.role === 'admin' ? 'ADMIN' : 'STAFF'}</span></div>
         <div className="flex gap-1">
           <Button variant="ghost" size="icon" onClick={() => setViewMode('appointments')} className={cn("h-8 w-8", viewMode === 'appointments' && "text-primary")}><CalendarIcon className="h-4 w-4" /></Button>
-          
           <Button variant="ghost" size="icon" onClick={() => setViewMode('professionals')} className={cn("h-8 w-8", viewMode === 'professionals' && "text-primary")}><Users className="h-4 w-4" /></Button>
-          
           {isAdmin && (
             <Button variant="ghost" size="icon" onClick={() => setViewMode('services')} className={cn("h-8 w-8", viewMode === 'services' && "text-primary")}><Scissors className="h-4 w-4" /></Button>
           )}
@@ -339,7 +351,6 @@ export default function AdminDashboardPage() {
         </div>
       </header>
 
-      {/* Main Content Area - Sem Scroll Global */}
       <main className="flex-1 flex flex-col overflow-hidden p-4 pt-6">
         <div className="flex justify-between items-end mb-4">
           <h1 className="text-2xl font-anton uppercase tracking-tight leading-none">
@@ -349,7 +360,6 @@ export default function AdminDashboardPage() {
             {viewMode === 'finance' && "CAIXA"}
           </h1>
           
-          {/* Ações Rápidas por View */}
           <div className="flex gap-2">
             {viewMode === 'appointments' && (
               <Dialog open={isAptDialogOpen} onOpenChange={setIsAptDialogOpen}>
@@ -441,7 +451,6 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Dash Summary - Super Compacto */}
         <div className="grid grid-cols-3 gap-2 mb-4">
           <Card className="bg-[#0a0a0a] border-white/5 p-2 rounded-2xl">
             <div className="text-[7px] font-bold text-white/40 uppercase">Geração</div>
@@ -457,31 +466,66 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
 
-        {/* Content Area com Scroll Interno Limitado */}
-        <div className="flex-1 overflow-hidden bg-[#0a0a0a] border border-white/5 rounded-3xl">
-          <div className="h-full overflow-y-auto custom-scrollbar">
+        <div className="flex-1 overflow-hidden bg-[#0a0a0a] border border-white/5 rounded-3xl flex flex-col">
+          {viewMode === 'appointments' && (
+            <div className="flex items-center justify-between p-3 border-b border-white/5 bg-white/[0.02]">
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" onClick={handlePrevDay} className="h-7 w-7"><ChevronLeft className="h-4 w-4" /></Button>
+                <div className="text-[10px] font-anton text-primary uppercase min-w-[120px] text-center">
+                  {format(new Date(agendaDate + 'T12:00:00'), "EEEE, dd 'DE' MMMM", { locale: ptBR })}
+                </div>
+                <Button variant="ghost" size="icon" onClick={handleNextDay} className="h-7 w-7"><ChevronRight className="h-4 w-4" /></Button>
+              </div>
+              <Select value={selectedProfFilter} onValueChange={setSelectedProfFilter}>
+                <SelectTrigger className="h-7 text-[8px] w-24 border-white/10 uppercase font-anton">
+                  <SelectValue placeholder="FILTRO" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">TODOS</SelectItem>
+                  {professionals.map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
             {viewMode === 'appointments' && (
-              <Table>
-                <TableBody>
-                  {filteredAppointments.map((apt) => (
-                    <TableRow key={apt.id} className="border-white/5">
-                      <TableCell className="p-3">
-                        <div className="text-[10px] font-anton leading-tight">{format(new Date(apt.date + 'T12:00:00'), "dd/MM")} <span className="text-primary">{apt.time}</span></div>
-                        <div className="text-[10px] uppercase truncate max-w-[80px] text-white/60">{apt.clientName}</div>
-                      </TableCell>
-                      <TableCell className="p-3 hidden sm:table-cell">
-                        <Badge variant="outline" className="text-[7px] uppercase px-1 py-0">{getServiceName(apt.serviceId)}</Badge>
-                      </TableCell>
-                      <TableCell className="p-3 text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => openEditApt(apt)} className="h-7 w-7 text-white/20"><Edit2 className="h-3 w-3" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => deleteAppointment(apt.id)} className="h-7 w-7 text-white/20"><Trash2 className="h-3 w-3" /></Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="p-4 space-y-2">
+                {TIME_SLOTS.map(slot => {
+                  const slotApts = filteredAppointments.filter(a => a.date === agendaDate && a.time === slot);
+                  return (
+                    <div key={slot} className="flex gap-4 group">
+                      <div className="w-10 text-[10px] font-anton text-white/40 pt-1 text-right">{slot}</div>
+                      <div className="flex-1 min-h-[48px] border-l border-white/10 pl-4 pb-4">
+                        {slotApts.length > 0 ? (
+                          <div className="space-y-2">
+                            {slotApts.map(apt => (
+                              <div key={apt.id} className="bg-white/5 border border-white/10 rounded-2xl p-3 flex justify-between items-center group/item hover:border-primary/50 transition-colors shadow-sm">
+                                <div className="min-w-0">
+                                  <div className="text-[11px] font-anton uppercase truncate text-primary leading-tight">{apt.clientName}</div>
+                                  <div className="text-[8px] text-white/40 uppercase truncate flex items-center gap-1 mt-1">
+                                    <Scissors className="h-2 w-2" /> {getServiceName(apt.serviceId)}
+                                    <span className="opacity-20 mx-1">|</span>
+                                    <Users className="h-2 w-2" /> {getProfName(apt.professionalId)}
+                                  </div>
+                                </div>
+                                <div className="flex gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                   <Button variant="ghost" size="icon" onClick={() => openEditApt(apt)} className="h-7 w-7 text-white/40 hover:text-white"><Edit2 className="h-3 w-3" /></Button>
+                                   <Button variant="ghost" size="icon" onClick={() => deleteAppointment(apt.id)} className="h-7 w-7 text-destructive/40 hover:text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="h-full flex items-center">
+                            <div className="w-full border-b border-dashed border-white/5 opacity-10" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
 
             {viewMode === 'professionals' && (
@@ -545,11 +589,10 @@ export default function AdminDashboardPage() {
         </div>
       </main>
 
-      {/* Footer Nav Compacta */}
       <footer className="h-10 border-t border-white/5 flex items-center justify-center px-4 bg-black">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[7px] font-mono text-white/20 uppercase tracking-widest">System Synced • Profile Edit Enabled</span>
+          <span className="text-[7px] font-mono text-white/20 uppercase tracking-widest">System Synced • Timeline Active</span>
         </div>
       </footer>
     </div>
