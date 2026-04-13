@@ -1,11 +1,11 @@
 
 import { Service, Professional } from './types';
 
-export const TIME_SLOTS = [
-  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-  '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-  '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'
-];
+export const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
+  const hour = Math.floor(i / 2);
+  const minute = i % 2 === 0 ? '00' : '30';
+  return `${hour.toString().padStart(2, '0')}:${minute}`;
+});
 
 export const MOCK_SERVICES: Service[] = [
   { id: 's1', name: 'Corte', price: 50.00, duration: 30, description: 'Corte de cabelo masculino com acabamento premium.' },
@@ -23,7 +23,7 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     specialty: 'Cortes Clássicos & Degradê',
     commission: 50,
     active: true,
-    workingHours: TIME_SLOTS 
+    workingHours: TIME_SLOTS.slice(18, 38) // Exemplo: 09:00 às 19:00
   },
   { 
     id: 'p2', 
@@ -32,7 +32,7 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     specialty: 'Visagismo de Barba',
     commission: 40,
     active: true,
-    workingHours: TIME_SLOTS.slice(0, 10)
+    workingHours: TIME_SLOTS.slice(20, 30)
   },
   { 
     id: 'p3', 
@@ -41,6 +41,6 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     specialty: 'Cabelos Modernos',
     commission: 45,
     active: true,
-    workingHours: TIME_SLOTS.slice(6)
+    workingHours: TIME_SLOTS.slice(24, 40)
   },
 ];

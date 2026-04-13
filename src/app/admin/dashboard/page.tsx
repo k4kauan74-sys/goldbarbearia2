@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
@@ -70,7 +71,7 @@ export default function AdminDashboardPage() {
   const [profSpecialty, setProfSpecialty] = useState("");
   const [profPhoto, setProfPhoto] = useState("");
   const [profCommission, setProfCommission] = useState("50");
-  const [profWorkingHours, setProfWorkingHours] = useState<string[]>(TIME_SLOTS);
+  const [profWorkingHours, setProfWorkingHours] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [aptClient, setAptClient] = useState("");
@@ -274,14 +275,14 @@ export default function AdminDashboardPage() {
   const resetProfForm = () => {
     setEditingProf(null); setProfName(""); setProfEmail(""); setProfPassword("123");
     setProfSpecialty(""); setProfPhoto(""); setProfCommission("50");
-    setProfWorkingHours(TIME_SLOTS);
+    setProfWorkingHours([]);
   };
 
   const openEditProf = (prof: Professional) => {
     setEditingProf(prof); setProfName(prof.name); setProfEmail(prof.email || "");
     setProfPassword(prof.password || "123"); setProfSpecialty(prof.specialty);
     setProfPhoto(prof.photo); setProfCommission(prof.commission?.toString() ?? "50");
-    setProfWorkingHours(prof.workingHours || TIME_SLOTS);
+    setProfWorkingHours(prof.workingHours || []);
     setIsProfDialogOpen(true);
   };
 
@@ -335,7 +336,7 @@ export default function AdminDashboardPage() {
   const activeSlots = useMemo(() => {
     if (selectedProfFilter === "all") return TIME_SLOTS;
     const prof = professionals.find(p => p.id === selectedProfFilter);
-    return prof?.workingHours || TIME_SLOTS;
+    return prof?.workingHours || [];
   }, [selectedProfFilter, professionals]);
 
   const handlePrevDay = () => {
@@ -421,7 +422,7 @@ export default function AdminDashboardPage() {
                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Comissão %</Label><Input type="number" value={profCommission} onChange={e=>setProfCommission(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                      <div className="col-span-2 space-y-2 mt-2">
-                       <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Expediente (Horários Disponíveis)</Label>
+                       <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Expediente (00:00 - 23:30)</Label>
                        <div className="grid grid-cols-4 gap-2">
                          {TIME_SLOTS.map(slot => (
                            <button
@@ -470,7 +471,7 @@ export default function AdminDashboardPage() {
                       <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                       <div className="space-y-1 col-span-2"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nova Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                       <div className="col-span-2 space-y-2 mt-2">
-                        <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Meu Expediente</Label>
+                        <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Meu Expediente (00:00 - 23:30)</Label>
                         <div className="grid grid-cols-4 gap-2">
                           {TIME_SLOTS.map(slot => (
                             <button
