@@ -38,7 +38,7 @@ export default function Home() {
               <div key={i} className="flex gap-16 px-8 items-center">
                 <div className="flex items-center gap-4">
                   <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Local</span>
-                  <span className="text-sm font-mono text-white">ROD. GABRIEL ARNS, 4806</span>
+                  <span className="text-sm font-mono text-white uppercase">Rod. Gabriel Arns, 4806</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Atendimento</span>
@@ -47,10 +47,6 @@ export default function Home() {
                 <div className="flex items-center gap-4">
                   <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">WhatsApp</span>
                   <span className="text-sm font-mono text-secondary">(48) 9246-5639</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Experiência</span>
-                  <span className="text-sm font-mono text-white">HIGH-END GROOMING</span>
                 </div>
               </div>
             ))}
