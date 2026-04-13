@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { ArrowRight, Scissors, Zap, ShieldCheck, CheckCircle2 } from "lucide-react";
@@ -30,17 +31,20 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Nova Seção de Chamada para Assinatura */}
-            <div className="flex flex-col items-center gap-4 max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-700">
-              <p className="text-white/40 text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-medium leading-relaxed">
-                JÁ PENSOU EM CORTAR O CABELO QUANTAS VEZES QUISER?
-              </p>
-              <p className="text-primary text-[10px] md:text-[12px] uppercase tracking-[0.3em] font-black">
-                POR APENAS 69,90 R$/MÊS É POSSÍVEL
-              </p>
-              <Link href="#assinatura" className="mt-2 text-white/20 hover:text-white border border-white/5 hover:border-white/20 px-8 py-3 rounded-full text-[8px] uppercase tracking-[0.4em] transition-all duration-300 backdrop-blur-sm">
-                Saiba mais
-              </Link>
+            {/* Nova Seção de Chamada para Assinatura Editorial */}
+            <div className="flex flex-col items-center gap-6 max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-700">
+              <h2 className="text-4xl md:text-6xl font-anton leading-[1.1] text-white uppercase tracking-tighter max-w-sm md:max-w-xl">
+                JA PENSOU <span className="text-[#F5F5F5]">CORTAR</span> O <span className="text-[#D4AF37]">CABELO</span> QUANTAS VEZES QUISER?
+              </h2>
+              
+              <div className="flex flex-col items-center gap-4">
+                <p className="text-primary text-[10px] md:text-[12px] uppercase tracking-[0.4em] font-black">
+                  POR APENAS 69,90 R$/MÊS É POSSÍVEL
+                </p>
+                <Link href="#assinatura" className="mt-2 text-white/30 hover:text-white border border-white/10 hover:border-white/30 px-10 py-4 rounded-full text-[9px] uppercase tracking-[0.4em] transition-all duration-500 backdrop-blur-md">
+                  Saiba mais
+                </Link>
+              </div>
             </div>
           </div>
         </div>
