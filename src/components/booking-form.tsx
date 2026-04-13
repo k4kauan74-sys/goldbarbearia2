@@ -214,7 +214,7 @@ export function BookingForm() {
                         : "glass border-white/5 text-neutral-400 hover:border-primary/40 hover:text-white"
                     )}
                   >
-                    <span className="opacity-20 text-[7px] font-bold">DISPONÍVEL</span>
+                    <span className="text-emerald-500 text-[7px] font-bold uppercase">DISPONÍVEL</span>
                     {time}
                   </button>
                 ))}
