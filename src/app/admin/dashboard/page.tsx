@@ -21,7 +21,8 @@ import {
   Upload,
   DollarSign,
   PieChart,
-  Percent
+  Percent,
+  Scissors
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -40,25 +41,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { MOCK_SERVICES, MOCK_PROFESSIONALS, TIME_SLOTS } from "@/lib/mock-data";
-import { Professional, Appointment } from "@/lib/types";
+import { Professional, Appointment, Service } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
-type ViewMode = 'appointments' | 'professionals' | 'finance';
+type ViewMode = 'appointments' | 'professionals' | 'services' | 'finance';
 
 export default function AdminDashboardPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('appointments');
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [search, setSearch] = useState("");
   const [selectedProfFilter, setSelectedProfFilter] = useState<string>("all");
   const { toast } = useToast();
   
   const [isProfDialogOpen, setIsProfDialogOpen] = useState(false);
   const [isAptDialogOpen, setIsAptDialogOpen] = useState(false);
+  const [isServiceDialogOpen, setIsServiceDialogOpen] = useState(false);
+  
   const [editingProf, setEditingProf] = useState<Professional | null>(null);
   const [editingApt, setEditingApt] = useState<Appointment | null>(null);
+  const [editingService, setEditingService] = useState<Service | null>(null);
   
   const [profName, setProfName] = useState("");
   const [profSpecialty, setProfSpecialty] = useState("");
@@ -72,6 +78,11 @@ export default function AdminDashboardPage() {
   const [aptProf, setAptProf] = useState("");
   const [aptDate, setAptDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [aptTime, setAptTime] = useState("");
+
+  const [srvName, setSrvName] = useState("");
+  const [srvPrice, setSrvPrice] = useState("");
+  const [srvDuration, setSrvDuration] = useState("");
+  const [srvDescription, setSrvDescription] = useState("");
 
   const router = useRouter();
 
@@ -92,17 +103,25 @@ export default function AdminDashboardPage() {
     } else {
       setProfessionals(savedProfs);
     }
+
+    const savedServices = JSON.parse(localStorage.getItem('gold_services') || '[]');
+    if (savedServices.length === 0) {
+      localStorage.setItem('gold_services', JSON.stringify(MOCK_SERVICES));
+      setServices(MOCK_SERVICES);
+    } else {
+      setServices(savedServices);
+    }
   }, [router]);
 
   // Finance Calculations
   const financeData = useMemo(() => {
     const totalRevenue = appointments.reduce((acc, curr) => {
-      const service = MOCK_SERVICES.find(s => s.id === curr.serviceId);
+      const service = services.find(s => s.id === curr.serviceId);
       return acc + (service?.price || 0);
     }, 0);
 
     const totalCommissions = appointments.reduce((acc, curr) => {
-      const service = MOCK_SERVICES.find(s => s.id === curr.serviceId);
+      const service = services.find(s => s.id === curr.serviceId);
       const prof = professionals.find(p => p.id === curr.professionalId);
       const commissionAmount = ((service?.price || 0) * (prof?.commission ?? 0)) / 100;
       return acc + commissionAmount;
@@ -111,7 +130,7 @@ export default function AdminDashboardPage() {
     const profBreakdown = professionals.map(p => {
       const profApts = appointments.filter(a => a.professionalId === p.id);
       const revenue = profApts.reduce((acc, curr) => {
-        const service = MOCK_SERVICES.find(s => s.id === curr.serviceId);
+        const service = services.find(s => s.id === curr.serviceId);
         return acc + (service?.price || 0);
       }, 0);
       const commission = (revenue * (p.commission ?? 0)) / 100;
@@ -132,7 +151,7 @@ export default function AdminDashboardPage() {
       netProfit: totalRevenue - totalCommissions,
       profBreakdown
     };
-  }, [appointments, professionals]);
+  }, [appointments, professionals, services]);
 
   const handleLogout = () => {
     localStorage.removeItem("gold_admin_logged");
@@ -253,12 +272,65 @@ export default function AdminDashboardPage() {
     setProfName(prof.name);
     setProfSpecialty(prof.specialty);
     setProfPhoto(prof.photo);
-    // Correção: Fallback seguro para evitar erro de toString em undefined
     setProfCommission(prof.commission?.toString() ?? "50");
     setIsProfDialogOpen(true);
   };
 
-  const getServiceName = (id: string) => MOCK_SERVICES.find(s => s.id === id)?.name || "N/A";
+  const handleSaveService = () => {
+    if (!srvName || !srvPrice || !srvDuration) {
+      toast({ title: "Erro", description: "Preencha os campos obrigatórios.", variant: "destructive" });
+      return;
+    }
+
+    let updatedServices;
+    if (editingService) {
+      updatedServices = services.map(s => s.id === editingService.id ? { 
+        ...s, name: srvName, price: Number(srvPrice), 
+        duration: Number(srvDuration), description: srvDescription 
+      } : s);
+    } else {
+      const newService: Service = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: srvName,
+        price: Number(srvPrice),
+        duration: Number(srvDuration),
+        description: srvDescription
+      };
+      updatedServices = [...services, newService];
+    }
+    
+    setServices(updatedServices);
+    localStorage.setItem('gold_services', JSON.stringify(updatedServices));
+    setIsServiceDialogOpen(false);
+    resetServiceForm();
+    toast({ title: "Sucesso", description: "Serviço salvo." });
+  };
+
+  const deleteService = (id: string) => {
+    const updated = services.filter(s => s.id !== id);
+    setServices(updated);
+    localStorage.setItem('gold_services', JSON.stringify(updated));
+    toast({ title: "Removido", description: "Serviço excluído." });
+  };
+
+  const resetServiceForm = () => {
+    setEditingService(null);
+    setSrvName("");
+    setSrvPrice("");
+    setSrvDuration("");
+    setSrvDescription("");
+  };
+
+  const openEditService = (service: Service) => {
+    setEditingService(service);
+    setSrvName(service.name);
+    setSrvPrice(service.price.toString());
+    setSrvDuration(service.duration.toString());
+    setSrvDescription(service.description || "");
+    setIsServiceDialogOpen(true);
+  };
+
+  const getServiceName = (id: string) => services.find(s => s.id === id)?.name || "N/A";
   const getProfName = (id: string) => professionals.find(p => p.id === id)?.name || "N/A";
 
   const filteredAppointments = appointments.filter(a => {
@@ -297,6 +369,16 @@ export default function AdminDashboardPage() {
           </Button>
           <Button 
             variant="ghost" 
+            onClick={() => setViewMode('services')}
+            className={cn(
+              "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-6",
+              viewMode === 'services' ? "bg-primary/10 text-primary border border-primary/20" : "text-white/40 hover:text-white"
+            )}
+          >
+            <Scissors className="h-4 w-4" /> Serviços
+          </Button>
+          <Button 
+            variant="ghost" 
             onClick={() => setViewMode('finance')}
             className={cn(
               "w-full justify-start gap-3 font-anton uppercase tracking-widest text-[10px] py-6",
@@ -328,10 +410,12 @@ export default function AdminDashboardPage() {
             <h1 className="text-5xl font-anton uppercase tracking-tighter">
               {viewMode === 'appointments' && "PAINEL DE "}
               {viewMode === 'professionals' && "GESTÃO DE "}
+              {viewMode === 'services' && "TABELA DE "}
               {viewMode === 'finance' && "GESTÃO DE "}
               <span className="text-shimmer">
                 {viewMode === 'appointments' && "AGENDAMENTOS"}
                 {viewMode === 'professionals' && "PROFISSIONAIS"}
+                {viewMode === 'services' && "SERVIÇOS"}
                 {viewMode === 'finance' && "CAIXA & COMISSÕES"}
               </span>
             </h1>
@@ -377,7 +461,7 @@ export default function AdminDashboardPage() {
                         <Select value={aptService} onValueChange={setAptService}>
                           <SelectTrigger className="bg-transparent border-white/10 border-b rounded-none h-12"><SelectValue /></SelectTrigger>
                           <SelectContent className="bg-[#0a0a0a] text-white">
-                            {MOCK_SERVICES.map(s => <SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>)}
+                            {services.map(s => <SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>
@@ -450,6 +534,42 @@ export default function AdminDashboardPage() {
                 </div>
                 <DialogFooter>
                   <Button onClick={handleSaveProfessional} className="w-full bg-primary text-black font-anton uppercase py-6">Salvar Perfil</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+
+          {viewMode === 'services' && (
+            <Dialog open={isServiceDialogOpen} onOpenChange={(open) => { setIsServiceDialogOpen(open); if(!open) resetServiceForm(); }}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary text-black hover:bg-white font-anton uppercase tracking-widest text-[10px] px-8 py-6 rounded-full">
+                  <Plus className="mr-2 h-4 w-4" /> Novo Serviço
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-[#0a0a0a] border-white/10 text-white">
+                <DialogHeader><DialogTitle className="font-anton text-2xl uppercase tracking-widest">{editingService ? 'Editar Serviço' : 'Novo Serviço'}</DialogTitle></DialogHeader>
+                <div className="space-y-6 py-4">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase text-white/40">Nome do Serviço</Label>
+                    <Input value={srvName} onChange={(e) => setSrvName(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none uppercase" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase text-white/40">Preço (R$)</Label>
+                      <Input type="number" value={srvPrice} onChange={(e) => setSrvPrice(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase text-white/40">Duração (Min)</Label>
+                      <Input type="number" value={srvDuration} onChange={(e) => setSrvDuration(e.target.value)} className="bg-transparent border-white/10 border-b rounded-none" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase text-white/40">Descrição</Label>
+                    <Textarea value={srvDescription} onChange={(e) => setSrvDescription(e.target.value)} className="bg-transparent border-white/10 rounded-xl min-h-[100px]" placeholder="Breve descrição do serviço..." />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button onClick={handleSaveService} className="w-full bg-primary text-black font-anton uppercase py-6">Salvar Serviço</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -550,6 +670,46 @@ export default function AdminDashboardPage() {
               </Card>
             ))}
           </div>
+        )}
+
+        {viewMode === 'services' && (
+          <Card className="bg-[#0a0a0a] border-white/5 rounded-[2rem] overflow-hidden">
+            <Table>
+              <TableHeader className="bg-black/40">
+                <TableRow className="border-white/5">
+                  <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30 h-16">Serviço</TableHead>
+                  <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30">Descrição</TableHead>
+                  <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30">Duração</TableHead>
+                  <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30">Preço</TableHead>
+                  <TableHead className="font-anton uppercase text-[10px] tracking-widest text-white/30 text-right pr-12">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {services.map((service) => (
+                  <TableRow key={service.id} className="border-white/5 hover:bg-white/[0.03] transition-colors">
+                    <TableCell className="py-6">
+                      <span className="font-anton text-sm uppercase tracking-widest">{service.name}</span>
+                    </TableCell>
+                    <TableCell className="max-w-[300px]">
+                      <p className="text-[10px] text-white/40 truncate">{service.description || "Sem descrição"}</p>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-[9px] border-white/10 text-white/60">{service.duration} MIN</Badge>
+                    </TableCell>
+                    <TableCell className="font-anton text-lg text-primary">
+                      R$ {service.price.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="text-right pr-8">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon" onClick={() => openEditService(service)} className="text-white/20 hover:text-primary"><Edit2 className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => deleteService(service.id)} className="text-white/20 hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         )}
 
         {viewMode === 'finance' && (

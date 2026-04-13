@@ -2,11 +2,11 @@
 import { Service, Professional } from './types';
 
 export const MOCK_SERVICES: Service[] = [
-  { id: 's1', name: 'Corte', price: 50.00, duration: 30 },
-  { id: 's2', name: 'Barba', price: 35.00, duration: 20 },
-  { id: 's3', name: 'Corte + Barba', price: 75.00, duration: 50 },
-  { id: 's4', name: 'Sobrancelha', price: 15.00, duration: 10 },
-  { id: 's5', name: 'Acabamento', price: 20.00, duration: 15 },
+  { id: 's1', name: 'Corte', price: 50.00, duration: 30, description: 'Corte de cabelo masculino com acabamento premium.' },
+  { id: 's2', name: 'Barba', price: 35.00, duration: 20, description: 'Barba feita com toalha quente e navalha.' },
+  { id: 's3', name: 'Corte + Barba', price: 75.00, duration: 50, description: 'Combo completo de cabelo e barba.' },
+  { id: 's4', name: 'Sobrancelha', price: 15.00, duration: 10, description: 'Limpeza e design de sobrancelha.' },
+  { id: 's5', name: 'Acabamento', price: 20.00, duration: 15, description: 'Apenas limpeza de nuca e costeletas.' },
 ];
 
 export const MOCK_PROFESSIONALS: Professional[] = [

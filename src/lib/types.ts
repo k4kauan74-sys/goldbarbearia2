@@ -4,6 +4,7 @@ export type Service = {
   name: string;
   price: number;
   duration: number; // in minutes
+  description?: string;
 };
 
 export type Professional = {

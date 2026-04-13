@@ -7,7 +7,7 @@ import { Scissors, CheckCircle2, ChevronLeft, ArrowRight, Circle } from "lucide-
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-import { MOCK_SERVICES, TIME_SLOTS } from "@/lib/mock-data";
+import { TIME_SLOTS } from "@/lib/mock-data";
 import { Service, Professional } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,8 @@ export function BookingForm() {
   const [clientName, setClientName] = useState("");
   const [clientPhone, setClientPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [services, setServices] = useState<Service[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   
   const { toast } = useToast();
@@ -38,15 +40,20 @@ export function BookingForm() {
     setSelectedDate(now);
     setToday(now);
 
-    // Load Professionals from LocalStorage (sincronizado com Admin)
+    // Load dynamic data from localStorage
+    const savedServices = JSON.parse(localStorage.getItem('gold_services') || '[]');
     const savedProfs = JSON.parse(localStorage.getItem('gold_professionals') || '[]');
+
+    if (savedServices.length > 0) {
+      setServices(savedServices);
+    } else {
+      import('@/lib/mock-data').then(m => setServices(m.MOCK_SERVICES));
+    }
+
     if (savedProfs.length > 0) {
       setProfessionals(savedProfs);
     } else {
-      // Fallback
-      import('@/lib/mock-data').then(m => {
-        setProfessionals(m.MOCK_PROFESSIONALS);
-      });
+      import('@/lib/mock-data').then(m => setProfessionals(m.MOCK_PROFESSIONALS));
     }
   }, []);
 
@@ -96,7 +103,7 @@ export function BookingForm() {
               SELECIONE O <span className="text-shimmer">SERVIÇO</span>
             </h2>
             <div className="grid gap-4">
-              {MOCK_SERVICES.map((s, idx) => (
+              {services.map((s, idx) => (
                 <button
                   key={s.id}
                   onClick={() => { setSelectedService(s); setStep('professional'); }}
