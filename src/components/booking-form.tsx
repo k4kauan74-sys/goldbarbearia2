@@ -133,22 +133,24 @@ export function BookingForm() {
                 <ChevronLeft className="h-4 w-4" /> Voltar
               </Button>
             </div>
-            <div className="grid sm:grid-cols-3 gap-6">
+            <div className="flex flex-wrap justify-center gap-10 md:gap-16">
               {professionals.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => { setSelectedProfessional(p); setStep('datetime'); }}
-                  className="group relative glass p-8 rounded-[2.5rem] hover:border-primary/40 hover:-translate-y-2 transition-all duration-500 text-left"
+                  className="group flex flex-col items-center gap-4 transition-all duration-300"
                 >
-                  <div className="aspect-[4/5] overflow-hidden rounded-2xl mb-8 bg-neutral-900 border border-white/5">
+                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-white/5 group-hover:border-primary transition-colors bg-neutral-900 shadow-xl group-hover:shadow-primary/20">
                     <img 
                       src={p.photo} 
                       alt={p.name} 
-                      className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
+                      className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" 
                     />
                   </div>
-                  <h3 className="font-anton text-xl text-white mb-2 uppercase tracking-widest">{p.name}</h3>
-                  <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">{p.specialty}</p>
+                  <div className="text-center">
+                    <h3 className="font-anton text-sm md:text-lg text-white group-hover:text-primary uppercase tracking-widest transition-colors">{p.name.split(' ')[0]}</h3>
+                    <p className="text-[8px] md:text-[10px] font-mono text-neutral-500 uppercase tracking-widest mt-1">{p.specialty.split(' ')[0]}</p>
+                  </div>
                 </button>
               ))}
             </div>
