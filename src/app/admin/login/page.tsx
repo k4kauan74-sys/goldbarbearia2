@@ -73,13 +73,13 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary rounded-full blur-[140px] opacity-10 animate-float" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#D4AF37] rounded-full blur-[140px] opacity-10 animate-float" />
       </div>
 
       <div className="text-center mb-8 relative z-10">
-        <h1 className="text-7xl md:text-8xl font-anton tracking-tighter uppercase leading-none flex flex-col">
-          <span style={{ WebkitTextStroke: '1px hsl(var(--primary))', color: 'transparent' }}>GOLD</span>
-          <span style={{ WebkitTextStroke: '1px hsl(var(--primary))', color: 'transparent' }}>ACCESS</span>
+        <h1 className="text-5xl md:text-6xl font-anton tracking-tighter uppercase leading-none flex flex-col items-center">
+          <span className="text-[#D4AF37]">GOLD</span>
+          <span className="text-[#F5F5F5]">ACCESS</span>
         </h1>
         <p className="text-primary/60 text-[10px] font-bold uppercase tracking-[0.4em] mt-4">Painel de Controle Gold</p>
       </div>
@@ -123,7 +123,7 @@ export default function AdminLoginPage() {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-primary text-black hover:bg-black hover:text-primary font-anton uppercase tracking-[0.2em] py-8 text-lg transition-all duration-300 rounded-2xl"
+              className="w-full bg-[#D4AF37] text-black hover:bg-black hover:text-[#D4AF37] font-anton uppercase tracking-[0.2em] py-8 text-lg transition-all duration-300 rounded-2xl"
               disabled={loading}
             >
               {loading ? "VALIDANDO..." : "ENTRAR NO PAINEL"}
