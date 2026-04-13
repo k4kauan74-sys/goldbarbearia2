@@ -423,22 +423,24 @@ export default function AdminDashboardPage() {
                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Comissão %</Label><Input type="number" value={profCommission} onChange={e=>setProfCommission(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                      <div className="col-span-2 space-y-2 mt-2">
                        <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Expediente (00:00 - 23:30)</Label>
-                       <div className="grid grid-cols-4 gap-2">
-                         {TIME_SLOTS.map(slot => (
-                           <button
-                             key={slot}
-                             onClick={() => toggleWorkingHour(slot)}
-                             className={cn(
-                               "py-1.5 rounded-lg text-[9px] font-anton border transition-all",
-                               profWorkingHours.includes(slot) 
-                                 ? "bg-[#D4AF37] text-black border-[#D4AF37]" 
-                                 : "bg-transparent text-[#F5F5F5]/40 border-white/10"
-                             )}
-                           >
-                             {slot}
-                           </button>
-                         ))}
-                       </div>
+                       <ScrollArea className="h-48 border border-white/5 rounded-xl p-2 bg-white/[0.02]">
+                         <div className="grid grid-cols-4 gap-2">
+                           {TIME_SLOTS.map(slot => (
+                             <button
+                               key={slot}
+                               onClick={() => toggleWorkingHour(slot)}
+                               className={cn(
+                                 "py-1.5 rounded-lg text-[9px] font-anton border transition-all",
+                                 profWorkingHours.includes(slot) 
+                                   ? "bg-[#D4AF37] text-black border-[#D4AF37]" 
+                                   : "bg-transparent text-[#F5F5F5]/40 border-white/10"
+                               )}
+                             >
+                               {slot}
+                             </button>
+                           ))}
+                         </div>
+                       </ScrollArea>
                      </div>
                    </div>
                  </ScrollArea>
@@ -472,22 +474,24 @@ export default function AdminDashboardPage() {
                       <div className="space-y-1 col-span-2"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nova Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                       <div className="col-span-2 space-y-2 mt-2">
                         <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Meu Expediente (00:00 - 23:30)</Label>
-                        <div className="grid grid-cols-4 gap-2">
-                          {TIME_SLOTS.map(slot => (
-                            <button
-                              key={slot}
-                              onClick={() => toggleWorkingHour(slot)}
-                              className={cn(
-                                "py-1.5 rounded-lg text-[9px] font-anton border transition-all",
-                                profWorkingHours.includes(slot) 
-                                  ? "bg-[#D4AF37] text-black border-[#D4AF37]" 
-                                  : "bg-transparent text-[#F5F5F5]/40 border-white/10"
-                              )}
-                            >
-                              {slot}
-                            </button>
-                          ))}
-                        </div>
+                        <ScrollArea className="h-48 border border-white/5 rounded-xl p-2 bg-white/[0.02]">
+                          <div className="grid grid-cols-4 gap-2">
+                            {TIME_SLOTS.map(slot => (
+                              <button
+                                key={slot}
+                                onClick={() => toggleWorkingHour(slot)}
+                                className={cn(
+                                  "py-1.5 rounded-lg text-[9px] font-anton border transition-all",
+                                  profWorkingHours.includes(slot) 
+                                    ? "bg-[#D4AF37] text-black border-[#D4AF37]" 
+                                    : "bg-transparent text-[#F5F5F5]/40 border-white/10"
+                                )}
+                              >
+                                {slot}
+                              </button>
+                            ))}
+                          </div>
+                        </ScrollArea>
                       </div>
                     </div>
                   </ScrollArea>
