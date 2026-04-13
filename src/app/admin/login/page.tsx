@@ -79,7 +79,7 @@ export default function AdminLoginPage() {
       <div className="text-center mb-8 relative z-10">
         <h1 className="text-5xl md:text-6xl font-anton tracking-tighter uppercase leading-none flex flex-col items-center">
           <span className="text-[#D4AF37]">GOLD</span>
-          <span className="text-[#F5F5F5]">ACCESS</span>
+          <span className="text-[#F5F5F5]">ADMIN</span>
         </h1>
         <p className="text-primary/60 text-[10px] font-bold uppercase tracking-[0.4em] mt-4">Painel de Controle Gold</p>
       </div>

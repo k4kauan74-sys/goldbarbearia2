@@ -354,7 +354,10 @@ export default function AdminDashboardPage() {
   return (
     <div className="h-[872px] w-[460px] mx-auto bg-[#030303] flex flex-col text-white font-body overflow-hidden border-x border-white/5 relative">
       <header className="h-14 flex items-center justify-between px-4 border-b border-white/5 bg-[#0a0a0a] z-50">
-        <div className="font-anton text-lg tracking-tighter uppercase">GOLD<span className="text-primary">{user.role === 'admin' ? 'ADMIN' : 'STAFF'}</span></div>
+        <div className="font-anton text-lg tracking-tighter uppercase">
+          <span className="text-[#D4AF37]">GOLD</span>
+          <span className="text-[#F5F5F5]">{user.role === 'admin' ? 'ADMIN' : 'STAFF'}</span>
+        </div>
         <div className="flex gap-1">
           <Button variant="ghost" size="icon" onClick={() => setViewMode('appointments')} className={cn("h-8 w-8", viewMode === 'appointments' && "text-primary")}><CalendarIcon className="h-4 w-4" /></Button>
           <Button variant="ghost" size="icon" onClick={() => setViewMode('professionals')} className={cn("h-8 w-8", viewMode === 'professionals' && "text-primary")}><Users className="h-4 w-4" /></Button>
