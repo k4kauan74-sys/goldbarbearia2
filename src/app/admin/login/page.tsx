@@ -63,7 +63,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 relative overflow-hidden">
       <div className="absolute top-8 left-8 z-20">
         <Link href="/">
           <Button variant="ghost" className="text-white/40 hover:text-white font-anton uppercase tracking-widest text-[10px] gap-2">
@@ -73,37 +73,40 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary rounded-full blur-[120px] opacity-10 animate-float" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary rounded-full blur-[140px] opacity-10 animate-float" />
       </div>
 
-      <Card className="w-full max-w-md relative z-10 bg-transparent border-none shadow-none">
-        <CardHeader className="text-center space-y-6">
-          <div className="space-y-4">
-            <CardTitle className="text-6xl font-anton text-white tracking-tighter uppercase">
-              GOLD <span className="text-primary">ACCESS</span>
-            </CardTitle>
-            <CardDescription className="text-primary/60 text-[10px] font-bold uppercase tracking-[0.4em]">Acesso Administrativo & Colaborador</CardDescription>
-          </div>
+      <div className="text-center mb-8 relative z-10">
+        <h1 className="text-7xl md:text-8xl font-anton tracking-tighter uppercase leading-none flex flex-col">
+          <span style={{ WebkitTextStroke: '1px hsl(var(--primary))', color: 'transparent' }}>GOLD</span>
+          <span style={{ WebkitTextStroke: '1px hsl(var(--primary))', color: 'transparent' }}>ACCESS</span>
+        </h1>
+        <p className="text-primary/60 text-[10px] font-bold uppercase tracking-[0.4em] mt-4">Painel de Controle Gold</p>
+      </div>
+
+      <Card className="w-full max-w-md relative z-10 bg-white border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
+        <CardHeader className="text-center pt-10 pb-4">
+          <CardDescription className="text-black/40 text-[9px] font-black uppercase tracking-[0.3em]">Autenticação de Segurança</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-10">
-            <div className="space-y-4">
-              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-primary/60">E-mail</Label>
+        <CardContent className="px-8 pb-10">
+          <form onSubmit={handleLogin} className="space-y-8">
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-black/60 ml-1">E-mail Corporativo</Label>
               <Input 
                 type="email"
-                className="bg-transparent border-white/10 border-b border-t-0 border-x-0 rounded-none py-8 text-lg font-medium text-white placeholder:text-white/10 focus-visible:ring-0 focus-visible:border-primary transition-colors"
-                placeholder="SEU@EMAIL.COM"
+                className="bg-transparent border-black/10 border-b border-t-0 border-x-0 rounded-none py-6 text-base font-medium text-black placeholder:text-black/10 focus-visible:ring-0 focus-visible:border-primary transition-colors h-auto"
+                placeholder="exemplo@goldbarber.com"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
-            <div className="space-y-4">
-              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-primary/60">Senha</Label>
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-black/60 ml-1">Senha de Acesso</Label>
               <div className="relative">
                 <Input 
                   type={showPassword ? "text" : "password"}
-                  className="bg-transparent border-white/10 border-b border-t-0 border-x-0 rounded-none py-8 text-lg font-medium text-white placeholder:text-white/10 focus-visible:ring-0 focus-visible:border-primary transition-colors"
+                  className="bg-transparent border-black/10 border-b border-t-0 border-x-0 rounded-none py-6 text-base font-medium text-black placeholder:text-black/10 focus-visible:ring-0 focus-visible:border-primary transition-colors h-auto"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -112,7 +115,7 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-black/20 hover:text-black transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -120,12 +123,15 @@ export default function AdminLoginPage() {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-primary text-black hover:bg-white font-anton uppercase tracking-[0.3em] py-12 text-xl transition-all duration-500"
+              className="w-full bg-primary text-black hover:bg-black hover:text-primary font-anton uppercase tracking-[0.2em] py-8 text-lg transition-all duration-300 rounded-2xl"
               disabled={loading}
             >
-              {loading ? "VERIFICANDO..." : "ENTRAR NO PAINEL"}
+              {loading ? "VALIDANDO..." : "ENTRAR NO PAINEL"}
             </Button>
-            <p className="text-center text-white/20 text-[8px] uppercase tracking-widest">Padrão p/ Barbeiros: email cadastrado + senha "123"</p>
+            <div className="text-center space-y-1">
+              <p className="text-black/20 text-[8px] uppercase tracking-widest">Acesso restrito a colaboradores autorizados</p>
+              <p className="text-black/30 text-[7px] uppercase tracking-widest font-bold">Padrão p/ Barbeiros: Email + senha "123"</p>
+            </div>
           </form>
         </CardContent>
       </Card>
