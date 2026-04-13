@@ -37,20 +37,20 @@ export default function Home() {
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="flex gap-16 px-8 items-center">
                 <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Atendimento</span>
-                  <span className="text-sm font-mono text-white">24/7 PREMIUM</span>
+                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Local</span>
+                  <span className="text-sm font-mono text-white">ROD. GABRIEL ARNS, 4806</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Estilo</span>
-                  <span className="text-sm font-mono text-primary">SYNAPSE MODULAR</span>
+                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Atendimento</span>
+                  <span className="text-sm font-mono text-primary">10/10 PREMIUM</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">WhatsApp</span>
+                  <span className="text-sm font-mono text-secondary">(48) 9246-5639</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Experiência</span>
-                  <span className="text-sm font-mono text-secondary">CURADORIA EDITORIAL</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Local</span>
-                  <span className="text-sm font-mono text-white">STUDIO PRIVATIVO</span>
+                  <span className="text-sm font-mono text-white">HIGH-END GROOMING</span>
                 </div>
               </div>
             ))}

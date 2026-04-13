@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -10,7 +9,7 @@ export function Navbar() {
     <div className="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-[672px] z-[100]">
       <nav className="glass rounded-full px-3 md:px-6 py-3 flex items-center justify-between shadow-2xl shadow-primary/10 border-white/10">
         <div className="flex items-center gap-4 shrink-0">
-          <Link href="https://wa.me/5500000000000" target="_blank" className="text-white hover:text-primary transition-colors">
+          <Link href="https://wa.me/554892465639" target="_blank" className="text-white hover:text-primary transition-colors">
             <MessageCircle className="h-4 w-4 md:h-5 md:w-5" />
           </Link>
           <Link href="https://tiktok.com/@goldbarbearia" target="_blank" className="text-white hover:text-primary transition-colors">
