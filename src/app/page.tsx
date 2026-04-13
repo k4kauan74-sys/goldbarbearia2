@@ -29,6 +29,19 @@ export default function Home() {
                 <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
+
+            {/* Nova Seção de Chamada para Assinatura */}
+            <div className="flex flex-col items-center gap-4 max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-700">
+              <p className="text-white/40 text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-medium leading-relaxed">
+                JÁ PENSOU EM CORTAR O CABELO QUANTAS VEZES QUISER?
+              </p>
+              <p className="text-primary text-[10px] md:text-[12px] uppercase tracking-[0.3em] font-black">
+                POR APENAS 69,90 R$/MÊS É POSSÍVEL
+              </p>
+              <Link href="#assinatura" className="mt-2 text-white/20 hover:text-white border border-white/5 hover:border-white/20 px-8 py-3 rounded-full text-[8px] uppercase tracking-[0.4em] transition-all duration-300 backdrop-blur-sm">
+                Saiba mais
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -56,7 +69,7 @@ export default function Home() {
       </section>
 
       {/* Hero Premium - Seção de Assinatura */}
-      <section className="relative py-24 md:py-32 bg-[#0A0A0A] overflow-hidden border-t border-white/5">
+      <section id="assinatura" className="relative py-24 md:py-32 bg-[#0A0A0A] overflow-hidden border-t border-white/5">
         {/* Grid Background */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
              style={{ backgroundImage: 'radial-gradient(#1A1A1A 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
