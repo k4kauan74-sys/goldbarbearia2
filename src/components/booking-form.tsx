@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Scissors, CheckCircle2, ChevronLeft, ArrowRight, Circle, Clock, Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { collection, doc } from "firebase/firestore";
 
 import { TIME_SLOTS } from "@/lib/mock-data";
 import { Service, Professional, Appointment } from "@/lib/types";
@@ -15,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { CustomCalendar } from "@/components/custom-calendar";
+import { useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking } from "@/firebase";
 
 type Step = 'service' | 'professional' | 'date' | 'time' | 'contact' | 'success';
 
@@ -29,41 +31,27 @@ export function BookingForm() {
   const [clientPhone, setClientPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const [services, setServices] = useState<Service[]>([]);
-  const [professionals, setProfessionals] = useState<Professional[]>([]);
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  
   const { toast } = useToast();
   const router = useRouter();
+  const firestore = useFirestore();
 
   useEffect(() => {
     const now = new Date();
     setSelectedDate(now);
     setToday(now);
-
-    const savedServices = JSON.parse(localStorage.getItem('gold_services') || '[]');
-    const savedProfs = JSON.parse(localStorage.getItem('gold_professionals') || '[]');
-    const savedApts = JSON.parse(localStorage.getItem('gold_appointments') || '[]');
-
-    setAppointments(savedApts);
-
-    if (savedServices.length > 0) {
-      setServices(savedServices);
-    } else {
-      import('@/lib/mock-data').then(m => setServices(m.MOCK_SERVICES));
-    }
-
-    if (savedProfs.length > 0) {
-      setProfessionals(savedProfs);
-    } else {
-      import('@/lib/mock-data').then(m => setProfessionals(m.MOCK_PROFESSIONALS));
-    }
   }, []);
+
+  const servicesQuery = useMemoFirebase(() => collection(firestore, "services"), [firestore]);
+  const professionalsQuery = useMemoFirebase(() => collection(firestore, "professionals"), [firestore]);
+  const appointmentsQuery = useMemoFirebase(() => collection(firestore, "appointments"), [firestore]);
+
+  const { data: services = [] } = useCollection<Service>(servicesQuery);
+  const { data: professionals = [] } = useCollection<Professional>(professionalsQuery);
+  const { data: appointments = [] } = useCollection<Appointment>(appointmentsQuery);
 
   const steps: Step[] = ['service', 'professional', 'date', 'time', 'contact', 'success'];
   const currentStepIndex = steps.indexOf(step);
 
-  // Calcula quais horários estão ocupados para o barbeiro e data selecionados
   const takenSlots = useMemo(() => {
     if (!selectedProfessional || !selectedDate) return [];
     const dateStr = format(selectedDate, "yyyy-MM-dd");
@@ -72,7 +60,6 @@ export function BookingForm() {
       .map(a => a.time);
   }, [appointments, selectedProfessional, selectedDate]);
 
-  // Horários de expediente do barbeiro (se não houver, usa o padrão)
   const profWorkingHours = useMemo(() => {
     if (!selectedProfessional) return TIME_SLOTS;
     return selectedProfessional.workingHours || TIME_SLOTS;
@@ -86,23 +73,23 @@ export function BookingForm() {
     }
 
     setIsSubmitting(true);
+    
+    const newAppointmentData = {
+      clientName,
+      phone: clientPhone,
+      serviceId: selectedService?.id || '',
+      professionalId: selectedProfessional?.id || '',
+      date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
+      time: selectedTime || '',
+      status: 'confirmed'
+    };
+
+    addDocumentNonBlocking(collection(firestore, "appointments"), newAppointmentData);
+    
     setTimeout(() => {
       setIsSubmitting(false);
       setStep('success');
-      const newAppointment: Appointment = {
-        id: Math.random().toString(36).substr(2, 9),
-        clientName,
-        phone: clientPhone,
-        serviceId: selectedService?.id || '',
-        professionalId: selectedProfessional?.id || '',
-        date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
-        time: selectedTime || '',
-        status: 'confirmed'
-      };
-      
-      const existing = JSON.parse(localStorage.getItem('gold_appointments') || '[]');
-      localStorage.setItem('gold_appointments', JSON.stringify([...existing, newAppointment]));
-    }, 1500);
+    }, 1000);
   };
 
   const prevStep = () => {
@@ -120,7 +107,7 @@ export function BookingForm() {
               SELECIONE O <span className="text-shimmer">SERVIÇO</span>
             </h2>
             <div className="grid gap-4">
-              {services.map((s, idx) => (
+              {services?.map((s, idx) => (
                 <button
                   key={s.id}
                   onClick={() => { setSelectedService(s); setStep('professional'); }}
@@ -151,7 +138,7 @@ export function BookingForm() {
               </Button>
             </div>
             <div className="flex flex-wrap justify-center gap-8 md:gap-12">
-              {professionals.map((p) => (
+              {professionals?.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => { setSelectedProfessional(p); setStep('date'); }}

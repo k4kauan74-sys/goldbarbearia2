@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { collection, doc } from "firebase/firestore";
 
 import { 
   Table, 
@@ -39,32 +40,42 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MOCK_SERVICES, MOCK_PROFESSIONALS, TIME_SLOTS } from "@/lib/mock-data";
+import { TIME_SLOTS } from "@/lib/mock-data";
 import { Professional, Appointment, Service, AuthUser } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  useFirestore, 
+  useCollection, 
+  useMemoFirebase, 
+  addDocumentNonBlocking, 
+  updateDocumentNonBlocking, 
+  deleteDocumentNonBlocking 
+} from "@/firebase";
 
 type ViewMode = 'appointments' | 'professionals' | 'services' | 'finance';
 
 export default function AdminDashboardPage() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('appointments');
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [professionals, setProfessionals] = useState<Professional[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
   const [search, setSearch] = useState("");
   const [selectedProfFilter, setSelectedProfFilter] = useState<string>("all");
   const [agendaDate, setAgendaDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const { toast } = useToast();
-  
+  const firestore = useFirestore();
+  const router = useRouter();
+
+  // Dialog states
   const [isProfDialogOpen, setIsProfDialogOpen] = useState(false);
   const [isAptDialogOpen, setIsAptDialogOpen] = useState(false);
   const [isServiceDialogOpen, setIsServiceDialogOpen] = useState(false);
   
+  // Edit states
   const [editingProf, setEditingProf] = useState<Professional | null>(null);
   const [editingApt, setEditingApt] = useState<Appointment | null>(null);
   const [editingService, setEditingService] = useState<Service | null>(null);
   
+  // Forms
   const [profName, setProfName] = useState("");
   const [profEmail, setProfEmail] = useState("");
   const [profPassword, setProfPassword] = useState("123");
@@ -86,8 +97,6 @@ export default function AdminDashboardPage() {
   const [srvDuration, setSrvDuration] = useState("");
   const [srvDescription, setSrvDescription] = useState("");
 
-  const router = useRouter();
-
   useEffect(() => {
     const loggedUser = localStorage.getItem("gold_user");
     if (!loggedUser) {
@@ -100,26 +109,15 @@ export default function AdminDashboardPage() {
     if (parsedUser.role === 'barber') {
       setSelectedProfFilter(parsedUser.id);
     }
-
-    const savedApts = JSON.parse(localStorage.getItem('gold_appointments') || '[]');
-    setAppointments(savedApts);
-
-    const savedProfs = JSON.parse(localStorage.getItem('gold_professionals') || '[]');
-    if (savedProfs.length === 0) {
-      localStorage.setItem('gold_professionals', JSON.stringify(MOCK_PROFESSIONALS));
-      setProfessionals(MOCK_PROFESSIONALS);
-    } else {
-      setProfessionals(savedProfs);
-    }
-
-    const savedServices = JSON.parse(localStorage.getItem('gold_services') || '[]');
-    if (savedServices.length === 0) {
-      localStorage.setItem('gold_services', JSON.stringify(MOCK_SERVICES));
-      setServices(MOCK_SERVICES);
-    } else {
-      setServices(savedServices);
-    }
   }, [router]);
+
+  const professionalsQuery = useMemoFirebase(() => collection(firestore, "professionals"), [firestore]);
+  const servicesQuery = useMemoFirebase(() => collection(firestore, "services"), [firestore]);
+  const appointmentsQuery = useMemoFirebase(() => collection(firestore, "appointments"), [firestore]);
+
+  const { data: professionals = [] } = useCollection<Professional>(professionalsQuery);
+  const { data: services = [] } = useCollection<Service>(servicesQuery);
+  const { data: appointments = [] } = useCollection<Appointment>(appointmentsQuery);
 
   const isAdmin = user?.role === 'admin';
 
@@ -179,30 +177,24 @@ export default function AdminDashboardPage() {
       toast({ title: "Erro", description: "Preencha todos os campos.", variant: "destructive" });
       return;
     }
-    let updatedApts;
+    
+    const data = {
+      clientName: aptClient, phone: aptPhone, serviceId: aptService, 
+      professionalId: profIdToSave, date: aptDate, time: aptTime, status: 'confirmed'
+    };
+
     if (editingApt) {
-      updatedApts = appointments.map(a => a.id === editingApt.id ? { 
-        ...a, clientName: aptClient, phone: aptPhone, serviceId: aptService, 
-        professionalId: profIdToSave, date: aptDate, time: aptTime 
-      } : a);
+      updateDocumentNonBlocking(doc(firestore, "appointments", editingApt.id), data);
     } else {
-      const newApt: Appointment = {
-        id: Math.random().toString(36).substr(2, 9),
-        clientName: aptClient, phone: aptPhone, serviceId: aptService,
-        professionalId: profIdToSave, date: aptDate, time: aptTime, status: 'confirmed'
-      };
-      updatedApts = [...appointments, newApt];
+      addDocumentNonBlocking(collection(firestore, "appointments"), data);
     }
-    setAppointments(updatedApts);
-    localStorage.setItem('gold_appointments', JSON.stringify(updatedApts));
+    
     setIsAptDialogOpen(false);
     resetAptForm();
   };
 
   const deleteAppointment = (id: string) => {
-    const updated = appointments.filter(a => a.id !== id);
-    setAppointments(updated);
-    localStorage.setItem('gold_appointments', JSON.stringify(updated));
+    deleteDocumentNonBlocking(doc(firestore, "appointments", id));
   };
 
   const resetAptForm = () => {
@@ -235,41 +227,31 @@ export default function AdminDashboardPage() {
 
   const handleSaveProfessional = () => {
     if (!profName || !profSpecialty) return;
-    let updatedProfs;
+    
+    const data = { 
+      name: profName, specialty: profSpecialty, photo: profPhoto, 
+      commission: Number(profCommission), email: profEmail, password: profPassword,
+      workingHours: profWorkingHours, active: true
+    };
+
     if (editingProf) {
-      updatedProfs = professionals.map(p => p.id === editingProf.id ? { 
-        ...p, name: profName, specialty: profSpecialty, photo: profPhoto || p.photo, 
-        commission: Number(profCommission), email: profEmail, password: profPassword,
-        workingHours: profWorkingHours
-      } : p);
-      
+      updateDocumentNonBlocking(doc(firestore, "professionals", editingProf.id), data);
       if (editingProf.id === user?.id) {
         const updatedUser = { ...user, name: profName, email: profEmail };
         setUser(updatedUser);
         localStorage.setItem("gold_user", JSON.stringify(updatedUser));
       }
     } else {
-      const newProf: Professional = {
-        id: Math.random().toString(36).substr(2, 9),
-        name: profName, specialty: profSpecialty, photo: profPhoto || "https://picsum.photos/seed/new/400",
-        commission: Number(profCommission), active: true, email: profEmail, password: profPassword,
-        workingHours: profWorkingHours
-      };
-      updatedProfs = [...professionals, newProf];
+      addDocumentNonBlocking(collection(firestore, "professionals"), data);
     }
-    setProfessionals(updatedProfs);
-    localStorage.setItem('gold_professionals', JSON.stringify(updatedProfs));
+    
     setIsProfDialogOpen(false);
     resetProfForm();
     toast({ title: "Sucesso", description: "Perfil e expediente atualizados." });
   };
 
   const deleteProfessional = (id: string) => {
-    const updated = professionals.filter(p => p.id !== id);
-    setAppointments(prev => prev.filter(a => a.professionalId !== id)); // Clean up appointments
-    setProfessionals(updated);
-    localStorage.setItem('gold_professionals', JSON.stringify(updated));
-    localStorage.setItem('gold_appointments', JSON.stringify(appointments.filter(a => a.professionalId !== id)));
+    deleteDocumentNonBlocking(doc(firestore, "professionals", id));
   };
 
   const resetProfForm = () => {
@@ -288,28 +270,23 @@ export default function AdminDashboardPage() {
 
   const handleSaveService = () => {
     if (!srvName || !srvPrice || !srvDuration) return;
-    let updatedServices;
+    
+    const data = { 
+      name: srvName, price: Number(srvPrice), duration: Number(srvDuration), description: srvDescription 
+    };
+
     if (editingService) {
-      updatedServices = services.map(s => s.id === editingService.id ? { 
-        ...s, name: srvName, price: Number(srvPrice), duration: Number(srvDuration), description: srvDescription 
-      } : s);
+      updateDocumentNonBlocking(doc(firestore, "services", editingService.id), data);
     } else {
-      const newService: Service = {
-        id: Math.random().toString(36).substr(2, 9), name: srvName,
-        price: Number(srvPrice), duration: Number(srvDuration), description: srvDescription
-      };
-      updatedServices = [...services, newService];
+      addDocumentNonBlocking(collection(firestore, "services"), data);
     }
-    setServices(updatedServices);
-    localStorage.setItem('gold_services', JSON.stringify(updatedServices));
+    
     setIsServiceDialogOpen(false);
     resetServiceForm();
   };
 
   const deleteService = (id: string) => {
-    const updated = services.filter(s => s.id !== id);
-    setServices(updated);
-    localStorage.setItem('gold_services', JSON.stringify(updated));
+    deleteDocumentNonBlocking(doc(firestore, "services", id));
   };
 
   const resetServiceForm = () => {
@@ -328,7 +305,6 @@ export default function AdminDashboardPage() {
   const filteredAppointments = useMemo(() => {
     return appointments.filter(a => {
       const matchesSearch = a.clientName.toLowerCase().includes(search.toLowerCase()) || a.phone.includes(search);
-      // Se for barbeiro, ignora selectedProfFilter "all" e força o próprio ID
       const effectiveFilter = user?.role === 'barber' ? user.id : selectedProfFilter;
       const matchesProf = effectiveFilter === "all" || a.professionalId === effectiveFilter;
       return matchesSearch && matchesProf;
