@@ -1,0 +1,274 @@
+{
+  "entities": {
+    "AdminUser": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AdminUser",
+      "type": "object",
+      "description": "Represents an administrative user with credentials to manage the barber shop's operations. Passwords are handled by an external authentication system and are not stored here.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AdminUser entity."
+        },
+        "username": {
+          "type": "string",
+          "description": "Username for the administrator to log in. This should be unique."
+        }
+      },
+      "required": [
+        "id",
+        "username"
+      ]
+    },
+    "Professional": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Professional",
+      "type": "object",
+      "description": "Represents a barber or service professional working at the GoldBarbearia.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Professional entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name of the professional."
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "URL to the professional's profile picture.",
+          "format": "uri"
+        },
+        "specialty": {
+          "type": "string",
+          "description": "The main specialty or expertise of the professional (e.g., 'Corte Masculino', 'Barba Clássica')."
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Indicates if the professional is currently active and available for bookings."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "specialty",
+        "isActive"
+      ]
+    },
+    "Service": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Service",
+      "type": "object",
+      "description": "Defines a specific service offered by GoldBarbearia, including its name and price.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Service entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the service (e.g., 'Corte', 'Barba', 'Corte + Barba')."
+        },
+        "price": {
+          "type": "number",
+          "description": "The price of the service."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "price"
+      ]
+    },
+    "AvailableSlot": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AvailableSlot",
+      "type": "object",
+      "description": "Represents a specific date and time slot when a professional is available or has been scheduled to work, which can then be booked by a client or blocked by an admin.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AvailableSlot entity."
+        },
+        "professionalId": {
+          "type": "string",
+          "description": "Reference to the Professional offering this slot. (Relationship: Professional 1:N AvailableSlot)"
+        },
+        "date": {
+          "type": "string",
+          "description": "The date of the available slot.",
+          "format": "date"
+        },
+        "time": {
+          "type": "string",
+          "description": "The specific time of the available slot.",
+          "format": "time"
+        },
+        "isAvailable": {
+          "type": "boolean",
+          "description": "Indicates if this slot is currently available for booking (true) or blocked/booked (false). An appointment implicitly makes a corresponding slot unavailable."
+        }
+      },
+      "required": [
+        "id",
+        "professionalId",
+        "date",
+        "time",
+        "isAvailable"
+      ]
+    },
+    "Appointment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Appointment",
+      "type": "object",
+      "description": "Represents a confirmed booking made by a client for a specific service with a professional at a given time.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Appointment entity."
+        },
+        "clientName": {
+          "type": "string",
+          "description": "The full name of the client who made the appointment."
+        },
+        "clientPhone": {
+          "type": "string",
+          "description": "The client's phone number. Format should accommodate various national numbers."
+        },
+        "serviceId": {
+          "type": "string",
+          "description": "Reference to the Service booked. (Relationship: Service 1:N Appointment)"
+        },
+        "professionalId": {
+          "type": "string",
+          "description": "Reference to the Professional assigned to the appointment. (Relationship: Professional 1:N Appointment)"
+        },
+        "date": {
+          "type": "string",
+          "description": "The date of the appointment.",
+          "format": "date"
+        },
+        "time": {
+          "type": "string",
+          "description": "The specific time of the appointment.",
+          "format": "time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the appointment (e.g., 'confirmed', 'completed', 'cancelled', 'pending')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the appointment was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the appointment was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "clientName",
+        "clientPhone",
+        "serviceId",
+        "professionalId",
+        "date",
+        "time",
+        "status"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/admin_roles/{adminUid}",
+        "definition": {
+          "entityName": "AdminUser",
+          "schema": {
+            "$ref": "#/backend/entities/AdminUser"
+          },
+          "description": "Stores documents representing administrative users. The document ID (`adminUid`) is the Firebase Authentication UID of the administrator. The existence of a document in this collection grants administrative privileges across the application. This setup enables DBAC (Database Access Control) and ensures Authorization Independence.",
+          "params": [
+            {
+              "name": "adminUid",
+              "description": "The Firebase Authentication User ID (UID) of an administrative user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/professionals/{professionalId}",
+        "definition": {
+          "entityName": "Professional",
+          "schema": {
+            "$ref": "#/backend/entities/Professional"
+          },
+          "description": "Contains details for all barbers/service professionals. Documents are publicly readable for clients to view, but only writable by authenticated administrators. This collection supports secure 'list' operations for all users.",
+          "params": [
+            {
+              "name": "professionalId",
+              "description": "The unique identifier for a professional."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/services/{serviceId}",
+        "definition": {
+          "entityName": "Service",
+          "schema": {
+            "$ref": "#/backend/entities/Service"
+          },
+          "description": "Defines the services offered by GoldBarbearia. Documents are publicly readable for clients to view pricing and options, but only writable by authenticated administrators. This collection supports secure 'list' operations for all users.",
+          "params": [
+            {
+              "name": "serviceId",
+              "description": "The unique identifier for a service."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/available_slots/{slotId}",
+        "definition": {
+          "entityName": "AvailableSlot",
+          "schema": {
+            "$ref": "#/backend/entities/AvailableSlot"
+          },
+          "description": "Stores specific date and time slots when professionals are available. Documents are publicly readable to facilitate client bookings and appointments, but only writable by authenticated administrators to manage schedules. Includes denormalized 'professionalId' for Authorization Independence.",
+          "params": [
+            {
+              "name": "slotId",
+              "description": "The unique identifier for an available time slot."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/appointments/{appointmentId}",
+        "definition": {
+          "entityName": "Appointment",
+          "schema": {
+            "$ref": "#/backend/entities/Appointment"
+          },
+          "description": "Manages all client appointments. Each document includes denormalized fields: 'clientId' (the client's Firebase UID), 'professionalId', and 'serviceId'. This ensures Authorization Independence, allowing clients to read/write only their own appointments and administrators to have full read/write access to all appointments without complex rule dependencies or 'get()' calls, supporting efficient QAPs for 'list' operations.",
+          "params": [
+            {
+              "name": "appointmentId",
+              "description": "The unique identifier for an appointment."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The recommended Firestore structure for GoldBarbearia prioritizes robust security, scalability, and ease of debugging by strictly adhering to the core design principles. The primary goal is to ensure all data changes are globally synchronized and consistently accessible across devices, addressing the user's issue of changes not appearing on other devices.\n\n**Authorization Independence (CRITICAL):**\n1.  **Admin Authorization:** Administrative privileges are managed through a dedicated top-level collection: `/admin_roles/{adminUid}`. This collection stores documents where the document ID is the Firebase Auth UID of an administrator. Security rules will grant administrative write access to key collections (like `professionals`, `services`, `available_slots`, and `appointments`) by checking `exists(/databases/$(database)/documents/admin_roles/$(request.auth.uid))`. This completely eliminates hierarchical authorization dependencies, preventing `get()` calls for role checks and enabling atomic operations.\n2.  **Appointment Ownership:** The `Appointment` entity is augmented with a `clientId` field, which stores the Firebase Auth UID of the client who made the booking. This denormalizes ownership information directly into the `Appointment` document itself. Security rules for client-specific access to appointments will simply verify `resource.data.clientId == request.auth.uid`. This design avoids fetching data from a `users` collection or a parent collection to determine ownership, ensuring authorization independence for client-owned data.\n3.  **Cross-Entity References:** `AvailableSlot` documents include `professionalId`, and `Appointment` documents include `professionalId` and `serviceId`. These explicit references ensure that relevant identifiers for relationships are available directly within the document, preventing any need for `get()` calls to parent `Professional` or `Service` documents during authorization checks.\n\n**QAPs (Rules are not Filters):**\n1.  **Structural Segregation:** Data is organized into distinct top-level collections based on their security posture:\n    *   `/professionals`, `/services`, and `/available_slots` collections are designed for public read access (for clients to browse and select options) and restricted admin-only write access (for administrators to manage barbershop offerings and schedules). This homogeneous security posture within these collections allows for efficient `list` operations without requiring complex filtering within security rules.\n    *   `/appointments` collection stores all bookings. Clients can securely `list` and manage only their own appointments by querying with `where('clientId', '==', request.auth.uid)`. Administrators, identified by their presence in `/admin_roles`, have full read/write access to all appointments. The `clientId` field is crucial here, enabling both client-specific and admin-global access without rules needing to filter out unauthorized documents during `list` operations.\n\n**Overall, this structure ensures that the admin's changes (adding barbers, managing schedules, etc.) are centrally stored and instantly accessible to all other devices, resolving the synchronization issue. It simplifies security rules, enhances debuggability, and scales efficiently by avoiding expensive and problematic `get()` operations for authorization.**"
+  }
+}

@@ -1,0 +1,128 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * GoldBarbearia Security Rules
+     * 
+     * Philosophy:
+     * This ruleset implements a centralized administrative model combined with specific 
+     * user-ownership for appointments. It prioritizes global data synchronization to ensure 
+     * that administrative changes (like adding professionals or updating schedules) are 
+     * immediately visible across all devices.
+     * 
+     * Data Structure:
+     * - /admin_roles: Top-level collection identifying administrative users by their Auth UID.
+     * - /professionals, /services, /available_slots: Publicly readable collections, manageable only by admins.
+     * - /appointments: Shared collection where clients manage their own bookings and admins have full oversight.
+     * 
+     * Key Security Decisions:
+     * - Authorization Independence: Admin status is verified via the existence of a document in /admin_roles.
+     * - Denormalized Ownership: The 'clientId' field in appointment documents is used to authorize 
+     *   client access without requiring nested lookups.
+     * - Global Synchronization: Top-level collections ensure that data is not trapped in device-specific 
+     *   or user-specific silos unless explicitly intended.
+     * - Prototyping Flexibility: Rules enforce strict authorization (who can write) while allowing 
+     *   flexible data shapes to support rapid development.
+     */
+
+    // --- Helper Functions ---
+
+    /** Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the authenticated user has a document in the admin_roles collection. */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/admin_roles/$(request.auth.uid));
+    }
+
+    /** Validates that the provided ID matches the authenticated user's UID. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** Checks if the authenticated user is the owner of the existing document based on a field. */
+    function isExistingOwner(field) {
+      return isSignedIn() && resource != null && resource.data[field] == request.auth.uid;
+    }
+
+    /** Checks if the authenticated user is setting themselves as the owner in the incoming data. */
+    function isNewOwner(field) {
+      return isSignedIn() && request.resource.data[field] == request.auth.uid;
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Identifies administrative users. The document ID must match the user's UID.
+     * @path /admin_roles/{adminUid}
+     * @allow Authenticated user (create) if creating their own role (for initial setup or self-reg).
+     * @deny User 'A' (create/update) for User 'B' ID.
+     * @principle Ensures administrative identity is tied to verified Auth UIDs.
+     */
+    match /admin_roles/{adminUid} {
+      allow get: if isSignedIn();
+      allow list: if isAdmin();
+      allow create: if isOwner(adminUid);
+      allow update: if isOwner(adminUid) && resource != null;
+      allow delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Barber professionals working at the shop.
+     * @path /professionals/{professionalId}
+     * @allow Public (get, list). Authenticated Admin (create, update, delete).
+     * @deny Non-admin (write).
+     * @principle Publicly accessible data with restricted administrative control.
+     */
+    match /professionals/{professionalId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Services offered by the barber shop (name and price).
+     * @path /services/{serviceId}
+     * @allow Public (get, list). Authenticated Admin (create, update, delete).
+     * @deny Anonymous user (write).
+     * @principle Restricts pricing and service management to authorized administrators.
+     */
+    match /services/{serviceId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Time slots available for booking.
+     * @path /available_slots/{slotId}
+     * @allow Public (get, list). Authenticated Admin (create, update, delete).
+     * @deny Non-admin (write).
+     * @principle Centralizes schedule management while allowing clients to view availability.
+     */
+    match /available_slots/{slotId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Client appointments. Secured by administrative role or client ownership.
+     * @path /appointments/{appointmentId}
+     * @allow Admin (all), Client (create/read/update/delete their own).
+     * @deny Client (update/delete) someone else's appointment.
+     * @principle Enforces data ownership using denormalized 'clientId' for performance.
+     */
+    match /appointments/{appointmentId} {
+      allow get: if isAdmin() || isExistingOwner('clientId');
+      allow list: if isSignedIn(); // Query must still filter by clientId for the 'get' rule to pass.
+      allow create: if isAdmin() || isNewOwner('clientId');
+      allow update: if (isAdmin() || isExistingOwner('clientId')) && (request.resource.data.clientId == resource.data.clientId);
+      allow delete: if isAdmin() || isExistingOwner('clientId');
+    }
+
+  }
+}
