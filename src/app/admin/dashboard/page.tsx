@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { collection, doc } from "firebase/firestore";
+import { collection, doc, query, where } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,13 +39,14 @@ import {
   useMemoFirebase, 
   addDocumentNonBlocking, 
   updateDocumentNonBlocking, 
-  deleteDocumentNonBlocking 
+  deleteDocumentNonBlocking,
+  useUser
 } from "@/firebase";
 
 type ViewMode = 'appointments' | 'professionals' | 'services' | 'finance';
 
 export default function AdminDashboardPage() {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [adminSession, setAdminSession] = useState<AuthUser | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('appointments');
   const [search, setSearch] = useState("");
   const [selectedProfFilter, setSelectedProfFilter] = useState<string>("all");
@@ -53,6 +54,7 @@ export default function AdminDashboardPage() {
   const { toast } = useToast();
   const firestore = useFirestore();
   const router = useRouter();
+  const { user: firebaseUser, isUserLoading } = useUser();
 
   // Dialog states
   const [isProfDialogOpen, setIsProfDialogOpen] = useState(false);
@@ -93,27 +95,42 @@ export default function AdminDashboardPage() {
       return;
     }
     const parsedUser: AuthUser = JSON.parse(loggedUser);
-    setUser(parsedUser);
+    setAdminSession(parsedUser);
 
     if (parsedUser.role === 'barber') {
       setSelectedProfFilter(parsedUser.id);
     }
   }, [router]);
 
-  // Firestore Data
-  const professionalsQuery = useMemoFirebase(() => collection(firestore, "professionals"), [firestore]);
-  const servicesQuery = useMemoFirebase(() => collection(firestore, "services"), [firestore]);
-  const appointmentsQuery = useMemoFirebase(() => collection(firestore, "appointments"), [firestore]);
+  // Firestore Data - Garantindo que só busca após auth inicializar
+  const professionalsQuery = useMemoFirebase(() => {
+    if (!firestore || isUserLoading) return null;
+    return collection(firestore, "professionals");
+  }, [firestore, isUserLoading]);
+
+  const servicesQuery = useMemoFirebase(() => {
+    if (!firestore || isUserLoading) return null;
+    return collection(firestore, "services");
+  }, [firestore, isUserLoading]);
+
+  const appointmentsQuery = useMemoFirebase(() => {
+    if (!firestore || isUserLoading) return null;
+    // Administrador vê tudo, Barbeiro vê apenas os seus
+    if (adminSession?.role === 'barber') {
+      return query(collection(firestore, "appointments"), where("professionalId", "==", adminSession.id));
+    }
+    return collection(firestore, "appointments");
+  }, [firestore, isUserLoading, adminSession]);
 
   const { data: professionals = [] } = useCollection<Professional>(professionalsQuery);
   const { data: services = [] } = useCollection<Service>(servicesQuery);
   const { data: appointments = [] } = useCollection<Appointment>(appointmentsQuery);
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = adminSession?.role === 'admin';
 
   const financeData = useMemo(() => {
-    const relevantApts = user?.role === 'barber' 
-      ? (appointments || []).filter(a => a.professionalId === user.id)
+    const relevantApts = adminSession?.role === 'barber' 
+      ? (appointments || []).filter(a => a.professionalId === adminSession.id)
       : (appointments || []);
 
     const totalRevenue = relevantApts.reduce((acc, curr) => {
@@ -129,7 +146,7 @@ export default function AdminDashboardPage() {
     }, 0);
 
     const profBreakdown = (professionals || [])
-      .filter(p => user?.role === 'admin' || p.id === user?.id)
+      .filter(p => adminSession?.role === 'admin' || p.id === adminSession?.id)
       .map(p => {
         const profApts = (appointments || []).filter(a => a.professionalId === p.id);
         const revenue = profApts.reduce((acc, curr) => {
@@ -154,7 +171,7 @@ export default function AdminDashboardPage() {
       netProfit: totalRevenue - totalCommissions,
       profBreakdown
     };
-  }, [appointments, professionals, services, user]);
+  }, [appointments, professionals, services, adminSession]);
 
   const handleLogout = () => {
     localStorage.removeItem("gold_user");
@@ -162,15 +179,21 @@ export default function AdminDashboardPage() {
   };
 
   const handleSaveAppointment = () => {
-    const profIdToSave = user?.role === 'barber' ? user.id : aptProf;
+    const profIdToSave = adminSession?.role === 'barber' ? adminSession.id : aptProf;
     if (!aptClient || !aptPhone || !aptService || !profIdToSave || !aptDate || !aptTime) {
       toast({ title: "Erro", description: "Preencha todos os campos.", variant: "destructive" });
       return;
     }
     
     const data = {
-      clientName: aptClient, phone: aptPhone, serviceId: aptService, 
-      professionalId: profIdToSave, date: aptDate, time: aptTime, status: 'confirmed'
+      clientName: aptClient, 
+      phone: aptPhone, 
+      serviceId: aptService, 
+      professionalId: profIdToSave, 
+      date: aptDate, 
+      time: aptTime, 
+      status: 'confirmed',
+      clientId: firebaseUser?.uid || 'admin-manual'
     };
 
     if (editingApt) {
@@ -228,9 +251,9 @@ export default function AdminDashboardPage() {
 
     if (editingProf) {
       updateDocumentNonBlocking(doc(firestore, "professionals", editingProf.id), data);
-      if (editingProf.id === user?.id) {
-        const updatedUser = { ...user, name: profName, email: profEmail };
-        setUser(updatedUser);
+      if (editingProf.id === adminSession?.id) {
+        const updatedUser = { ...adminSession, name: profName, email: profEmail };
+        setAdminSession(updatedUser);
         localStorage.setItem("gold_user", JSON.stringify(updatedUser));
       }
     } else {
@@ -299,18 +322,18 @@ export default function AdminDashboardPage() {
   const filteredAppointments = useMemo(() => {
     return (appointments || []).filter(a => {
       const matchesSearch = a.clientName.toLowerCase().includes(search.toLowerCase()) || a.phone.includes(search);
-      const effectiveFilter = user?.role === 'barber' ? user.id : selectedProfFilter;
+      const effectiveFilter = adminSession?.role === 'barber' ? adminSession.id : selectedProfFilter;
       const matchesProf = effectiveFilter === "all" || a.professionalId === effectiveFilter;
       return matchesSearch && matchesProf;
     });
-  }, [appointments, search, selectedProfFilter, user]);
+  }, [appointments, search, selectedProfFilter, adminSession]);
 
   const activeSlots = useMemo(() => {
-    const effectiveFilter = user?.role === 'barber' ? user.id : selectedProfFilter;
+    const effectiveFilter = adminSession?.role === 'barber' ? adminSession.id : selectedProfFilter;
     if (effectiveFilter === "all") return TIME_SLOTS;
     const prof = (professionals || []).find(p => p.id === effectiveFilter);
     return prof?.workingHours || [];
-  }, [selectedProfFilter, professionals, user]);
+  }, [selectedProfFilter, professionals, adminSession]);
 
   const handlePrevDay = () => {
     const prev = subDays(new Date(agendaDate + 'T12:00:00'), 1);
@@ -322,14 +345,14 @@ export default function AdminDashboardPage() {
     setAgendaDate(format(next, "yyyy-MM-dd"));
   };
 
-  if (!user) return null;
+  if (!adminSession) return null;
 
   return (
     <div className="h-[872px] w-[460px] mx-auto bg-[#030303] flex flex-col text-[#F5F5F5] font-body overflow-hidden border-x border-white/5 relative">
       <header className="h-14 flex items-center justify-between px-4 border-b border-white/5 bg-[#0a0a0a] z-50">
         <div className="font-anton text-lg tracking-tighter uppercase">
           <span className="text-[#D4AF37]">GOLD</span>
-          <span className="text-[#F5F5F5]">{user.role === 'admin' ? 'ADMIN' : 'STAFF'}</span>
+          <span className="text-[#F5F5F5]">{adminSession.role === 'admin' ? 'ADMIN' : 'STAFF'}</span>
         </div>
         <div className="flex gap-1">
           <Button variant="ghost" size="icon" onClick={() => setViewMode('appointments')} className={cn("h-8 w-8", viewMode === 'appointments' && "text-[#D4AF37]")}><CalendarIcon className="h-4 w-4" /></Button>
@@ -360,7 +383,7 @@ export default function AdminDashboardPage() {
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Cliente</Label><Input value={aptClient} onChange={e=>setAptClient(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">WhatsApp</Label><Input value={aptPhone} onChange={e=>setAptPhone(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Serviço</Label><Select value={aptService} onValueChange={setAptService}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{services.map(s=><SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Barbeiro</Label><Select value={user.role === 'barber' ? user.id : aptProf} onValueChange={setAptProf} disabled={user.role === 'barber'}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{professionals.map(p=><SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Barbeiro</Label><Select value={adminSession.role === 'barber' ? adminSession.id : aptProf} onValueChange={setAptProf} disabled={adminSession.role === 'barber'}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{professionals.map(p=><SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Data</Label><Input type="date" value={aptDate} onChange={e=>setAptDate(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Hora</Label><Select value={aptTime} onValueChange={setAptTime}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{TIME_SLOTS.map(t=><SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select></div>
                   </div>
@@ -434,7 +457,7 @@ export default function AdminDashboardPage() {
           </Card>
           <Card className="bg-[#0a0a0a] border-white/5 p-2 rounded-2xl">
             <div className="text-[7px] font-bold text-[#F5F5F5]/40 uppercase">Saldo</div>
-            <div className="text-sm font-anton text-[#D4AF37]">R$ {(user.role === 'admin' ? financeData.netProfit : financeData.totalCommissions).toFixed(0)}</div>
+            <div className="text-sm font-anton text-[#D4AF37]">R$ {(adminSession.role === 'admin' ? financeData.netProfit : financeData.totalCommissions).toFixed(0)}</div>
           </Card>
         </div>
 
@@ -509,7 +532,7 @@ export default function AdminDashboardPage() {
             {viewMode === 'professionals' && (
               <div className="p-3 space-y-2">
                 {(professionals || [])
-                  .filter(p => isAdmin || p.id === user.id)
+                  .filter(p => isAdmin || p.id === adminSession.id)
                   .map(p => (
                   <div key={p.id} className="flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 rounded-2xl">
                     <img src={p.photo || 'https://picsum.photos/seed/default/100'} className="w-10 h-10 rounded-full object-cover grayscale" />
@@ -522,7 +545,7 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      {(isAdmin || p.id === user.id) && (
+                      {(isAdmin || p.id === adminSession.id) && (
                         <Button variant="ghost" size="icon" onClick={() => openEditProf(p)} className="h-7 w-7 border border-white/5 text-[#F5F5F5]">
                           <Edit2 className="h-3 w-3" />
                         </Button>

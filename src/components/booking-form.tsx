@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Scissors, CheckCircle2, ChevronLeft, ArrowRight, Clock, Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { collection } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 
 import { TIME_SLOTS } from "@/lib/mock-data";
 import { Service, Professional, Appointment } from "@/lib/types";
@@ -34,7 +34,7 @@ export function BookingForm() {
   const { toast } = useToast();
   const router = useRouter();
   const firestore = useFirestore();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
 
   useEffect(() => {
     const now = new Date();
@@ -42,9 +42,27 @@ export function BookingForm() {
     setToday(now);
   }, []);
 
-  const servicesQuery = useMemoFirebase(() => collection(firestore, "services"), [firestore]);
-  const professionalsQuery = useMemoFirebase(() => collection(firestore, "professionals"), [firestore]);
-  const appointmentsQuery = useMemoFirebase(() => collection(firestore, "appointments"), [firestore]);
+  // Queries só iniciam após o usuário estar autenticado (mesmo anonimamente)
+  const servicesQuery = useMemoFirebase(() => {
+    if (!firestore || isUserLoading) return null;
+    return collection(firestore, "services");
+  }, [firestore, isUserLoading]);
+
+  const professionalsQuery = useMemoFirebase(() => {
+    if (!firestore || isUserLoading) return null;
+    return collection(firestore, "professionals");
+  }, [firestore, isUserLoading]);
+
+  // Busca agendamentos para o profissional e data selecionados para checar disponibilidade
+  const appointmentsQuery = useMemoFirebase(() => {
+    if (!firestore || isUserLoading || !selectedProfessional || !selectedDate) return null;
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    return query(
+      collection(firestore, "appointments"),
+      where("professionalId", "==", selectedProfessional.id),
+      where("date", "==", dateStr)
+    );
+  }, [firestore, isUserLoading, selectedProfessional, selectedDate]);
 
   const { data: services = [] } = useCollection<Service>(servicesQuery);
   const { data: professionals = [] } = useCollection<Professional>(professionalsQuery);
@@ -54,12 +72,11 @@ export function BookingForm() {
   const currentStepIndex = steps.indexOf(step);
 
   const takenSlots = useMemo(() => {
-    if (!selectedProfessional || !selectedDate || !appointments) return [];
-    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    if (!appointments) return [];
     return (appointments || [])
-      .filter(a => a.date === dateStr && a.professionalId === selectedProfessional.id && a.status !== 'cancelled')
+      .filter(a => a.status !== 'cancelled')
       .map(a => a.time);
-  }, [appointments, selectedProfessional, selectedDate]);
+  }, [appointments]);
 
   const profWorkingHours = useMemo(() => {
     if (!selectedProfessional) return TIME_SLOTS;
@@ -81,7 +98,7 @@ export function BookingForm() {
     setIsSubmitting(true);
     
     const newAppointmentData = {
-      clientId: user.uid, // Define o proprietário do agendamento para cumprir as regras de segurança
+      clientId: user.uid,
       clientName,
       phone: clientPhone,
       serviceId: selectedService?.id || '',
@@ -132,7 +149,7 @@ export function BookingForm() {
                 </button>
               ))}
               {(!services || services.length === 0) && (
-                <div className="text-center py-12 text-white/20 uppercase tracking-widest font-anton">Nenhum serviço disponível</div>
+                <div className="text-center py-12 text-white/20 uppercase tracking-widest font-anton">Carregando serviços...</div>
               )}
             </div>
           </div>
@@ -226,7 +243,7 @@ export function BookingForm() {
                       isDisabled 
                         ? "bg-white/[0.02] border-white/5 text-white/10 cursor-not-allowed line-through" 
                         : selectedTime === time 
-                          ? "bg-primary text-black border-primary shadow-[0_0_25px_rgba(251,191,36,0.3)] scale-105" 
+                          ? "bg-primary text-black border-primary shadow-[0_0_25px_rgba(212,175,55,0.3)] scale-105" 
                           : "glass border-white/5 text-neutral-400 hover:border-primary/40 hover:text-white"
                     )}
                   >
