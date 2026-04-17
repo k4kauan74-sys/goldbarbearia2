@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { CustomCalendar } from "@/components/custom-calendar";
-import { useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, useUser } from "@/firebase";
 
 type Step = 'service' | 'professional' | 'date' | 'time' | 'contact' | 'success';
 
@@ -34,6 +34,7 @@ export function BookingForm() {
   const { toast } = useToast();
   const router = useRouter();
   const firestore = useFirestore();
+  const { user } = useUser();
 
   useEffect(() => {
     const now = new Date();
@@ -72,9 +73,15 @@ export function BookingForm() {
       return;
     }
 
+    if (!user) {
+      toast({ title: "Aguarde", description: "Sincronizando conexão segura...", variant: "destructive" });
+      return;
+    }
+
     setIsSubmitting(true);
     
     const newAppointmentData = {
+      clientId: user.uid, // Define o proprietário do agendamento para cumprir as regras de segurança
       clientName,
       phone: clientPhone,
       serviceId: selectedService?.id || '',
@@ -297,7 +304,7 @@ export function BookingForm() {
                 </div>
                 <Button 
                   type="submit" 
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !user}
                   className="w-full bg-primary text-black py-10 text-xl font-anton uppercase tracking-[0.3em] rounded-2xl"
                 >
                   {isSubmitting ? "ENVIANDO..." : "AGENDAR AGORA"}
