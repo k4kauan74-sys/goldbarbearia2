@@ -1,13 +1,12 @@
 
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { 
   Calendar as CalendarIcon, 
   Users, 
   LogOut, 
-  Search, 
   Trash2, 
   Edit2, 
   UserPlus, 
@@ -17,26 +16,16 @@ import {
   Scissors,
   ChevronLeft,
   ChevronRight,
-  Clock,
-  Check
+  Clock
 } from "lucide-react";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { collection, doc } from "firebase/firestore";
 
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -111,6 +100,7 @@ export default function AdminDashboardPage() {
     }
   }, [router]);
 
+  // Firestore Data
   const professionalsQuery = useMemoFirebase(() => collection(firestore, "professionals"), [firestore]);
   const servicesQuery = useMemoFirebase(() => collection(firestore, "services"), [firestore]);
   const appointmentsQuery = useMemoFirebase(() => collection(firestore, "appointments"), [firestore]);
@@ -123,27 +113,27 @@ export default function AdminDashboardPage() {
 
   const financeData = useMemo(() => {
     const relevantApts = user?.role === 'barber' 
-      ? appointments.filter(a => a.professionalId === user.id)
-      : appointments;
+      ? (appointments || []).filter(a => a.professionalId === user.id)
+      : (appointments || []);
 
     const totalRevenue = relevantApts.reduce((acc, curr) => {
-      const service = services.find(s => s.id === curr.serviceId);
+      const service = (services || []).find(s => s.id === curr.serviceId);
       return acc + (service?.price || 0);
     }, 0);
 
     const totalCommissions = relevantApts.reduce((acc, curr) => {
-      const service = services.find(s => s.id === curr.serviceId);
-      const prof = professionals.find(p => p.id === curr.professionalId);
+      const service = (services || []).find(s => s.id === curr.serviceId);
+      const prof = (professionals || []).find(p => p.id === curr.professionalId);
       const commissionAmount = ((service?.price || 0) * (prof?.commission ?? 0)) / 100;
       return acc + commissionAmount;
     }, 0);
 
-    const profBreakdown = professionals
+    const profBreakdown = (professionals || [])
       .filter(p => user?.role === 'admin' || p.id === user?.id)
       .map(p => {
-        const profApts = appointments.filter(a => a.professionalId === p.id);
+        const profApts = (appointments || []).filter(a => a.professionalId === p.id);
         const revenue = profApts.reduce((acc, curr) => {
-          const service = services.find(s => s.id === curr.serviceId);
+          const service = (services || []).find(s => s.id === curr.serviceId);
           return acc + (service?.price || 0);
         }, 0);
         const commission = (revenue * (p.commission ?? 0)) / 100;
@@ -191,10 +181,12 @@ export default function AdminDashboardPage() {
     
     setIsAptDialogOpen(false);
     resetAptForm();
+    toast({ title: "Sucesso", description: "Agendamento sincronizado." });
   };
 
   const deleteAppointment = (id: string) => {
     deleteDocumentNonBlocking(doc(firestore, "appointments", id));
+    toast({ title: "Removido", description: "Agendamento excluído do sistema." });
   };
 
   const resetAptForm = () => {
@@ -247,11 +239,12 @@ export default function AdminDashboardPage() {
     
     setIsProfDialogOpen(false);
     resetProfForm();
-    toast({ title: "Sucesso", description: "Perfil e expediente atualizados." });
+    toast({ title: "Sucesso", description: "Perfil e expediente atualizados no banco de dados." });
   };
 
   const deleteProfessional = (id: string) => {
     deleteDocumentNonBlocking(doc(firestore, "professionals", id));
+    toast({ title: "Removido", description: "Profissional removido do sistema." });
   };
 
   const resetProfForm = () => {
@@ -283,6 +276,7 @@ export default function AdminDashboardPage() {
     
     setIsServiceDialogOpen(false);
     resetServiceForm();
+    toast({ title: "Sucesso", description: "Serviço atualizado globalmente." });
   };
 
   const deleteService = (id: string) => {
@@ -299,11 +293,11 @@ export default function AdminDashboardPage() {
     setIsServiceDialogOpen(true);
   };
 
-  const getServiceName = (id: string) => services.find(s => s.id === id)?.name || "N/A";
-  const getProfName = (id: string) => professionals.find(p => p.id === id)?.name || "N/A";
+  const getServiceName = (id: string) => (services || []).find(s => s.id === id)?.name || "N/A";
+  const getProfName = (id: string) => (professionals || []).find(p => p.id === id)?.name || "N/A";
 
   const filteredAppointments = useMemo(() => {
-    return appointments.filter(a => {
+    return (appointments || []).filter(a => {
       const matchesSearch = a.clientName.toLowerCase().includes(search.toLowerCase()) || a.phone.includes(search);
       const effectiveFilter = user?.role === 'barber' ? user.id : selectedProfFilter;
       const matchesProf = effectiveFilter === "all" || a.professionalId === effectiveFilter;
@@ -314,7 +308,7 @@ export default function AdminDashboardPage() {
   const activeSlots = useMemo(() => {
     const effectiveFilter = user?.role === 'barber' ? user.id : selectedProfFilter;
     if (effectiveFilter === "all") return TIME_SLOTS;
-    const prof = professionals.find(p => p.id === effectiveFilter);
+    const prof = (professionals || []).find(p => p.id === effectiveFilter);
     return prof?.workingHours || [];
   }, [selectedProfFilter, professionals, user]);
 
@@ -374,11 +368,11 @@ export default function AdminDashboardPage() {
                 </DialogContent>
               </Dialog>
             )}
-            {viewMode === 'professionals' && isAdmin && (
+            {viewMode === 'professionals' && (
                <Dialog open={isProfDialogOpen} onOpenChange={setIsProfDialogOpen}>
-               <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-[#D4AF37] text-black font-anton uppercase rounded-full"><UserPlus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
+               <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-[#D4AF37] text-black font-anton uppercase rounded-full">{isAdmin ? <UserPlus className="h-3 w-3 mr-1" /> : <Edit2 className="h-3 w-3 mr-1" />} {isAdmin ? "Novo" : "Editar"}</Button></DialogTrigger>
                <DialogContent className="bg-[#0a0a0a] border-white/10 text-[#F5F5F5] w-[90%] max-h-[90vh] flex flex-col">
-                 <DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">Especialista</DialogTitle></DialogHeader>
+                 <DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">{isAdmin ? "Especialista" : "Meu Perfil"}</DialogTitle></DialogHeader>
                  <ScrollArea className="flex-1 pr-2">
                    <div className="grid grid-cols-2 gap-3 py-2">
                      <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
@@ -398,8 +392,7 @@ export default function AdminDashboardPage() {
                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Especialidade</Label><Input value={profSpecialty} onChange={e=>setProfSpecialty(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
-                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
-                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Comissão %</Label><Input type="number" value={profCommission} onChange={e=>setProfCommission(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                     {isAdmin && <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Comissão %</Label><Input type="number" value={profCommission} onChange={e=>setProfCommission(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>}
                      <div className="col-span-2 space-y-2 mt-2">
                        <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Expediente (00:00 - 23:30)</Label>
                        <ScrollArea className="h-48 border border-white/5 rounded-xl p-2 bg-white/[0.02]">
@@ -426,72 +419,6 @@ export default function AdminDashboardPage() {
                  <Button onClick={handleSaveProfessional} className="w-full bg-[#D4AF37] text-black font-anton uppercase h-10 mt-4 shrink-0">Salvar</Button>
                </DialogContent>
              </Dialog>
-            )}
-            {viewMode === 'professionals' && !isAdmin && (
-              <Dialog open={isProfDialogOpen} onOpenChange={setIsProfDialogOpen}>
-                <DialogContent className="bg-[#0a0a0a] border-white/10 text-[#F5F5F5] w-[90%] max-h-[90vh] flex flex-col">
-                  <DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">Meu Perfil</DialogTitle></DialogHeader>
-                  <ScrollArea className="flex-1 pr-2">
-                    <div className="grid grid-cols-2 gap-3 py-2">
-                      <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
-                        <Label className="text-[8px] uppercase opacity-40 mb-2 text-[#F5F5F5]">Foto de Perfil</Label>
-                        <div 
-                          className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center"
-                          onClick={() => fileInputRef.current?.click()}
-                        >
-                          {profPhoto ? (
-                            <img src={profPhoto} className="w-full h-full object-cover" />
-                          ) : (
-                            <Upload className="h-4 w-4 opacity-20" />
-                          )}
-                        </div>
-                        <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} className="hidden" accept="image/*" />
-                        <p className="text-[7px] text-[#F5F5F5]/30 mt-1">Clique p/ alterar foto</p>
-                      </div>
-                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nome</Label><Input value={profName} onChange={e=>setProfName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
-                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Email</Label><Input value={profEmail} onChange={e=>setProfEmail(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
-                      <div className="space-y-1 col-span-2"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nova Senha</Label><Input type="password" value={profPassword} onChange={e=>setProfPassword(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
-                      <div className="col-span-2 space-y-2 mt-2">
-                        <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Meu Expediente (00:00 - 23:30)</Label>
-                        <ScrollArea className="h-48 border border-white/5 rounded-xl p-2 bg-white/[0.02]">
-                          <div className="grid grid-cols-4 gap-2">
-                            {TIME_SLOTS.map(slot => (
-                              <button
-                                key={slot}
-                                onClick={() => toggleWorkingHour(slot)}
-                                className={cn(
-                                  "py-1.5 rounded-lg text-[9px] font-anton border transition-all",
-                                  profWorkingHours.includes(slot) 
-                                    ? "bg-[#D4AF37] text-black border-[#D4AF37]" 
-                                    : "bg-transparent text-[#F5F5F5]/40 border-white/10"
-                                )}
-                              >
-                                {slot}
-                              </button>
-                            ))}
-                          </div>
-                        </ScrollArea>
-                      </div>
-                    </div>
-                  </ScrollArea>
-                  <Button onClick={handleSaveProfessional} className="w-full bg-[#D4AF37] text-black font-anton uppercase h-10 mt-4 shrink-0">Atualizar Perfil</Button>
-                </DialogContent>
-              </Dialog>
-            )}
-            {viewMode === 'services' && isAdmin && (
-              <Dialog open={isServiceDialogOpen} onOpenChange={setIsServiceDialogOpen}>
-                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-[#D4AF37] text-black font-anton uppercase rounded-full"><Plus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
-                <DialogContent className="bg-[#0a0a0a] border-white/10 text-[#F5F5F5] w-[90%]"><DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">Serviço</DialogTitle></DialogHeader>
-                  <div className="space-y-3 py-2">
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nome</Label><Input value={srvName} onChange={e=>setSrvName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Preço</Label><Input type="number" value={srvPrice} onChange={e=>setSrvPrice(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
-                      <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Minutos</Label><Input type="number" value={srvDuration} onChange={e=>setSrvDuration(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
-                    </div>
-                  </div>
-                  <Button onClick={handleSaveService} className="w-full bg-[#D4AF37] text-black font-anton uppercase h-10 mt-2">Salvar</Button>
-                </DialogContent>
-              </Dialog>
             )}
           </div>
         </div>
@@ -581,11 +508,11 @@ export default function AdminDashboardPage() {
 
             {viewMode === 'professionals' && (
               <div className="p-3 space-y-2">
-                {professionals
+                {(professionals || [])
                   .filter(p => isAdmin || p.id === user.id)
                   .map(p => (
                   <div key={p.id} className="flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 rounded-2xl">
-                    <img src={p.photo} className="w-10 h-10 rounded-full object-cover grayscale" />
+                    <img src={p.photo || 'https://picsum.photos/seed/default/100'} className="w-10 h-10 rounded-full object-cover grayscale" />
                     <div className="flex-1 min-w-0">
                       <div className="text-[10px] font-anton uppercase text-[#F5F5F5]">{p.name}</div>
                       <div className="text-[8px] text-[#D4AF37] uppercase">{p.specialty}</div>
@@ -597,7 +524,7 @@ export default function AdminDashboardPage() {
                     <div className="flex gap-1">
                       {(isAdmin || p.id === user.id) && (
                         <Button variant="ghost" size="icon" onClick={() => openEditProf(p)} className="h-7 w-7 border border-white/5 text-[#F5F5F5]">
-                          {p.id === user.id ? <Edit2 className="h-3 w-3 text-[#D4AF37]" /> : <Edit2 className="h-3 w-3" />}
+                          <Edit2 className="h-3 w-3" />
                         </Button>
                       )}
                       {isAdmin && (
@@ -611,7 +538,7 @@ export default function AdminDashboardPage() {
 
             {viewMode === 'services' && (
               <div className="p-3 space-y-2">
-                {services.map(s => (
+                {(services || []).map(s => (
                   <div key={s.id} className="p-3 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center justify-between">
                     <div className="flex-1">
                       <div className="text-[10px] font-anton uppercase text-[#F5F5F5]">{s.name}</div>
@@ -649,7 +576,7 @@ export default function AdminDashboardPage() {
       <footer className="h-10 border-t border-white/5 flex items-center justify-center px-4 bg-black">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[7px] font-mono text-[#F5F5F5]/20 uppercase tracking-widest">System Synced • Timeline Active</span>
+          <span className="text-[7px] font-mono text-[#F5F5F5]/20 uppercase tracking-widest">Database Synced • Cloud Real-time</span>
         </div>
       </footer>
     </div>

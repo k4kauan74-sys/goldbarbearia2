@@ -3,10 +3,10 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Scissors, CheckCircle2, ChevronLeft, ArrowRight, Circle, Clock, Calendar as CalendarIcon } from "lucide-react";
+import { Scissors, CheckCircle2, ChevronLeft, ArrowRight, Clock, Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { collection, doc } from "firebase/firestore";
+import { collection } from "firebase/firestore";
 
 import { TIME_SLOTS } from "@/lib/mock-data";
 import { Service, Professional, Appointment } from "@/lib/types";
@@ -53,16 +53,16 @@ export function BookingForm() {
   const currentStepIndex = steps.indexOf(step);
 
   const takenSlots = useMemo(() => {
-    if (!selectedProfessional || !selectedDate) return [];
+    if (!selectedProfessional || !selectedDate || !appointments) return [];
     const dateStr = format(selectedDate, "yyyy-MM-dd");
-    return appointments
+    return (appointments || [])
       .filter(a => a.date === dateStr && a.professionalId === selectedProfessional.id && a.status !== 'cancelled')
       .map(a => a.time);
   }, [appointments, selectedProfessional, selectedDate]);
 
   const profWorkingHours = useMemo(() => {
     if (!selectedProfessional) return TIME_SLOTS;
-    return selectedProfessional.workingHours || TIME_SLOTS;
+    return selectedProfessional.workingHours || [];
   }, [selectedProfessional]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,7 +81,8 @@ export function BookingForm() {
       professionalId: selectedProfessional?.id || '',
       date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
       time: selectedTime || '',
-      status: 'confirmed'
+      status: 'confirmed',
+      createdAt: new Date().toISOString()
     };
 
     addDocumentNonBlocking(collection(firestore, "appointments"), newAppointmentData);
@@ -107,7 +108,7 @@ export function BookingForm() {
               SELECIONE O <span className="text-shimmer">SERVIÇO</span>
             </h2>
             <div className="grid gap-4">
-              {services?.map((s, idx) => (
+              {(services || []).map((s, idx) => (
                 <button
                   key={s.id}
                   onClick={() => { setSelectedService(s); setStep('professional'); }}
@@ -123,6 +124,9 @@ export function BookingForm() {
                   <div className="font-anton text-lg md:text-2xl text-primary">R$ {s.price.toFixed(0)}</div>
                 </button>
               ))}
+              {(!services || services.length === 0) && (
+                <div className="text-center py-12 text-white/20 uppercase tracking-widest font-anton">Nenhum serviço disponível</div>
+              )}
             </div>
           </div>
         )}
@@ -138,7 +142,7 @@ export function BookingForm() {
               </Button>
             </div>
             <div className="flex flex-wrap justify-center gap-8 md:gap-12">
-              {professionals?.map((p) => (
+              {(professionals || []).map((p) => (
                 <button
                   key={p.id}
                   onClick={() => { setSelectedProfessional(p); setStep('date'); }}
@@ -146,7 +150,7 @@ export function BookingForm() {
                 >
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-white/5 group-hover:border-primary transition-colors bg-neutral-900 shadow-xl group-hover:shadow-primary/20">
                     <img 
-                      src={p.photo} 
+                      src={p.photo || 'https://picsum.photos/seed/default/200'} 
                       alt={p.name} 
                       className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" 
                     />
@@ -172,10 +176,6 @@ export function BookingForm() {
             </div>
 
             <div className="glass rounded-[2rem] p-6 md:p-10 border-white/5 shadow-inner">
-              <div className="flex items-center gap-2 mb-6 justify-center">
-                <CalendarIcon className="w-3 h-3 text-primary" />
-                <p className="text-[9px] font-mono text-primary uppercase tracking-[0.3em]">01. Selecione o Dia</p>
-              </div>
               <CustomCalendar
                 selectedDate={selectedDate}
                 onSelect={(date) => { setSelectedDate(date); setStep('time'); }}
@@ -203,42 +203,36 @@ export function BookingForm() {
               </Button>
             </div>
 
-            <div className="space-y-6">
-              <div className="flex items-center gap-2 mb-6 justify-center">
-                <Clock className="w-3 h-3 text-primary" />
-                <p className="text-[9px] font-mono text-primary uppercase tracking-[0.3em]">02. Selecione o Horário</p>
-              </div>
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                {TIME_SLOTS.map((time) => {
-                  const isTaken = takenSlots.includes(time);
-                  const isWorkingHour = profWorkingHours.includes(time);
-                  const isDisabled = isTaken || !isWorkingHour;
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+              {TIME_SLOTS.map((time) => {
+                const isTaken = takenSlots.includes(time);
+                const isWorkingHour = profWorkingHours.includes(time);
+                const isDisabled = isTaken || !isWorkingHour;
 
-                  return (
-                    <button
-                      key={time}
-                      disabled={isDisabled}
-                      onClick={() => { setSelectedTime(time); setStep('contact'); }}
-                      className={cn(
-                        "py-5 px-2 text-[11px] md:text-xs font-mono border rounded-2xl transition-all uppercase tracking-widest flex flex-col items-center justify-center gap-1",
-                        isDisabled 
-                          ? "bg-white/[0.02] border-white/5 text-white/10 cursor-not-allowed line-through" 
-                          : selectedTime === time 
-                            ? "bg-primary text-black border-primary shadow-[0_0_25px_rgba(251,191,36,0.3)] scale-105" 
-                            : "glass border-white/5 text-neutral-400 hover:border-primary/40 hover:text-white"
-                      )}
-                    >
-                      <span className={cn(
-                        "text-[7px] font-bold uppercase",
-                        isDisabled ? "text-destructive" : "text-emerald-500"
-                      )}>
-                        {isTaken ? "INDISPONÍVEL" : !isWorkingHour ? "FECHADO" : "DISPONÍVEL"}
-                      </span>
-                      {time}
-                    </button>
-                  );
-                })}
-              </div>
+                return (
+                  <button
+                    key={time}
+                    disabled={isDisabled}
+                    onClick={() => { setSelectedTime(time); setStep('contact'); }}
+                    className={cn(
+                      "py-5 px-2 text-[11px] md:text-xs font-mono border rounded-2xl transition-all uppercase tracking-widest flex flex-col items-center justify-center gap-1",
+                      isDisabled 
+                        ? "bg-white/[0.02] border-white/5 text-white/10 cursor-not-allowed line-through" 
+                        : selectedTime === time 
+                          ? "bg-primary text-black border-primary shadow-[0_0_25px_rgba(251,191,36,0.3)] scale-105" 
+                          : "glass border-white/5 text-neutral-400 hover:border-primary/40 hover:text-white"
+                    )}
+                  >
+                    <span className={cn(
+                      "text-[7px] font-bold uppercase",
+                      isDisabled ? "text-destructive" : "text-emerald-500"
+                    )}>
+                      {isTaken ? "INDISPONÍVEL" : !isWorkingHour ? "FECHADO" : "DISPONÍVEL"}
+                    </span>
+                    {time}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -254,38 +248,33 @@ export function BookingForm() {
               </Button>
             </div>
             <div className="grid md:grid-cols-2 gap-10 md:gap-20">
-              <div className="space-y-6">
-                <div className="glass p-8 md:p-10 rounded-[2rem] border-white/10 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-8">
-                    <Scissors className="text-primary/10 w-24 h-24 rotate-12" />
+              <div className="glass p-8 md:p-10 rounded-[2rem] border-white/10 relative overflow-hidden">
+                <span className="text-primary uppercase text-[8px] font-mono tracking-[0.5em] mb-8 block">Bilhete Digital Cloud</span>
+                <div className="grid grid-cols-2 gap-y-8 gap-x-4">
+                  <div>
+                    <p className="text-[7px] text-neutral-600 uppercase font-mono tracking-widest mb-1">Serviço</p>
+                    <p className="font-anton text-lg text-white uppercase">{selectedService?.name}</p>
                   </div>
-                  <span className="text-primary uppercase text-[8px] font-mono tracking-[0.5em] mb-8 block">Bilhete Digital</span>
-                  <div className="grid grid-cols-2 gap-y-8 gap-x-4 relative z-10">
-                    <div>
-                      <p className="text-[7px] text-neutral-600 uppercase font-mono tracking-widest mb-1">Serviço</p>
-                      <p className="font-anton text-lg text-white uppercase">{selectedService?.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-[7px] text-neutral-600 uppercase font-mono tracking-widest mb-1">Especialista</p>
-                      <p className="font-anton text-lg text-white uppercase">{selectedProfessional?.name.split(' ')[0]}</p>
-                    </div>
-                    <div>
-                      <p className="text-[7px] text-neutral-600 uppercase font-mono tracking-widest mb-1">Data</p>
-                      <p className="font-anton text-lg text-white uppercase">{selectedDate ? format(selectedDate, "dd MMM", { locale: ptBR }) : ''}</p>
-                    </div>
-                    <div>
-                      <p className="text-[7px] text-neutral-600 uppercase font-mono tracking-widest mb-1">Hora</p>
-                      <p className="font-anton text-lg text-white uppercase">{selectedTime}</p>
-                    </div>
+                  <div>
+                    <p className="text-[7px] text-neutral-600 uppercase font-mono tracking-widest mb-1">Especialista</p>
+                    <p className="font-anton text-lg text-white uppercase">{selectedProfessional?.name.split(' ')[0]}</p>
                   </div>
-                  <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
-                    <span className="font-anton text-lg text-white uppercase tracking-widest">Total</span>
-                    <span className="text-2xl font-anton text-shimmer">R$ {selectedService?.price.toFixed(0)}</span>
+                  <div>
+                    <p className="text-[7px] text-neutral-600 uppercase font-mono tracking-widest mb-1">Data</p>
+                    <p className="font-anton text-lg text-white uppercase">{selectedDate ? format(selectedDate, "dd MMM", { locale: ptBR }) : ''}</p>
                   </div>
+                  <div>
+                    <p className="text-[7px] text-neutral-600 uppercase font-mono tracking-widest mb-1">Hora</p>
+                    <p className="font-anton text-lg text-white uppercase">{selectedTime}</p>
+                  </div>
+                </div>
+                <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
+                  <span className="font-anton text-lg text-white uppercase tracking-widest">Total</span>
+                  <span className="text-2xl font-anton text-shimmer">R$ {selectedService?.price.toFixed(0)}</span>
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-8 flex flex-col justify-center">
+              <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-4">
                   <Label className="text-[9px] uppercase tracking-[0.3em] font-mono text-neutral-500">Seu Nome</Label>
                   <Input 
@@ -306,37 +295,33 @@ export function BookingForm() {
                     required
                   />
                 </div>
-                <div className="shiny-border w-full mt-4">
-                  <Button 
-                    type="submit" 
-                    disabled={isSubmitting}
-                    className="shiny-border-content w-full bg-transparent text-white hover:bg-white/[0.03] py-10 text-xl font-anton uppercase tracking-[0.3em] transition-all duration-500"
-                  >
-                    {isSubmitting ? "ENVIANDO..." : "AGENDAR AGORA"}
-                  </Button>
-                </div>
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full bg-primary text-black py-10 text-xl font-anton uppercase tracking-[0.3em] rounded-2xl"
+                >
+                  {isSubmitting ? "ENVIANDO..." : "AGENDAR AGORA"}
+                </Button>
               </form>
             </div>
           </div>
         )}
 
         {step === 'success' && (
-          <div className="py-16 md:py-24 flex flex-col items-center text-center animate-in zoom-in duration-700">
-            <div className="w-20 h-20 md:w-28 md:h-28 rounded-full glass flex items-center justify-center mb-10 shadow-[0_0_50px_rgba(197,160,89,0.25)] border-primary/20">
+          <div className="py-16 md:py-24 flex flex-col items-center text-center">
+            <div className="w-20 h-20 md:w-28 md:h-28 rounded-full glass flex items-center justify-center mb-10 border-primary/20">
               <CheckCircle2 className="h-10 w-10 md:h-12 md:w-12 text-primary" />
             </div>
             <h2 className="text-5xl md:text-9xl font-anton text-white mb-6 uppercase tracking-tighter">SUCESSO</h2>
-            <p className="text-neutral-500 uppercase tracking-[0.3em] text-[9px] md:text-[10px] max-w-xs md:max-w-lg mx-auto mb-16 leading-loose">
-              Seu horário foi sincronizado. Aguardamos você para a melhor experiência da cidade.
+            <p className="text-neutral-500 uppercase tracking-[0.3em] text-[9px] md:text-[10px] mb-16">
+              Seu horário foi sincronizado na nuvem. Aguardamos você.
             </p>
-            <div className="shiny-border">
-              <Button 
-                onClick={() => router.push('/')}
-                className="shiny-border-content bg-transparent text-white hover:bg-white/[0.03] px-12 md:px-20 py-8 md:py-10 font-anton uppercase tracking-[0.2em] text-[9px] md:text-[10px]"
-              >
-                VOLTAR AO INÍCIO
-              </Button>
-            </div>
+            <Button 
+              onClick={() => router.push('/')}
+              className="bg-white text-black px-12 md:px-20 py-8 md:py-10 font-anton uppercase tracking-[0.2em] rounded-full"
+            >
+              VOLTAR AO INÍCIO
+            </Button>
           </div>
         )}
       </div>

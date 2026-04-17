@@ -1,15 +1,17 @@
+
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Professional } from "@/lib/types";
+import { useFirestore } from "@/firebase";
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
@@ -18,13 +20,14 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const firestore = useFirestore();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    setTimeout(() => {
-      // Check for Admin
+    try {
+      // Admin global bypass (Production should use Auth correctly, but keeping for prototype flow)
       if (username.toLowerCase() === "admin@barber.com" && password === "admin123") {
         const adminUser = {
           id: 'admin',
@@ -37,28 +40,39 @@ export default function AdminLoginPage() {
         return;
       }
 
-      // Check for Professionals
-      const savedProfs: Professional[] = JSON.parse(localStorage.getItem('gold_professionals') || '[]');
-      const prof = savedProfs.find(p => p.email?.toLowerCase() === username.toLowerCase() && (p.password || "123") === password);
+      // Check Professionals in Firestore
+      const profsRef = collection(firestore, "professionals");
+      const q = query(profsRef, where("email", "==", username.toLowerCase()));
+      const querySnapshot = await getDocs(q);
 
-      if (prof) {
-        const barberUser = {
-          id: prof.id,
-          name: prof.name,
-          email: username,
-          role: 'barber'
-        };
-        localStorage.setItem("gold_user", JSON.stringify(barberUser));
-        router.push("/admin/dashboard");
-      } else {
-        toast({ 
-          title: "Erro de Autenticação", 
-          description: "Usuário ou senha inválidos.", 
-          variant: "destructive" 
-        });
-        setLoading(false);
+      if (!querySnapshot.empty) {
+        const profDoc = querySnapshot.docs[0];
+        const profData = profDoc.data();
+
+        if (profData.password === password) {
+          const barberUser = {
+            id: profDoc.id,
+            name: profData.name,
+            email: username,
+            role: 'barber'
+          };
+          localStorage.setItem("gold_user", JSON.stringify(barberUser));
+          router.push("/admin/dashboard");
+          return;
+        }
       }
-    }, 1000);
+
+      toast({ 
+        title: "Erro de Autenticação", 
+        description: "Usuário ou senha inválidos no banco de dados.", 
+        variant: "destructive" 
+      });
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Erro de Conexão", description: "Não foi possível conectar ao banco de dados.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -80,12 +94,12 @@ export default function AdminLoginPage() {
           <span className="text-[#D4AF37]">GOLD</span>
           <span className="text-[#F5F5F5]">ADMIN</span>
         </h1>
-        <p className="text-[#D4AF37]/60 text-[10px] font-bold uppercase tracking-[0.4em] mt-4">Painel de Controle Gold</p>
+        <p className="text-[#D4AF37]/60 text-[10px] font-bold uppercase tracking-[0.4em] mt-4">Painel de Controle Gold Sync</p>
       </div>
 
       <Card className="w-full max-w-md relative z-10 bg-[#0A0A0A] border-white/5 shadow-2xl rounded-[2.5rem] overflow-hidden">
         <CardHeader className="text-center pt-10 pb-4">
-          <CardDescription className="text-[#F5F5F5]/40 text-[9px] font-black uppercase tracking-[0.3em]">Autenticação de Segurança</CardDescription>
+          <CardDescription className="text-[#F5F5F5]/40 text-[9px] font-black uppercase tracking-[0.3em]">Autenticação Cloud</CardDescription>
         </CardHeader>
         <CardContent className="px-8 pb-10">
           <form onSubmit={handleLogin} className="space-y-8">
@@ -129,7 +143,6 @@ export default function AdminLoginPage() {
             </Button>
             <div className="text-center space-y-1">
               <p className="text-[#F5F5F5]/20 text-[8px] uppercase tracking-widest">Acesso restrito a colaboradores autorizados</p>
-              <p className="text-[#D4AF37]/30 text-[7px] uppercase tracking-widest font-bold">Padrão p/ Barbeiros: Email + senha "123"</p>
             </div>
           </form>
         </CardContent>
