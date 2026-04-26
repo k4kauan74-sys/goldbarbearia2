@@ -1,10 +1,11 @@
 
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
-import { ArrowRight, Scissors, Zap, ShieldCheck, CheckCircle2 } from "lucide-react";
-import Image from "next/image";
+import { ArrowRight, Scissors } from "lucide-react";
 
 export default function Home() {
+  const EXTERNAL_BOOKING_URL = "https://agendeonline.salonsoft.com.br/goldbarbearia";
+
   return (
     <div className="flex flex-col min-h-screen bg-background selection:bg-primary/30">
       <Navbar />
@@ -29,32 +30,28 @@ export default function Home() {
           
           <div className="flex flex-col items-center gap-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
             <div className="shiny-border">
-              <Link href="/agendar" className="shiny-border-content px-12 py-5 flex items-center gap-3 group">
+              <Link href={EXTERNAL_BOOKING_URL} target="_blank" className="shiny-border-content px-12 py-5 flex items-center gap-3 group">
                 <span className="font-bold uppercase tracking-[0.3em] text-xs text-white group-hover:text-primary transition-colors">Agendar Agora</span>
                 <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
 
-            {/* Nova Seção Hero Premium - Minimalista e Editorial */}
+            {/* Seção Hero Premium */}
             <div className="flex flex-col items-center gap-8 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-700 mt-12">
-              {/* Tag Superior */}
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
                 <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#D4AF37]">PLANO EXCLUSIVO | BARBEARIA</span>
               </div>
 
-              {/* Título Principal Mapeado */}
               <h2 className="text-4xl md:text-7xl font-anton leading-[1.1] text-white uppercase tracking-tighter max-w-sm md:max-w-4xl">
                 JA PENSOU <span className="text-[#F5F5F5]">CORTAR</span> O <span className="text-[#D4AF37]">CABELO</span> QUANTAS VEZES QUISER?
               </h2>
               
-              {/* Subtexto Mapeado */}
               <div className="flex flex-col items-center gap-10">
                 <p className="text-[#F5F5F5] text-2xl md:text-5xl font-anton uppercase tracking-tight leading-none">
                   POR APENAS <span className="text-[#D4AF37]">69,90 R$/MÊS</span> É POSSIVEL
                 </p>
 
-                {/* CTAs Premium */}
                 <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
                   <Link href="https://wa.me/554892465639" target="_blank" className="flex-1">
                     <button className="w-full bg-[#D4AF37] text-black h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:bg-[#C9A227] transition-all shadow-[0_0_30px_rgba(212,175,55,0.2)] active:scale-95">
@@ -95,15 +92,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Hero Premium - Seção de Detalhes (Ancora) */}
+      {/* Detalhes Assinatura */}
       <section id="assinatura" className="relative py-24 md:py-32 bg-[#0A0A0A] overflow-hidden border-t border-white/5">
-        {/* Glow Suave Dourado */}
         <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-[#D4AF37]/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid md:grid-cols-2 gap-16 items-center">
-            
-            {/* Lado Esquerdo - Conteúdo */}
             <div className="space-y-8 max-w-xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
@@ -129,39 +123,12 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Lado Direito - Elemento Visual */}
             <div className="relative group hidden md:block">
               <div className="absolute inset-0 bg-[#D4AF37]/10 rounded-full blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
               <div className="relative aspect-square glass rounded-[3rem] overflow-hidden border-white/5 flex items-center justify-center p-12">
                 <Scissors className="w-48 h-48 text-[#D4AF37] opacity-20 rotate-12" />
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#D4AF37]/5 to-transparent" />
               </div>
-            </div>
-
-          </div>
-
-          {/* Provas - Rodapé da Seção */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 pt-12 border-t border-white/5">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
-                <h4 className="font-anton text-[#F5F5F5] uppercase tracking-widest text-sm">Cortes ilimitados</h4>
-              </div>
-              <p className="text-[#A8A8A8] text-[10px] uppercase tracking-widest pl-4">Sem restrições de agenda</p>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
-                <h4 className="font-anton text-[#F5F5F5] uppercase tracking-widest text-sm">Plano mensal</h4>
-              </div>
-              <p className="text-[#A8A8A8] text-[10px] uppercase tracking-widest pl-4">Simples e automático</p>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
-                <h4 className="font-anton text-[#F5F5F5] uppercase tracking-widest text-sm">Sem fidelidade</h4>
-              </div>
-              <p className="text-[#A8A8A8] text-[10px] uppercase tracking-widest pl-4">Cancele quando quiser</p>
             </div>
           </div>
         </div>

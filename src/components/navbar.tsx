@@ -1,10 +1,12 @@
+
 "use client";
 
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export function Navbar() {
+  const EXTERNAL_BOOKING_URL = "https://agendeonline.salonsoft.com.br/goldbarbearia";
+
   return (
     <div className="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-[672px] z-[100]">
       <nav className="glass rounded-full px-3 md:px-6 py-3 flex items-center justify-between shadow-2xl shadow-primary/10 border-white/10">
@@ -24,7 +26,7 @@ export function Navbar() {
           <Link href="/admin/login" className="text-neutral-400 hover:text-white transition-colors whitespace-nowrap">Admin</Link>
         </div>
 
-        <Link href="/agendar" className="shrink-0">
+        <Link href={EXTERNAL_BOOKING_URL} target="_blank" className="shrink-0">
           <button className="bg-white text-black px-3 md:px-6 py-2 rounded-full font-bold uppercase tracking-widest text-[8px] md:text-[10px] hover:bg-neutral-200 transition-all active:scale-95 shadow-lg">
             Agendar
           </button>
