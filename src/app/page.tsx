@@ -156,7 +156,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <Link href="https://wa.me/554892465639" target="_blank" className="w-full">
+                <Link href="/checkout?plan=basico" className="w-full">
                   <button className="w-full h-20 bg-primary text-black font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:scale-[1.02] active:scale-95 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)]">
                     Escolher plano
                   </button>
@@ -209,7 +209,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <Link href="https://wa.me/554892465639" target="_blank" className="w-full mt-8">
+                <Link href="/checkout?plan=gold" className="w-full mt-8">
                   <button className="w-full h-20 bg-transparent text-white border border-white/10 font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:bg-white hover:text-black hover:border-white transition-all active:scale-95">
                     Escolher plano
                   </button>
