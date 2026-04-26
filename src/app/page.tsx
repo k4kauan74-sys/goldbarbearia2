@@ -132,7 +132,7 @@ export default function Home() {
                 <div className="mb-10">
                   <h3 className="text-4xl font-anton text-white uppercase tracking-tighter mb-3">Plano Básico</h3>
                   <p className="text-[#F5F5F5]/40 text-[11px] uppercase font-bold tracking-[0.2em] leading-relaxed max-w-[240px]">
-                    Perfeito para manter o visual em dia com praticidade * ilimitado
+                    Perfeito para manter o visual em dia com praticidade
                   </p>
                 </div>
 
