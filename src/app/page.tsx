@@ -58,7 +58,7 @@ export default function Home() {
                       Quero entrar
                     </button>
                   </Link>
-                  <Link href="#assinatura" className="flex-1">
+                  <Link href="#planos" className="flex-1">
                     <button className="w-full bg-transparent text-white border border-[#2A2A2A] h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:border-[#D4AF37]/40 transition-all active:scale-95">
                       saiba mais
                     </button>
@@ -143,10 +143,10 @@ export default function Home() {
 
                 <div className="space-y-6 mb-16 flex-1 w-full">
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Segunda a quarta
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Cortes ilimitados
                   </div>
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Cortes ilimitados
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Segunda a quarta
                   </div>
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
                     <Check className="w-5 h-5 text-primary shrink-0" /> Corte de cabelo
@@ -181,10 +181,10 @@ export default function Home() {
 
                 <div className="space-y-6 mb-16 flex-1 w-full overflow-y-auto max-h-[300px] custom-scrollbar">
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Segunda a quinta
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Cortes ilimitados
                   </div>
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Cortes ilimitados
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Segunda a quinta
                   </div>
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
                     <Check className="w-5 h-5 text-primary shrink-0" /> Barba
@@ -214,48 +214,6 @@ export default function Home() {
                     Escolher plano
                   </button>
                 </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Detalhes Assinatura / Club Gold */}
-      <section id="assinatura" className="relative py-24 md:py-32 bg-[#0A0A0A] overflow-hidden border-t border-white/5">
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-[#D4AF37]/5 rounded-full blur-[120px] pointer-events-none" />
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8 max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
-                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#D4AF37]">Club Gold | Benefícios</span>
-              </div>
-
-              <h2 className="text-6xl md:text-8xl font-anton leading-[0.9] uppercase tracking-tighter">
-                <span className="text-[#F5F5F5]">Estilo sem</span><br />
-                <span className="text-[#D4AF37]">limites</span><br />
-                <span className="text-[#F5F5F5]">mensais</span>
-              </h2>
-
-              <p className="text-[#A8A8A8] text-sm md:text-base leading-relaxed tracking-wide font-light">
-                Corte o cabelo quantas vezes quiser, com a liberdade de um plano feito pra quem valoriza o autocuidado constante. Um plano simples, direto e inteligente.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Link href="#planos" className="flex-1">
-                  <button className="w-full bg-[#D4AF37] text-black h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:bg-[#C9A227] transition-all active:scale-95 shadow-lg">
-                    Ver Planos
-                  </button>
-                </Link>
-              </div>
-            </div>
-
-            <div className="relative group hidden md:block">
-              <div className="absolute inset-0 bg-[#D4AF37]/10 rounded-full blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-              <div className="relative aspect-square glass rounded-[3rem] overflow-hidden border-white/5 flex items-center justify-center p-12">
-                <Scissors className="w-48 h-48 text-[#D4AF37] opacity-20 rotate-12" />
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#D4AF37]/5 to-transparent" />
               </div>
             </div>
           </div>
