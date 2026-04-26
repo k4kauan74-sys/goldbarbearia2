@@ -102,7 +102,7 @@ export default function AdminDashboardPage() {
     }
   }, [router]);
 
-  // Firestore Data - Garantindo que só busca após auth inicializar
+  // Firestore Data
   const professionalsQuery = useMemoFirebase(() => {
     if (!firestore || isUserLoading) return null;
     return collection(firestore, "professionals");
@@ -114,43 +114,42 @@ export default function AdminDashboardPage() {
   }, [firestore, isUserLoading]);
 
   const appointmentsQuery = useMemoFirebase(() => {
-    if (!firestore || isUserLoading) return null;
-    // Administrador vê tudo, Barbeiro vê apenas os seus
-    if (adminSession?.role === 'barber') {
+    if (!firestore || isUserLoading || !adminSession) return null;
+    if (adminSession.role === 'barber') {
       return query(collection(firestore, "appointments"), where("professionalId", "==", adminSession.id));
     }
     return collection(firestore, "appointments");
   }, [firestore, isUserLoading, adminSession]);
 
-  const { data: professionals = [] } = useCollection<Professional>(professionalsQuery);
-  const { data: services = [] } = useCollection<Service>(servicesQuery);
-  const { data: appointments = [] } = useCollection<Appointment>(appointmentsQuery);
+  const { data: professionalsData } = useCollection<Professional>(professionalsQuery);
+  const { data: servicesData } = useCollection<Service>(servicesQuery);
+  const { data: appointmentsData } = useCollection<Appointment>(appointmentsQuery);
+
+  const professionals = professionalsData || [];
+  const services = servicesData || [];
+  const appointments = appointmentsData || [];
 
   const isAdmin = adminSession?.role === 'admin';
 
   const financeData = useMemo(() => {
-    const relevantApts = adminSession?.role === 'barber' 
-      ? (appointments || []).filter(a => a.professionalId === adminSession.id)
-      : (appointments || []);
-
-    const totalRevenue = relevantApts.reduce((acc, curr) => {
-      const service = (services || []).find(s => s.id === curr.serviceId);
+    const totalRevenue = appointments.reduce((acc, curr) => {
+      const service = services.find(s => s.id === curr.serviceId);
       return acc + (service?.price || 0);
     }, 0);
 
-    const totalCommissions = relevantApts.reduce((acc, curr) => {
-      const service = (services || []).find(s => s.id === curr.serviceId);
-      const prof = (professionals || []).find(p => p.id === curr.professionalId);
+    const totalCommissions = appointments.reduce((acc, curr) => {
+      const service = services.find(s => s.id === curr.serviceId);
+      const prof = professionals.find(p => p.id === curr.professionalId);
       const commissionAmount = ((service?.price || 0) * (prof?.commission ?? 0)) / 100;
       return acc + commissionAmount;
     }, 0);
 
-    const profBreakdown = (professionals || [])
-      .filter(p => adminSession?.role === 'admin' || p.id === adminSession?.id)
+    const profBreakdown = professionals
+      .filter(p => !adminSession || adminSession.role === 'admin' || p.id === adminSession.id)
       .map(p => {
-        const profApts = (appointments || []).filter(a => a.professionalId === p.id);
+        const profApts = appointments.filter(a => a.professionalId === p.id);
         const revenue = profApts.reduce((acc, curr) => {
-          const service = (services || []).find(s => s.id === curr.serviceId);
+          const service = services.find(s => s.id === curr.serviceId);
           return acc + (service?.price || 0);
         }, 0);
         const commission = (revenue * (p.commission ?? 0)) / 100;
@@ -251,7 +250,7 @@ export default function AdminDashboardPage() {
 
     if (editingProf) {
       updateDocumentNonBlocking(doc(firestore, "professionals", editingProf.id), data);
-      if (editingProf.id === adminSession?.id) {
+      if (adminSession && editingProf.id === adminSession.id) {
         const updatedUser = { ...adminSession, name: profName, email: profEmail };
         setAdminSession(updatedUser);
         localStorage.setItem("gold_user", JSON.stringify(updatedUser));
@@ -262,12 +261,12 @@ export default function AdminDashboardPage() {
     
     setIsProfDialogOpen(false);
     resetProfForm();
-    toast({ title: "Sucesso", description: "Perfil e expediente atualizados no banco de dados." });
+    toast({ title: "Sucesso", description: "Perfil e expediente atualizados." });
   };
 
   const deleteProfessional = (id: string) => {
     deleteDocumentNonBlocking(doc(firestore, "professionals", id));
-    toast({ title: "Removido", description: "Profissional removido do sistema." });
+    toast({ title: "Removido", description: "Profissional removido." });
   };
 
   const resetProfForm = () => {
@@ -299,7 +298,7 @@ export default function AdminDashboardPage() {
     
     setIsServiceDialogOpen(false);
     resetServiceForm();
-    toast({ title: "Sucesso", description: "Serviço atualizado globalmente." });
+    toast({ title: "Sucesso", description: "Serviço atualizado." });
   };
 
   const deleteService = (id: string) => {
@@ -316,11 +315,11 @@ export default function AdminDashboardPage() {
     setIsServiceDialogOpen(true);
   };
 
-  const getServiceName = (id: string) => (services || []).find(s => s.id === id)?.name || "N/A";
-  const getProfName = (id: string) => (professionals || []).find(p => p.id === id)?.name || "N/A";
+  const getServiceName = (id: string) => services.find(s => s.id === id)?.name || "N/A";
+  const getProfName = (id: string) => professionals.find(p => p.id === id)?.name || "N/A";
 
   const filteredAppointments = useMemo(() => {
-    return (appointments || []).filter(a => {
+    return appointments.filter(a => {
       const matchesSearch = a.clientName.toLowerCase().includes(search.toLowerCase()) || a.phone.includes(search);
       const effectiveFilter = adminSession?.role === 'barber' ? adminSession.id : selectedProfFilter;
       const matchesProf = effectiveFilter === "all" || a.professionalId === effectiveFilter;
@@ -331,7 +330,7 @@ export default function AdminDashboardPage() {
   const activeSlots = useMemo(() => {
     const effectiveFilter = adminSession?.role === 'barber' ? adminSession.id : selectedProfFilter;
     if (effectiveFilter === "all") return TIME_SLOTS;
-    const prof = (professionals || []).find(p => p.id === effectiveFilter);
+    const prof = professionals.find(p => p.id === effectiveFilter);
     return prof?.workingHours || [];
   }, [selectedProfFilter, professionals, adminSession]);
 
@@ -352,7 +351,7 @@ export default function AdminDashboardPage() {
       <header className="h-14 flex items-center justify-between px-4 border-b border-white/5 bg-[#0a0a0a] z-50">
         <div className="font-anton text-lg tracking-tighter uppercase">
           <span className="text-[#D4AF37]">GOLD</span>
-          <span className="text-[#F5F5F5]">{adminSession.role === 'admin' ? 'ADMIN' : 'STAFF'}</span>
+          <span className="text-[#F5F5F5]">{adminSession.role === 'admin' ? ' ADMIN' : ' STAFF'}</span>
         </div>
         <div className="flex gap-1">
           <Button variant="ghost" size="icon" onClick={() => setViewMode('appointments')} className={cn("h-8 w-8", viewMode === 'appointments' && "text-[#D4AF37]")}><CalendarIcon className="h-4 w-4" /></Button>
@@ -382,8 +381,8 @@ export default function AdminDashboardPage() {
                   <div className="grid grid-cols-2 gap-3 py-2">
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Cliente</Label><Input value={aptClient} onChange={e=>setAptClient(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">WhatsApp</Label><Input value={aptPhone} onChange={e=>setAptPhone(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Serviço</Label><Select value={aptService} onValueChange={setAptService}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{services.map(s=><SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
-                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Barbeiro</Label><Select value={adminSession.role === 'barber' ? adminSession.id : aptProf} onValueChange={setAptProf} disabled={adminSession.role === 'barber'}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{professionals.map(p=><SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Serviço</Label><Select value={aptService} onValueChange={setAptService}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{(services || []).map(s=><SelectItem key={s.id} value={s.id}>{s.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Barbeiro</Label><Select value={adminSession.role === 'barber' ? adminSession.id : aptProf} onValueChange={setAptProf} disabled={adminSession.role === 'barber'}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{(professionals || []).map(p=><SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}</SelectContent></Select></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Data</Label><Input type="date" value={aptDate} onChange={e=>setAptDate(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                     <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Hora</Label><Select value={aptTime} onValueChange={setAptTime}><SelectTrigger className="h-8 text-xs text-[#F5F5F5]"><SelectValue /></SelectTrigger><SelectContent>{TIME_SLOTS.map(t=><SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select></div>
                   </div>
@@ -478,7 +477,7 @@ export default function AdminDashboardPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">TODOS</SelectItem>
-                    {professionals.map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
+                    {(professionals || []).map(p => <SelectItem key={p.id} value={p.id}>{p.name.toUpperCase()}</SelectItem>)}
                   </SelectContent>
                 </Select>
               )}
@@ -532,7 +531,7 @@ export default function AdminDashboardPage() {
             {viewMode === 'professionals' && (
               <div className="p-3 space-y-2">
                 {(professionals || [])
-                  .filter(p => isAdmin || p.id === adminSession.id)
+                  .filter(p => isAdmin || (adminSession && p.id === adminSession.id))
                   .map(p => (
                   <div key={p.id} className="flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 rounded-2xl">
                     <img src={p.photo || 'https://picsum.photos/seed/default/100'} className="w-10 h-10 rounded-full object-cover grayscale" />
@@ -545,7 +544,7 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      {(isAdmin || p.id === adminSession.id) && (
+                      {(isAdmin || (adminSession && p.id === adminSession.id)) && (
                         <Button variant="ghost" size="icon" onClick={() => openEditProf(p)} className="h-7 w-7 border border-white/5 text-[#F5F5F5]">
                           <Edit2 className="h-3 w-3" />
                         </Button>
@@ -580,7 +579,7 @@ export default function AdminDashboardPage() {
               <div className="p-3 space-y-3">
                 <div className="space-y-2">
                   <div className="text-[8px] font-anton uppercase text-[#F5F5F5]/30 tracking-widest">Resumo {isAdmin ? "por Barbeiro" : "Pessoal"}</div>
-                  {financeData.profBreakdown.map(row => (
+                  {(financeData.profBreakdown || []).map(row => (
                     <div key={row.id} className="flex justify-between items-center p-3 bg-white/[0.02] rounded-2xl border border-white/5">
                       <div className="text-[10px] font-anton uppercase text-[#F5F5F5]">{row.name}</div>
                       <div className="text-right">
