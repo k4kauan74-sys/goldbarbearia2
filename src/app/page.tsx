@@ -181,7 +181,7 @@ export default function Home() {
                     <Check className="w-5 h-5 text-primary shrink-0" /> Segunda a quinta
                   </div>
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Corte de cabelo
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Cortes ilimitados
                   </div>
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
                     <Check className="w-5 h-5 text-primary shrink-0" /> Barba
