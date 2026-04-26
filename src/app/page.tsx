@@ -1,7 +1,7 @@
 
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
-import { ArrowRight, Scissors } from "lucide-react";
+import { ArrowRight, Scissors, Check } from "lucide-react";
 
 export default function Home() {
   const EXTERNAL_BOOKING_URL = "https://agendeonline.salonsoft.com.br/goldbarbearia";
@@ -49,13 +49,13 @@ export default function Home() {
               
               <div className="flex flex-col items-center gap-10">
                 <p className="text-[#F5F5F5] text-2xl md:text-5xl font-anton uppercase tracking-tight leading-none">
-                  POR APENAS <span className="text-[#D4AF37]">69,90 R$/MÊS</span> É POSSIVEL
+                  A PARTIR DE <span className="text-[#D4AF37]">69,90 R$/MÊS</span> É POSSIVEL
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-                  <Link href="https://wa.me/554892465639" target="_blank" className="flex-1">
+                  <Link href="#planos" className="flex-1">
                     <button className="w-full bg-[#D4AF37] text-black h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:bg-[#C9A227] transition-all shadow-[0_0_30px_rgba(212,175,55,0.2)] active:scale-95">
-                      Quero entrar | R$69/mês
+                      Quero entrar
                     </button>
                   </Link>
                   <Link href="#assinatura" className="flex-1">
@@ -115,9 +115,9 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Link href="https://wa.me/554892465639" target="_blank" className="flex-1">
+                <Link href="#planos" className="flex-1">
                   <button className="w-full bg-[#D4AF37] text-black h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:bg-[#C9A227] transition-all active:scale-95 shadow-lg">
-                    Assinar Agora
+                    Ver Planos
                   </button>
                 </Link>
               </div>
@@ -128,6 +128,119 @@ export default function Home() {
               <div className="relative aspect-square glass rounded-[3rem] overflow-hidden border-white/5 flex items-center justify-center p-12">
                 <Scissors className="w-48 h-48 text-[#D4AF37] opacity-20 rotate-12" />
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#D4AF37]/5 to-transparent" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Seção de Planos */}
+      <section id="planos" className="relative py-24 md:py-40 bg-[#030303] overflow-hidden">
+        {/* Background Decorative */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[160px] pointer-events-none" />
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16 md:mb-24">
+            <span className="text-primary uppercase text-[10px] font-black tracking-[0.5em] mb-4 block animate-in fade-in slide-in-from-bottom-4 duration-700">
+              Planos e preços
+            </span>
+            <h2 className="text-5xl md:text-8xl font-anton text-white uppercase tracking-tighter mb-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
+              Escolha o plano ideal para você
+            </h2>
+            <div className="flex flex-wrap justify-center gap-6 md:gap-12 text-[10px] font-bold uppercase tracking-widest text-[#F5F5F5]/40 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-primary" /> Cancele quando quiser
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-primary" /> Atendimento prioritário
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-primary" /> Economia mensal garantida
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-stretch max-w-6xl mx-auto">
+            {/* Plano Básico - MAIS POPULAR */}
+            <div className="relative group animate-in fade-in slide-in-from-left-8 duration-1000">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 to-primary/10 rounded-[3rem] blur opacity-20 group-hover:opacity-40 transition duration-1000" />
+              <div className="relative h-full glass border-primary/20 p-8 md:p-16 rounded-[3rem] flex flex-col items-start text-left shadow-[0_0_50px_rgba(212,175,55,0.05)]">
+                <div className="absolute top-8 right-8">
+                  <span className="bg-primary text-black text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full">
+                    Mais Popular
+                  </span>
+                </div>
+                
+                <div className="mb-10">
+                  <h3 className="text-4xl font-anton text-white uppercase tracking-tighter mb-3">Plano Básico</h3>
+                  <p className="text-[#F5F5F5]/40 text-[11px] uppercase font-bold tracking-[0.2em] leading-relaxed max-w-[240px]">
+                    Perfeito para manter o visual em dia com praticidade
+                  </p>
+                </div>
+
+                <div className="mb-12 flex items-baseline gap-2">
+                  <span className="text-5xl md:text-7xl font-anton text-primary">R$ 69,90</span>
+                  <span className="text-[#F5F5F5]/20 text-[12px] uppercase font-black tracking-widest">/mês</span>
+                </div>
+
+                <div className="space-y-6 mb-16 flex-1 w-full">
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Segunda a quarta
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Corte de cabelo
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Atendimento ágil
+                  </div>
+                </div>
+
+                <Link href="https://wa.me/554892465639" target="_blank" className="w-full">
+                  <button className="w-full h-20 bg-primary text-black font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:scale-[1.02] active:scale-95 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)]">
+                    Escolher plano
+                  </button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Plano Gold */}
+            <div className="relative group animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
+              <div className="relative h-full glass border-white/10 p-8 md:p-16 rounded-[3rem] flex flex-col items-start text-left hover:border-primary/20 transition-all duration-700">
+                <div className="mb-10">
+                  <h3 className="text-4xl font-anton text-white uppercase tracking-tighter mb-3">Plano Gold</h3>
+                  <p className="text-[#F5F5F5]/40 text-[11px] uppercase font-bold tracking-[0.2em] leading-relaxed max-w-[240px]">
+                    Experiência completa para quem quer sempre estar impecável
+                  </p>
+                </div>
+
+                <div className="mb-12 flex items-baseline gap-2">
+                  <span className="text-5xl md:text-7xl font-anton text-white">R$ 144,87</span>
+                  <span className="text-[#F5F5F5]/20 text-[12px] uppercase font-black tracking-widest">/mês</span>
+                </div>
+
+                <div className="space-y-6 mb-16 flex-1 w-full">
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Segunda a quinta
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Corte de cabelo
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Barba
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Sobrancelha
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Atendimento prioritário
+                  </div>
+                </div>
+
+                <Link href="https://wa.me/554892465639" target="_blank" className="w-full">
+                  <button className="w-full h-20 bg-transparent text-white border border-white/10 font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:bg-white hover:text-black hover:border-white transition-all active:scale-95">
+                    Escolher plano
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
