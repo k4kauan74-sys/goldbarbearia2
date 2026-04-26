@@ -176,7 +176,7 @@ export default function Home() {
                   <span className="text-[#F5F5F5]/20 text-[12px] uppercase font-black tracking-widest">/mês</span>
                 </div>
 
-                <div className="space-y-6 mb-16 flex-1 w-full">
+                <div className="space-y-6 mb-16 flex-1 w-full overflow-y-auto max-h-[300px] custom-scrollbar">
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
                     <Check className="w-5 h-5 text-primary shrink-0" /> Segunda a quinta
                   </div>
@@ -192,9 +192,21 @@ export default function Home() {
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
                     <Check className="w-5 h-5 text-primary shrink-0" /> Atendimento prioritário
                   </div>
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Desconto em produtos
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Brindes exclusivos
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Sorteios mensais
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Hidratação capilar e facial
+                  </div>
                 </div>
 
-                <Link href="https://wa.me/554892465639" target="_blank" className="w-full">
+                <Link href="https://wa.me/554892465639" target="_blank" className="w-full mt-8">
                   <button className="w-full h-20 bg-transparent text-white border border-white/10 font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:bg-white hover:text-black hover:border-white transition-all active:scale-95">
                     Escolher plano
                   </button>
