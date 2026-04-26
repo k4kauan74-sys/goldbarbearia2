@@ -92,48 +92,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Detalhes Assinatura */}
-      <section id="assinatura" className="relative py-24 md:py-32 bg-[#0A0A0A] overflow-hidden border-t border-white/5">
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-[#D4AF37]/5 rounded-full blur-[120px] pointer-events-none" />
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8 max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
-                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#D4AF37]">Club Gold | Benefícios</span>
-              </div>
-
-              <h2 className="text-6xl md:text-8xl font-anton leading-[0.9] uppercase tracking-tighter">
-                <span className="text-[#F5F5F5]">Estilo sem</span><br />
-                <span className="text-[#D4AF37]">limites</span><br />
-                <span className="text-[#F5F5F5]">mensais</span>
-              </h2>
-
-              <p className="text-[#A8A8A8] text-sm md:text-base leading-relaxed tracking-wide font-light">
-                Corte o cabelo quantas vezes quiser, com a liberdade de um plano feito pra quem valoriza o autocuidado constante. Um plano simples, direto e inteligente.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Link href="#planos" className="flex-1">
-                  <button className="w-full bg-[#D4AF37] text-black h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:bg-[#C9A227] transition-all active:scale-95 shadow-lg">
-                    Ver Planos
-                  </button>
-                </Link>
-              </div>
-            </div>
-
-            <div className="relative group hidden md:block">
-              <div className="absolute inset-0 bg-[#D4AF37]/10 rounded-full blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-              <div className="relative aspect-square glass rounded-[3rem] overflow-hidden border-white/5 flex items-center justify-center p-12">
-                <Scissors className="w-48 h-48 text-[#D4AF37] opacity-20 rotate-12" />
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#D4AF37]/5 to-transparent" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Seção de Planos */}
       <section id="planos" className="relative py-24 md:py-40 bg-[#030303] overflow-hidden">
         {/* Background Decorative */}
@@ -174,7 +132,7 @@ export default function Home() {
                 <div className="mb-10">
                   <h3 className="text-4xl font-anton text-white uppercase tracking-tighter mb-3">Plano Básico</h3>
                   <p className="text-[#F5F5F5]/40 text-[11px] uppercase font-bold tracking-[0.2em] leading-relaxed max-w-[240px]">
-                    Perfeito para manter o visual em dia com praticidade
+                    Perfeito para manter o visual em dia com praticidade * ilimitado
                   </p>
                 </div>
 
@@ -241,6 +199,48 @@ export default function Home() {
                     Escolher plano
                   </button>
                 </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Detalhes Assinatura / Club Gold */}
+      <section id="assinatura" className="relative py-24 md:py-32 bg-[#0A0A0A] overflow-hidden border-t border-white/5">
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-[#D4AF37]/5 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8 max-w-xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
+                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#D4AF37]">Club Gold | Benefícios</span>
+              </div>
+
+              <h2 className="text-6xl md:text-8xl font-anton leading-[0.9] uppercase tracking-tighter">
+                <span className="text-[#F5F5F5]">Estilo sem</span><br />
+                <span className="text-[#D4AF37]">limites</span><br />
+                <span className="text-[#F5F5F5]">mensais</span>
+              </h2>
+
+              <p className="text-[#A8A8A8] text-sm md:text-base leading-relaxed tracking-wide font-light">
+                Corte o cabelo quantas vezes quiser, com a liberdade de um plano feito pra quem valoriza o autocuidado constante. Um plano simples, direto e inteligente.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Link href="#planos" className="flex-1">
+                  <button className="w-full bg-[#D4AF37] text-black h-16 rounded-full font-anton text-sm uppercase tracking-[0.2em] hover:bg-[#C9A227] transition-all active:scale-95 shadow-lg">
+                    Ver Planos
+                  </button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative group hidden md:block">
+              <div className="absolute inset-0 bg-[#D4AF37]/10 rounded-full blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+              <div className="relative aspect-square glass rounded-[3rem] overflow-hidden border-white/5 flex items-center justify-center p-12">
+                <Scissors className="w-48 h-48 text-[#D4AF37] opacity-20 rotate-12" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#D4AF37]/5 to-transparent" />
               </div>
             </div>
           </div>
