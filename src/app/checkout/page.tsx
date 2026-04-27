@@ -76,10 +76,10 @@ function CheckoutContent() {
   const discountAmount = hasDiscount ? baseTotalPrice * 0.3 : 0;
   const totalPrice = baseTotalPrice - discountAmount;
 
-  // Cálculo de Economia
+  // Cálculo de Economia MENSAL
   const individualMonthly = INDIVIDUAL_COMPARISON[selectedPlan].value;
-  const totalIndividual = individualMonthly * PERIOD_MONTHS[selectedPeriod];
-  const totalSavings = totalIndividual - totalPrice;
+  const effectiveMonthlyPrice = totalPrice / PERIOD_MONTHS[selectedPeriod];
+  const monthlySavings = individualMonthly - effectiveMonthlyPrice;
 
   const handleApplyCoupon = () => {
     const code = couponCode.trim().toUpperCase();
@@ -222,19 +222,19 @@ function CheckoutContent() {
                   </div>
                 </div>
 
-                {/* Comparativo de Economia */}
+                {/* Comparativo de Economia MENSAL */}
                 <div className="bg-white/[0.03] border border-white/5 p-5 rounded-2xl space-y-3">
                   <div className="flex items-center gap-2 text-[10px] font-anton text-primary uppercase tracking-widest">
                     <TrendingDown className="w-4 h-4" /> Por que assinar?
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-[9px] uppercase tracking-widest text-white/40">
-                      <span>Valor Avulso ({INDIVIDUAL_COMPARISON[selectedPlan].description})</span>
-                      <span className="line-through">R$ {totalIndividual.toFixed(2)}</span>
+                      <span>Custo Avulso Mensal</span>
+                      <span className="line-through">R$ {individualMonthly.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-emerald-500 font-bold">
-                      <span>Sua Economia Real</span>
-                      <span>- R$ {totalSavings.toFixed(2)}</span>
+                      <span>Sua Economia Mensal</span>
+                      <span>- R$ {monthlySavings.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -243,7 +243,7 @@ function CheckoutContent() {
                   {hasDiscount && (
                     <div className="flex justify-between text-[11px] text-emerald-500 uppercase font-bold tracking-[0.2em]">
                       <span className="flex items-center gap-1"><Percent className="w-3 h-3" /> Desconto (GOLD30)</span>
-                      <span>- R$ {discountAmount.toFixed(2)}</span>
+                      <span>- R$ {(discountAmount / PERIOD_MONTHS[selectedPeriod]).toFixed(2)}/mês</span>
                     </div>
                   )}
                 </div>
