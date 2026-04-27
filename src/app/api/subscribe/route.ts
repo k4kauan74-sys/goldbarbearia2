@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MercadoPagoConfig, PreApproval } from 'mercadopago';
 
-// Configuração do Mercado Pago utilizando a variável de ambiente correta
+// Configuração do Mercado Pago utilizando o Access Token fornecido
 const client = new MercadoPagoConfig({ 
-  accessToken: process.env.MP_ACCESS_TOKEN || '' 
+  accessToken: 'APP_USR-2221276034207684-042717-ec1dc710f61e0ce62de9933e069ef4cb-784803379' 
 });
 
 export async function POST(req: NextRequest) {
