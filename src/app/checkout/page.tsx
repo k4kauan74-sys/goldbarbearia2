@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -208,24 +207,12 @@ function CheckoutContent() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex justify-between text-[11px] text-white/40 uppercase font-bold tracking-[0.2em]">
-                    <span>Subtotal mensal</span>
-                    <span>R$ {monthlyPrice.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-[11px] text-white/40 uppercase font-bold tracking-[0.2em]">
-                    <span>Subtotal acumulado</span>
-                    <span>R$ {baseTotalPrice.toFixed(2)}</span>
-                  </div>
                   {hasDiscount && (
                     <div className="flex justify-between text-[11px] text-emerald-500 uppercase font-bold tracking-[0.2em]">
                       <span className="flex items-center gap-1"><Percent className="w-3 h-3" /> Desconto (GOLD30)</span>
                       <span>- R$ {discountAmount.toFixed(2)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-[11px] text-white/40 uppercase font-bold tracking-[0.2em]">
-                    <span>Impostos</span>
-                    <span>R$ 0,00</span>
-                  </div>
                 </div>
 
                 <div className="pt-6 border-t border-white/10 flex justify-between items-end">
