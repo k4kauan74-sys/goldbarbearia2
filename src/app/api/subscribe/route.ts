@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MercadoPagoConfig, PreApproval } from 'mercadopago';
 
-// Configuração do Mercado Pago utilizando o Access Token fornecido
+// Configuração do Mercado Pago
+// Access Token (Privado - Usado no Servidor)
 const client = new MercadoPagoConfig({ 
   accessToken: 'APP_USR-2221276034207684-042717-ec1dc710f61e0ce62de9933e069ef4cb-784803379' 
 });
+
+// Chave Pública (Identificador - APP_USR-f851c8dc-b925-4f8c-b8bc-0cba049c2f6a)
 
 export async function POST(req: NextRequest) {
   try {
