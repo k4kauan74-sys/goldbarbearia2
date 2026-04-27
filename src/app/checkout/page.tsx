@@ -14,7 +14,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Check, ChevronLeft, CreditCard, Tag, Sparkles, Percent } from "lucide-react";
+import { Check, ChevronLeft, CreditCard, Tag, Sparkles, Percent, TrendingDown } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +32,17 @@ const PRICES = {
     mensal: 199.90,
     trimestral: 184.90,
     semestral: 144.87
+  }
+};
+
+const INDIVIDUAL_COMPARISON = {
+  basico: {
+    value: 180.00,
+    description: "4 CORTES AVULSOS"
+  },
+  gold: {
+    value: 360.00,
+    description: "4 COMBOS COMPLETOS AVULSOS"
   }
 };
 
@@ -64,6 +75,11 @@ function CheckoutContent() {
   const hasDiscount = appliedCoupon === "GOLD30" && selectedPeriod === "semestral";
   const discountAmount = hasDiscount ? baseTotalPrice * 0.3 : 0;
   const totalPrice = baseTotalPrice - discountAmount;
+
+  // Cálculo de Economia
+  const individualMonthly = INDIVIDUAL_COMPARISON[selectedPlan].value;
+  const totalIndividual = individualMonthly * PERIOD_MONTHS[selectedPeriod];
+  const totalSavings = totalIndividual - totalPrice;
 
   const handleApplyCoupon = () => {
     const code = couponCode.trim().toUpperCase();
@@ -114,7 +130,7 @@ function CheckoutContent() {
               </p>
             </div>
 
-            {/* Seleção de Plano (Toggle Estilizado) */}
+            {/* Seleção de Plano */}
             <div className="grid grid-cols-2 gap-4 p-1 glass rounded-3xl border-white/5">
               <button
                 onClick={() => setSelectedPlan('basico')}
@@ -203,6 +219,23 @@ function CheckoutContent() {
                   <div className="text-right">
                     <p className="font-anton text-lg text-primary">R$ {monthlyPrice.toFixed(2)}</p>
                     <p className="text-[8px] text-white/20 uppercase tracking-widest">por mês</p>
+                  </div>
+                </div>
+
+                {/* Comparativo de Economia */}
+                <div className="bg-white/[0.03] border border-white/5 p-5 rounded-2xl space-y-3">
+                  <div className="flex items-center gap-2 text-[10px] font-anton text-primary uppercase tracking-widest">
+                    <TrendingDown className="w-4 h-4" /> Por que assinar?
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-[9px] uppercase tracking-widest text-white/40">
+                      <span>Valor Avulso ({INDIVIDUAL_COMPARISON[selectedPlan].description})</span>
+                      <span className="line-through">R$ {totalIndividual.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-emerald-500 font-bold">
+                      <span>Sua Economia Real</span>
+                      <span>- R$ {totalSavings.toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
 
