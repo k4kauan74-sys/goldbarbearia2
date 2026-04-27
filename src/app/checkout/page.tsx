@@ -28,8 +28,8 @@ const PRICES = {
     semestral: 69.90
   },
   gold: {
-    mensal: 200.00,
-    trimestral: 185.00,
+    mensal: 199.90,
+    trimestral: 184.90,
     semestral: 144.87
   }
 };
