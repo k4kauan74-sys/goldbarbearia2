@@ -164,7 +164,7 @@ export default function Home() {
                       <span>- R$ 110,10</span>
                     </div>
                     <div className="text-[10px] uppercase tracking-widest text-primary font-anton mt-1">
-                      pague somente 69,90 R$
+                      pague somente 69,90 R$/mês
                     </div>
                   </div>
                   <Link href="/checkout?plan=basico" className="w-full">
