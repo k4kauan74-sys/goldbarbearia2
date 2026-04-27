@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -53,11 +54,17 @@ const PERIOD_MONTHS = {
   semestral: 6
 };
 
+// Links diretos fornecidos pelo usuário
+const SEMESTRAL_DIRECT_LINKS = {
+  basico: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=de37170686944f3e9b9b247fc94ee9e5",
+  gold: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=0431358b608146a3bd360a15d43f0cc3"
+};
+
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
-  const { user, isUserLoading } = useUser();
+  const { user } = useUser();
   
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('basico');
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('semestral');
@@ -118,6 +125,13 @@ function CheckoutContent() {
       return;
     }
 
+    // Se for semestral e NÃO tiver cupom, usamos o link direto fornecido
+    if (selectedPeriod === 'semestral' && !appliedCoupon) {
+      window.location.href = SEMESTRAL_DIRECT_LINKS[selectedPlan];
+      return;
+    }
+
+    // Para outros períodos ou semestral com cupom, usamos a API dinâmica
     setIsProcessing(true);
     try {
       const response = await fetch('/api/subscribe', {
@@ -215,6 +229,9 @@ function CheckoutContent() {
                   </SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-[9px] text-white/20 uppercase tracking-widest ml-1">
+                Renovação automática conforme o período escolhido.
+              </p>
             </div>
 
             <Card className="relative overflow-hidden bg-white/[0.02] border-white/5 p-8 rounded-[2.5rem] group">
@@ -273,7 +290,7 @@ function CheckoutContent() {
                       <span>- R$ {monthlySavings.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-primary font-anton pt-1">
-                      <span>Pague somente</span>
+                      <span className="opacity-50">Pague somente</span>
                       <span>R$ {effectiveMonthlyPrice.toFixed(2)} / mês</span>
                     </div>
                   </div>
