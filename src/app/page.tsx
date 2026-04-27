@@ -163,6 +163,9 @@ export default function Home() {
                       <span>Economia no Semestral</span>
                       <span>- R$ 110,10</span>
                     </div>
+                    <div className="text-[10px] uppercase tracking-widest text-primary font-anton mt-1">
+                      pague somente 69,90 R$
+                    </div>
                   </div>
                   <Link href="/checkout?plan=basico" className="w-full">
                     <button className="w-full h-20 bg-primary text-black font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:scale-[1.02] active:scale-95 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)]">
@@ -227,6 +230,9 @@ export default function Home() {
                     <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-emerald-500 font-bold">
                       <span>Economia no Semestral</span>
                       <span>- R$ 215,13</span>
+                    </div>
+                    <div className="text-[10px] uppercase tracking-widest text-primary font-anton mt-1">
+                      pague somente 145,00 R$/mês
                     </div>
                   </div>
                   <Link href="/checkout?plan=gold" className="w-full">
