@@ -65,5 +65,29 @@ export default function LoginPage() {
         </Card>
       </main>
     </div>
+  
+
+"use client";
+
+import { useState } from "react";
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+
+  const entrar = async () => {
+    await signInWithEmailAndPassword(auth, email, senha);
+    window.location.href = "/dashboard";
+  };
+
+  return (
+    <div>
+      <input onChange={e => setEmail(e.target.value)} placeholder="Email" />
+      <input type="password" onChange={e => setSenha(e.target.value)} placeholder="Senha" />
+
+      <button onClick={entrar}>Entrar</button>
+    </div>
   );
 }

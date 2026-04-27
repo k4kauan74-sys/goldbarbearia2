@@ -101,3 +101,49 @@ export default function CadastroPage() {
     </div>
   );
 }
+"use client";
+
+import { useState } from "react";
+import { auth, db } from "@/lib/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+
+export default function Cadastro() {
+  const [form, setForm] = useState({
+    nome: "",
+    email: "",
+    cpf: "",
+    senha: "",
+  });
+
+  const cadastrar = async () => {
+    const userCred = await createUserWithEmailAndPassword(
+      auth,
+      form.email,
+      form.senha
+    );
+
+    await setDoc(doc(db, "clientes", userCred.user.uid), {
+      uid: userCred.user.uid,
+      nome: form.nome,
+      email: form.email,
+      cpf: form.cpf,
+      plano: null,
+      status_assinatura: "inativa",
+      data_criacao: new Date(),
+    });
+
+    alert("Conta criada!");
+  };
+
+  return (
+    <div>
+      <input placeholder="Nome" onChange={e => setForm({...form, nome: e.target.value})} />
+      <input placeholder="Email" onChange={e => setForm({...form, email: e.target.value})} />
+      <input placeholder="CPF" onChange={e => setForm({...form, cpf: e.target.value})} />
+      <input type="password" placeholder="Senha" onChange={e => setForm({...form, senha: e.target.value})} />
+
+      <button onClick={cadastrar}>Cadastrar</button>
+    </div>
+  );
+}

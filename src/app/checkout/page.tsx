@@ -14,10 +14,11 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Check, ChevronLeft, CreditCard, Tag, Sparkles, Percent, TrendingDown } from "lucide-react";
+import { Check, ChevronLeft, CreditCard, Tag, Sparkles, Percent, TrendingDown, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/firebase";
 
 type PlanType = 'basico' | 'gold';
 type PeriodType = 'mensal' | 'trimestral' | 'semestral';
@@ -54,12 +55,15 @@ const PERIOD_MONTHS = {
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { toast } = useToast();
+  const { user, isUserLoading } = useUser();
   
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('basico');
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('semestral');
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const plan = searchParams.get('plan') as PlanType;
@@ -71,12 +75,10 @@ function CheckoutContent() {
   const monthlyPrice = PRICES[selectedPlan][selectedPeriod];
   const baseTotalPrice = monthlyPrice * PERIOD_MONTHS[selectedPeriod];
   
-  // Lógica de Desconto: GOLD30 dá 30% em planos semestrais
   const hasDiscount = appliedCoupon === "GOLD30" && selectedPeriod === "semestral";
   const discountAmount = hasDiscount ? baseTotalPrice * 0.3 : 0;
   const totalPrice = baseTotalPrice - discountAmount;
 
-  // Cálculo de Economia MENSAL
   const individualMonthly = INDIVIDUAL_COMPARISON[selectedPlan].value;
   const effectiveMonthlyPrice = totalPrice / PERIOD_MONTHS[selectedPeriod];
   const monthlySavings = individualMonthly - effectiveMonthlyPrice;
@@ -105,6 +107,49 @@ function CheckoutContent() {
     setCouponCode("");
   };
 
+  const handleCheckout = async () => {
+    if (!user) {
+      toast({
+        title: "Atenção",
+        description: "Você precisa estar logado para assinar um plano.",
+        variant: "destructive",
+      });
+      router.push("/login?redirect=/checkout");
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          plan: selectedPeriod,
+          period: selectedPeriod,
+          planType: selectedPlan,
+          coupon: appliedCoupon
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.init_point) {
+        window.location.href = data.init_point;
+      } else {
+        throw new Error(data.error || "Erro ao iniciar pagamento");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro no Checkout",
+        description: error.message || "Não foi possível processar o pagamento agora.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#030303] flex flex-col pt-32 pb-20">
       <Navbar />
@@ -119,7 +164,6 @@ function CheckoutContent() {
         </div>
 
         <div className="grid lg:grid-cols-12 gap-12 items-start">
-          {/* Coluna Esquerda: Configuração */}
           <div className="lg:col-span-7 space-y-8 animate-in fade-in slide-in-from-left-8 duration-700">
             <div>
               <h1 className="text-4xl md:text-6xl font-anton text-white uppercase tracking-tighter mb-2">
@@ -130,7 +174,6 @@ function CheckoutContent() {
               </p>
             </div>
 
-            {/* Seleção de Plano */}
             <div className="grid grid-cols-2 gap-4 p-1 glass rounded-3xl border-white/5">
               <button
                 onClick={() => setSelectedPlan('basico')}
@@ -152,7 +195,6 @@ function CheckoutContent() {
               </button>
             </div>
 
-            {/* Seletor de Período */}
             <div className="space-y-4">
               <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-white/60 ml-1">
                 Escolha o período
@@ -175,7 +217,6 @@ function CheckoutContent() {
               </Select>
             </div>
 
-            {/* Banner de Destaque */}
             <Card className="relative overflow-hidden bg-white/[0.02] border-white/5 p-8 rounded-[2.5rem] group">
               <div className="absolute top-0 right-0 p-4 opacity-10">
                 <Sparkles className="w-16 h-16 text-primary" />
@@ -196,7 +237,6 @@ function CheckoutContent() {
             </Card>
           </div>
 
-          {/* Coluna Direita: Resumo */}
           <div className="lg:col-span-5 animate-in fade-in slide-in-from-right-8 duration-700 delay-200">
             <Card className="glass border-white/10 p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-primary/5">
               <h2 className="text-3xl font-anton text-white uppercase tracking-tighter mb-8">
@@ -219,7 +259,6 @@ function CheckoutContent() {
                   </div>
                 </div>
 
-                {/* Comparativo de Economia MENSAL */}
                 <div className="bg-white/[0.03] border border-white/5 p-5 rounded-2xl space-y-3">
                   <div className="flex items-center gap-2 text-[10px] font-anton text-primary uppercase tracking-widest">
                     <TrendingDown className="w-4 h-4" /> Por que assinar?
@@ -284,14 +323,20 @@ function CheckoutContent() {
                   </div>
                 )}
 
-                <Link href="https://wa.me/554892465639" target="_blank" className="block">
-                  <Button className="w-full h-20 bg-primary text-black hover:bg-white hover:text-black transition-all rounded-full font-anton text-xl uppercase tracking-[0.2em] shadow-[0_20px_40px_rgba(212,175,55,0.2)] group">
-                    Continuar <Sparkles className="ml-2 w-5 h-5 group-hover:scale-125 transition-transform" />
-                  </Button>
-                </Link>
+                <Button 
+                  onClick={handleCheckout}
+                  disabled={isProcessing}
+                  className="w-full h-20 bg-primary text-black hover:bg-white hover:text-black transition-all rounded-full font-anton text-xl uppercase tracking-[0.2em] shadow-[0_20px_40px_rgba(212,175,55,0.2)] group"
+                >
+                  {isProcessing ? (
+                    <Loader2 className="animate-spin h-6 w-6" />
+                  ) : (
+                    <>Continuar <Sparkles className="ml-2 w-5 h-5 group-hover:scale-125 transition-transform" /></>
+                  )}
+                </Button>
 
                 <div className="flex items-center justify-center gap-4 text-[9px] text-white/20 uppercase font-bold tracking-widest">
-                  <CreditCard className="w-3 h-3" /> Pagamento 100% Seguro
+                  <CreditCard className="w-3 h-3" /> Pagamento 100% Seguro via Mercado Pago
                 </div>
               </div>
             </Card>
