@@ -7,6 +7,7 @@ import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { 
   Select, 
   SelectContent, 
@@ -14,9 +15,10 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Check, ChevronLeft, CreditCard, Tag, Sparkles } from "lucide-react";
+import { Check, ChevronLeft, CreditCard, Tag, Sparkles, Percent } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 type PlanType = 'basico' | 'gold';
 type PeriodType = 'mensal' | 'trimestral' | 'semestral';
@@ -42,10 +44,12 @@ const PERIOD_MONTHS = {
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const { toast } = useToast();
   
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('basico');
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('semestral');
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 
   useEffect(() => {
     const plan = searchParams.get('plan') as PlanType;
@@ -55,7 +59,36 @@ function CheckoutContent() {
   }, [searchParams]);
 
   const monthlyPrice = PRICES[selectedPlan][selectedPeriod];
-  const totalPrice = monthlyPrice * PERIOD_MONTHS[selectedPeriod];
+  const baseTotalPrice = monthlyPrice * PERIOD_MONTHS[selectedPeriod];
+  
+  // Lógica de Desconto: GOLD30 dá 30% em planos semestrais
+  const hasDiscount = appliedCoupon === "GOLD30" && selectedPeriod === "semestral";
+  const discountAmount = hasDiscount ? baseTotalPrice * 0.3 : 0;
+  const totalPrice = baseTotalPrice - discountAmount;
+
+  const handleApplyCoupon = () => {
+    const code = couponCode.trim().toUpperCase();
+    if (code === "GOLD30") {
+      setAppliedCoupon(code);
+      toast({
+        title: "Cupom Aplicado!",
+        description: selectedPeriod === "semestral" 
+          ? "30% de desconto aplicado com sucesso." 
+          : "Cupom válido apenas para planos semestrais.",
+      });
+    } else {
+      toast({
+        title: "Cupom Inválido",
+        description: "O código inserido não existe ou expirou.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+  };
 
   return (
     <div className="min-h-screen bg-[#030303] flex flex-col pt-32 pb-20">
@@ -180,6 +213,16 @@ function CheckoutContent() {
                     <span>R$ {monthlyPrice.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-[11px] text-white/40 uppercase font-bold tracking-[0.2em]">
+                    <span>Subtotal acumulado</span>
+                    <span>R$ {baseTotalPrice.toFixed(2)}</span>
+                  </div>
+                  {hasDiscount && (
+                    <div className="flex justify-between text-[11px] text-emerald-500 uppercase font-bold tracking-[0.2em]">
+                      <span className="flex items-center gap-1"><Percent className="w-3 h-3" /> Desconto (GOLD30)</span>
+                      <span>- R$ {discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-[11px] text-white/40 uppercase font-bold tracking-[0.2em]">
                     <span>Impostos</span>
                     <span>R$ 0,00</span>
                   </div>
@@ -201,9 +244,38 @@ function CheckoutContent() {
               </div>
 
               <div className="space-y-6">
-                <button className="flex items-center gap-2 text-[10px] text-white/40 hover:text-primary transition-colors uppercase font-black tracking-[0.2em]">
-                  <Tag className="w-3 h-3" /> Tem um cupom de desconto?
-                </button>
+                {!appliedCoupon ? (
+                  <div className="space-y-3">
+                    <Label className="text-[9px] uppercase tracking-[0.2em] font-black text-white/40 ml-1">Cupom de Desconto</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        placeholder="CÓDIGO"
+                        className="h-12 bg-white/[0.02] border-white/10 rounded-xl font-anton uppercase tracking-widest text-xs focus-visible:ring-primary/20"
+                      />
+                      <Button 
+                        onClick={handleApplyCoupon}
+                        className="h-12 px-6 bg-white/5 hover:bg-white/10 text-white font-anton uppercase text-[10px] tracking-widest border border-white/10"
+                      >
+                        Aplicar
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
+                    <div className="flex items-center gap-2">
+                      <Tag className="w-4 h-4 text-emerald-500" />
+                      <span className="font-anton text-[10px] text-emerald-500 uppercase tracking-widest">{appliedCoupon} Aplicado</span>
+                    </div>
+                    <button 
+                      onClick={handleRemoveCoupon}
+                      className="text-[9px] text-white/40 hover:text-white uppercase font-black tracking-widest"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                )}
 
                 <Link href="https://wa.me/554892465639" target="_blank" className="block">
                   <Button className="w-full h-20 bg-primary text-black hover:bg-white hover:text-black transition-all rounded-full font-anton text-xl uppercase tracking-[0.2em] shadow-[0_20px_40px_rgba(212,175,55,0.2)] group">
