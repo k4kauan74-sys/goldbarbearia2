@@ -173,9 +173,6 @@ function CheckoutContent() {
                   </SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-[9px] text-white/20 uppercase tracking-widest ml-1 font-medium">
-                Renovação automática conforme o período escolhido.
-              </p>
             </div>
 
             {/* Banner de Destaque */}
@@ -235,6 +232,10 @@ function CheckoutContent() {
                     <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-emerald-500 font-bold">
                       <span>Sua Economia Mensal</span>
                       <span>- R$ {monthlySavings.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-primary font-anton pt-1">
+                      <span>Pague somente</span>
+                      <span>R$ {effectiveMonthlyPrice.toFixed(2)} / mês</span>
                     </div>
                   </div>
                 </div>
