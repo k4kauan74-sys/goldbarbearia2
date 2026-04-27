@@ -153,11 +153,23 @@ export default function Home() {
                   </div>
                 </div>
 
-                <Link href="/checkout?plan=basico" className="w-full">
-                  <button className="w-full h-20 bg-primary text-black font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:scale-[1.02] active:scale-95 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)]">
-                    Escolher plano
-                  </button>
-                </Link>
+                <div className="w-full mt-auto pt-8 border-t border-white/5">
+                  <div className="flex flex-col gap-1 mb-6">
+                    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-white/40">
+                      <span>Valor Avulso (4 cortes)</span>
+                      <span className="line-through">R$ 180,00</span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-emerald-500 font-bold">
+                      <span>Economia no Semestral</span>
+                      <span>- R$ 110,10</span>
+                    </div>
+                  </div>
+                  <Link href="/checkout?plan=basico" className="w-full">
+                    <button className="w-full h-20 bg-primary text-black font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:scale-[1.02] active:scale-95 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)]">
+                      Escolher plano
+                    </button>
+                  </Link>
+                </div>
               </div>
             </div>
 
@@ -206,11 +218,23 @@ export default function Home() {
                   </div>
                 </div>
 
-                <Link href="/checkout?plan=gold" className="w-full mt-8">
-                  <button className="w-full h-20 bg-transparent text-white border border-white/10 font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:bg-white hover:text-black hover:border-white transition-all active:scale-95">
-                    Escolher plano
-                  </button>
-                </Link>
+                <div className="w-full mt-auto pt-8 border-t border-white/5">
+                  <div className="flex flex-col gap-1 mb-6">
+                    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-white/40">
+                      <span>Valor Avulso (4x Completo)</span>
+                      <span className="line-through">R$ 360,00</span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-emerald-500 font-bold">
+                      <span>Economia no Semestral</span>
+                      <span>- R$ 215,13</span>
+                    </div>
+                  </div>
+                  <Link href="/checkout?plan=gold" className="w-full">
+                    <button className="w-full h-20 bg-transparent text-white border border-white/10 font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:bg-white hover:text-black hover:border-white transition-all active:scale-95">
+                      Escolher plano
+                    </button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
