@@ -247,20 +247,6 @@ function CheckoutContent() {
                     </div>
                   )}
                 </div>
-
-                <div className="pt-6 border-t border-white/10 flex justify-between items-end">
-                  <div>
-                    <p className="text-[10px] text-white/20 uppercase font-black tracking-[0.3em] mb-1">Total a pagar</p>
-                    <p className="text-4xl font-anton text-white uppercase tracking-tighter">
-                      R$ {totalPrice.toFixed(2)}
-                    </p>
-                  </div>
-                  {selectedPeriod === 'semestral' && (
-                    <span className="bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-emerald-500/20 mb-1">
-                      Melhor Valor
-                    </span>
-                  )}
-                </div>
               </div>
 
               <div className="space-y-6">
