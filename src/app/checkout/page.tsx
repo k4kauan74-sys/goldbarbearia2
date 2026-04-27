@@ -126,7 +126,7 @@ function CheckoutContent() {
                 </SelectContent>
               </Select>
               <p className="text-[9px] text-white/20 uppercase tracking-widest ml-1 font-medium">
-                Renovação automática conforme o período escolhido. Cancele quando quiser.
+                Renovação automática conforme o período escolhido.
               </p>
             </div>
 

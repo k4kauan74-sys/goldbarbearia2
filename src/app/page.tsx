@@ -107,9 +107,6 @@ export default function Home() {
             </h2>
             <div className="flex flex-wrap justify-center gap-6 md:gap-12 text-[10px] font-bold uppercase tracking-widest text-[#F5F5F5]/40 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
               <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-primary" /> Cancele quando quiser
-              </div>
-              <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-primary" /> Atendimento prioritário
               </div>
               <div className="flex items-center gap-2">
