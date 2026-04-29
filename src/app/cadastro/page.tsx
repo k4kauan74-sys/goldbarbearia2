@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { validateCPF, formatCPF } from "@/lib/utils";
+import { formatCPF } from "@/lib/cpf-utils";
 import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/components/navbar";
 import Link from "next/link";
@@ -98,52 +98,6 @@ export default function CadastroPage() {
           </CardContent>
         </Card>
       </main>
-    </div>
-  );
-}
-"use client";
-
-import { useState } from "react";
-import { auth, db } from "@/lib/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-
-export default function Cadastro() {
-  const [form, setForm] = useState({
-    nome: "",
-    email: "",
-    cpf: "",
-    senha: "",
-  });
-
-  const cadastrar = async () => {
-    const userCred = await createUserWithEmailAndPassword(
-      auth,
-      form.email,
-      form.senha
-    );
-
-    await setDoc(doc(db, "clientes", userCred.user.uid), {
-      uid: userCred.user.uid,
-      nome: form.nome,
-      email: form.email,
-      cpf: form.cpf,
-      plano: null,
-      status_assinatura: "inativa",
-      data_criacao: new Date(),
-    });
-
-    alert("Conta criada!");
-  };
-
-  return (
-    <div>
-      <input placeholder="Nome" onChange={e => setForm({...form, nome: e.target.value})} />
-      <input placeholder="Email" onChange={e => setForm({...form, email: e.target.value})} />
-      <input placeholder="CPF" onChange={e => setForm({...form, cpf: e.target.value})} />
-      <input type="password" placeholder="Senha" onChange={e => setForm({...form, senha: e.target.value})} />
-
-      <button onClick={cadastrar}>Cadastrar</button>
     </div>
   );
 }
