@@ -187,7 +187,7 @@ export default function Home() {
                 </div>
 
                 <div className="mb-12 flex items-baseline gap-2">
-                  <span className="text-5xl md:text-7xl font-anton text-white">R$ 144,87</span>
+                  <span className="text-5xl md:text-7xl font-anton text-white">R$ 145,00</span>
                   <span className="text-[#F5F5F5]/20 text-[12px] uppercase font-black tracking-widest">/mês</span>
                 </div>
 
@@ -229,7 +229,7 @@ export default function Home() {
                     </div>
                     <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-emerald-500 font-bold">
                       <span>Economia no Semestral</span>
-                      <span>- R$ 215,13</span>
+                      <span>- R$ 215,00</span>
                     </div>
                     <div className="text-[10px] uppercase tracking-widest text-primary font-anton mt-1">
                       pague somente 145,00 R$/mês

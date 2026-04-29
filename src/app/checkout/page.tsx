@@ -31,8 +31,8 @@ const PRICES = {
   },
   gold: {
     mensal: 199.90,
-    trimestral: 145.00,
-    semestral: 144.87
+    trimestral: 185.00,
+    semestral: 145.00
   }
 };
 
@@ -58,7 +58,7 @@ const DIRECT_LINKS = {
   basico: {
     semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/2OzS7QTrD",
     trimestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/7kcKDAIv5V",
-    mensal: "whatsapp" // Redireciona para WhatsApp
+    mensal: "whatsapp"
   },
   gold: {
     semestral: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=0431358b608146a3bd360a15d43f0cc3",
@@ -94,7 +94,7 @@ function CheckoutContent() {
   const totalPrice = baseTotalPrice - discountAmount;
 
   const individualMonthly = INDIVIDUAL_COMPARISON[selectedPlan].value;
-  const effectiveMonthlyPrice = totalPrice / PERIOD_MONTHS[selectedPeriod];
+  const effectiveMonthlyPrice = (totalPrice / PERIOD_MONTHS[selectedPeriod]);
   const monthlySavings = individualMonthly - effectiveMonthlyPrice;
 
   const handleApplyCoupon = () => {
@@ -140,17 +140,14 @@ function CheckoutContent() {
     const message = `Olá! Gostaria de assinar o Plano ${planName} (${periodName}). Meu email é ${user.email}.`;
     const whatsappLink = `${whatsappBase}?text=${encodeURIComponent(message)}`;
 
-    // Pega o link correspondente
     const link = DIRECT_LINKS[selectedPlan][selectedPeriod];
 
-    // Se for um link de WhatsApp ou se houver cupom aplicado
     if (link === "whatsapp" || appliedCoupon) {
       window.open(whatsappLink, '_blank');
       setIsProcessing(false);
       return;
     }
 
-    // Redireciona para o link direto em uma nova aba
     window.open(link, '_blank');
     setIsProcessing(false);
   };
@@ -220,9 +217,6 @@ function CheckoutContent() {
                   </SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-[9px] text-white/20 uppercase tracking-widest ml-1">
-                {selectedPeriod === 'mensal' || (selectedPlan === 'gold' && selectedPeriod === 'trimestral') ? 'Assinatura via WhatsApp.' : 'Pagamento via InfinitePay/Mercado Pago.'}
-              </p>
             </div>
 
             <Card className="relative overflow-hidden bg-white/[0.02] border-white/5 p-8 rounded-[2.5rem] group">
