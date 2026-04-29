@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     const prices: any = {
       basico: { mensal: 119.9, trimestral: 89.9, semestral: 69.9 },
-      gold: { mensal: 199.9, trimestral: 184.9, semestral: 144.87 }
+      gold: { mensal: 199.9, trimestral: 145.0, semestral: 144.87 }
     };
 
     const periodMonths: any = { mensal: 1, trimestral: 3, semestral: 6 };

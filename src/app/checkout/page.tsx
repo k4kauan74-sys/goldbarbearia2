@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -32,7 +31,7 @@ const PRICES = {
   },
   gold: {
     mensal: 199.90,
-    trimestral: 184.90,
+    trimestral: 145.00,
     semestral: 144.87
   }
 };
@@ -211,7 +210,7 @@ function CheckoutContent() {
                 </SelectTrigger>
                 <SelectContent className="bg-[#0A0A0A] border-white/10 rounded-2xl">
                   <SelectItem value="mensal" className="py-4 text-white hover:bg-white/5 cursor-pointer">
-                    MENSAL — R$ {PRICES[selectedPlan].mensal.toFixed(2)}
+                    MENSAL — R$ {PRICES[selectedPlan].mensal.toFixed(2)}/MÊS
                   </SelectItem>
                   <SelectItem value="trimestral" className="py-4 text-white hover:bg-white/5 cursor-pointer">
                     TRIMESTRAL — R$ {PRICES[selectedPlan].trimestral.toFixed(2)}/MÊS
@@ -222,7 +221,7 @@ function CheckoutContent() {
                 </SelectContent>
               </Select>
               <p className="text-[9px] text-white/20 uppercase tracking-widest ml-1">
-                {selectedPeriod === 'mensal' ? 'Assinatura via WhatsApp.' : 'Pagamento via InfinitePay/Mercado Pago.'}
+                {selectedPeriod === 'mensal' || (selectedPlan === 'gold' && selectedPeriod === 'trimestral') ? 'Assinatura via WhatsApp.' : 'Pagamento via InfinitePay/Mercado Pago.'}
               </p>
             </div>
 
