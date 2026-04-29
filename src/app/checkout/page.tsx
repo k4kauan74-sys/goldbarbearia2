@@ -144,15 +144,15 @@ function CheckoutContent() {
     // Pega o link correspondente
     const link = DIRECT_LINKS[selectedPlan][selectedPeriod];
 
-    // Se for um link de WhatsApp ou se houver cupom aplicado (que exige tratamento manual agora)
+    // Se for um link de WhatsApp ou se houver cupom aplicado
     if (link === "whatsapp" || appliedCoupon) {
-      window.location.href = whatsappLink;
+      window.open(whatsappLink, '_blank');
       setIsProcessing(false);
       return;
     }
 
-    // Redireciona para o link direto (InfinitePay ou Mercado Pago)
-    window.location.href = link;
+    // Redireciona para o link direto em uma nova aba
+    window.open(link, '_blank');
     setIsProcessing(false);
   };
 
