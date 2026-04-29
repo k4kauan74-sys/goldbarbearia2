@@ -15,7 +15,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Check, ChevronLeft, CreditCard, Tag, Sparkles, Percent, TrendingDown, Loader2 } from "lucide-react";
+import { Check, ChevronLeft, CreditCard, Tag, Sparkles, Percent, TrendingDown, Loader2, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -54,10 +54,18 @@ const PERIOD_MONTHS = {
   semestral: 6
 };
 
-// Links diretos fornecidos pelo usuário
-const SEMESTRAL_DIRECT_LINKS = {
-  basico: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=de37170686944f3e9b9b247fc94ee9e5",
-  gold: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=0431358b608146a3bd360a15d43f0cc3"
+// Links de Pagamento Diretos
+const DIRECT_LINKS = {
+  basico: {
+    semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/2OzS7QTrD",
+    trimestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/7kcKDAIv5V",
+    mensal: "whatsapp" // Redireciona para WhatsApp
+  },
+  gold: {
+    semestral: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=0431358b608146a3bd360a15d43f0cc3",
+    trimestral: "whatsapp",
+    mensal: "whatsapp"
+  }
 };
 
 function CheckoutContent() {
@@ -125,43 +133,27 @@ function CheckoutContent() {
       return;
     }
 
-    // Se for semestral e NÃO tiver cupom, usamos o link direto fornecido
-    if (selectedPeriod === 'semestral' && !appliedCoupon) {
-      window.location.href = SEMESTRAL_DIRECT_LINKS[selectedPlan];
+    setIsProcessing(true);
+
+    const whatsappBase = "https://wa.me/554892465639";
+    const planName = selectedPlan === 'basico' ? 'Básico' : 'Gold';
+    const periodName = selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1);
+    const message = `Olá! Gostaria de assinar o Plano ${planName} (${periodName}). Meu email é ${user.email}.`;
+    const whatsappLink = `${whatsappBase}?text=${encodeURIComponent(message)}`;
+
+    // Pega o link correspondente
+    const link = DIRECT_LINKS[selectedPlan][selectedPeriod];
+
+    // Se for um link de WhatsApp ou se houver cupom aplicado (que exige tratamento manual agora)
+    if (link === "whatsapp" || appliedCoupon) {
+      window.location.href = whatsappLink;
+      setIsProcessing(false);
       return;
     }
 
-    // Para outros períodos ou semestral com cupom, usamos a API dinâmica
-    setIsProcessing(true);
-    try {
-      const response = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: user.email,
-          plan: selectedPeriod,
-          period: selectedPeriod,
-          planType: selectedPlan,
-          coupon: appliedCoupon
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.init_point) {
-        window.location.href = data.init_point;
-      } else {
-        throw new Error(data.error || "Erro ao iniciar pagamento");
-      }
-    } catch (error: any) {
-      toast({
-        title: "Erro no Checkout",
-        description: error.message || "Não foi possível processar o pagamento agora.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+    // Redireciona para o link direto (InfinitePay ou Mercado Pago)
+    window.location.href = link;
+    setIsProcessing(false);
   };
 
   return (
@@ -184,7 +176,7 @@ function CheckoutContent() {
                 SEU <span className="text-primary">PLANO</span>
               </h1>
               <p className="text-white/40 uppercase tracking-[0.2em] text-[10px] font-bold">
-                Configure sua assinatura premium
+                Assine e garanta seu visual impecável
               </p>
             </div>
 
@@ -230,7 +222,7 @@ function CheckoutContent() {
                 </SelectContent>
               </Select>
               <p className="text-[9px] text-white/20 uppercase tracking-widest ml-1">
-                Renovação automática conforme o período escolhido.
+                {selectedPeriod === 'mensal' ? 'Assinatura via WhatsApp.' : 'Pagamento via InfinitePay/Mercado Pago.'}
               </p>
             </div>
 
@@ -348,12 +340,18 @@ function CheckoutContent() {
                   {isProcessing ? (
                     <Loader2 className="animate-spin h-6 w-6" />
                   ) : (
-                    <>Continuar <Sparkles className="ml-2 w-5 h-5 group-hover:scale-125 transition-transform" /></>
+                    <>
+                      {DIRECT_LINKS[selectedPlan][selectedPeriod] === "whatsapp" || appliedCoupon ? (
+                        <>Finalizar no WhatsApp <MessageCircle className="ml-2 w-5 h-5 group-hover:scale-125 transition-transform" /></>
+                      ) : (
+                        <>Continuar <Sparkles className="ml-2 w-5 h-5 group-hover:scale-125 transition-transform" /></>
+                      )}
+                    </>
                   )}
                 </Button>
 
                 <div className="flex items-center justify-center gap-4 text-[9px] text-white/20 uppercase font-bold tracking-widest">
-                  <CreditCard className="w-3 h-3" /> Pagamento 100% Seguro via Mercado Pago
+                  <CreditCard className="w-3 h-3" /> Pagamento 100% Seguro
                 </div>
               </div>
             </Card>
