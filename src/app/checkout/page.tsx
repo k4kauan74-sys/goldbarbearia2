@@ -63,7 +63,7 @@ const DIRECT_LINKS = {
   },
   gold: {
     semestral: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=0431358b608146a3bd360a15d43f0cc3",
-    trimestral: "whatsapp",
+    trimestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/1I6UkzKFRD",
     mensal: "whatsapp"
   }
 };
@@ -276,7 +276,7 @@ function CheckoutContent() {
                       <span>- R$ {monthlySavings.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-primary font-anton pt-1">
-                      <span className="opacity-50">Pague somente</span>
+                      <span className="opacity-50 text-white/60">Pague somente</span>
                       <span>R$ {effectiveMonthlyPrice.toFixed(2)} / mês</span>
                     </div>
                   </div>
