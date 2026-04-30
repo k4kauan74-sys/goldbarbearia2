@@ -1,8 +1,10 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import { MercadoPagoConfig, PreApproval } from 'mercadopago';
 
 // Configuração do Mercado Pago
 // Access Token (Privado - Usado no Servidor)
+// APP_USR-2221276034207684-042717-ec1dc710f61e0ce62de9933e069ef4cb-784803379
 const client = new MercadoPagoConfig({ 
   accessToken: 'APP_USR-2221276034207684-042717-ec1dc710f61e0ce62de9933e069ef4cb-784803379' 
 });

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -53,7 +54,7 @@ const PERIOD_MONTHS = {
   semestral: 6
 };
 
-// Links de Pagamento Diretos
+// Links de Pagamento Diretos Externos
 const DIRECT_LINKS = {
   basico: {
     semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/2OzS7QTrD",
@@ -166,7 +167,7 @@ function CheckoutContent() {
         </div>
 
         <div className="grid lg:grid-cols-12 gap-12 items-start">
-          <div className="lg:col-span-7 space-y-8 animate-in fade-in slide-in-from-left-8 duration-700">
+          <div className="lg:col-span-7 space-y-8">
             <div>
               <h1 className="text-4xl md:text-6xl font-anton text-white uppercase tracking-tighter mb-2">
                 SEU <span className="text-primary">PLANO</span>
@@ -239,7 +240,7 @@ function CheckoutContent() {
             </Card>
           </div>
 
-          <div className="lg:col-span-5 animate-in fade-in slide-in-from-right-8 duration-700 delay-200">
+          <div className="lg:col-span-5">
             <Card className="glass border-white/10 p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-primary/5">
               <h2 className="text-3xl font-anton text-white uppercase tracking-tighter mb-8">
                 RESUMO DO <span className="text-shimmer">PEDIDO</span>
