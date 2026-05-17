@@ -63,7 +63,7 @@ const DIRECT_LINKS = {
   },
   gold: {
     semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/3Kvy4qCYn",
-    trimestral: "whatsapp",
+    trimestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/1I6UkzKFRD",
     mensal: "whatsapp"
   }
 };
