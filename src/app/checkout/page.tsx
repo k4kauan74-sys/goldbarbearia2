@@ -62,8 +62,8 @@ const DIRECT_LINKS = {
     mensal: "whatsapp"
   },
   gold: {
-    semestral: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=0431358b608146a3bd360a15d43f0cc3",
-    trimestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/3Kvy4qCYn",
+    semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/3Kvy4qCYn",
+    trimestral: "whatsapp",
     mensal: "whatsapp"
   }
 };
