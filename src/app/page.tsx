@@ -257,7 +257,7 @@ export default function Home() {
             
             <div className="flex flex-col md:flex-row gap-12 text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-500">
               <Link href="/" className="hover:text-white transition-colors">Início</Link>
-              <Link href="#" className="hover:text-white transition-colors">Instagram</Link>
+              <Link href="https://www.instagram.com/goldbarbearia_/" target="_blank" className="hover:text-white transition-colors">Instagram</Link>
             </div>
 
             <div className="flex items-center gap-2">
