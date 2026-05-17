@@ -153,19 +153,6 @@ export default function Home() {
                 </div>
 
                 <div className="w-full mt-auto pt-8 border-t border-white/5">
-                  <div className="flex flex-col gap-1 mb-6">
-                    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-white/40">
-                      <span>Valor Avulso (4 cortes)</span>
-                      <span className="line-through">R$ 180,00</span>
-                    </div>
-                    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-emerald-500 font-bold">
-                      <span>Economia no Semestral</span>
-                      <span>- R$ 110,10</span>
-                    </div>
-                    <div className="text-[10px] uppercase tracking-widest text-primary font-anton mt-1">
-                      pague somente 69,90 R$/mês
-                    </div>
-                  </div>
                   <Link href="/checkout?plan=basico" className="w-full">
                     <button className="w-full h-20 bg-primary text-black font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:scale-[1.02] active:scale-95 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)]">
                       Escolher plano
@@ -209,31 +196,9 @@ export default function Home() {
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
                     <Check className="w-5 h-5 text-primary shrink-0" /> Desconto em produtos
                   </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Brindes exclusivos
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Sorteios mensais
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Hidratação capilar e facial
-                  </div>
                 </div>
 
                 <div className="w-full mt-auto pt-8 border-t border-white/5">
-                  <div className="flex flex-col gap-1 mb-6">
-                    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-white/40">
-                      <span>Valor Avulso (4x Completo)</span>
-                      <span className="line-through">R$ 360,00</span>
-                    </div>
-                    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-emerald-500 font-bold">
-                      <span>Economia no Semestral</span>
-                      <span>- R$ 215,00</span>
-                    </div>
-                    <div className="text-[10px] uppercase tracking-widest text-primary font-anton mt-1">
-                      pague somente 145,00 R$/mês
-                    </div>
-                  </div>
                   <Link href="/checkout?plan=gold" className="w-full">
                     <button className="w-full h-20 bg-transparent text-white border border-white/10 font-anton text-lg uppercase tracking-[0.3em] rounded-full hover:bg-white hover:text-black hover:border-white transition-all active:scale-95">
                       Escolher plano
@@ -246,8 +211,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Seção Regras Detalhadas */}
-      <section id="regras" className="relative py-24 md:py-40 bg-[#030303] overflow-hidden">
+      {/* Seção Regras Detalhadas (Nova seção dentro da Home) */}
+      <section id="regras" className="relative py-24 md:py-40 bg-[#030303] overflow-hidden border-t border-white/5">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="container mx-auto px-4 max-w-5xl relative z-10">
           <div className="text-center mb-16 md:mb-24">
