@@ -21,6 +21,7 @@ export function Navbar() {
         
         <div className="flex items-center gap-3 md:gap-8 font-medium uppercase tracking-[0.15em] text-[8px] md:text-[10px] mx-2">
           <Link href="/" className="text-neutral-400 hover:text-white transition-colors whitespace-nowrap">Início</Link>
+          <Link href="/saiba-mais" className="text-neutral-400 hover:text-white transition-colors whitespace-nowrap">Regras</Link>
         </div>
 
         <Link href={EXTERNAL_BOOKING_URL} target="_blank" className="shrink-0">
