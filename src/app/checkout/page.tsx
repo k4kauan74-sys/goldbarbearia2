@@ -47,7 +47,7 @@ const DIRECT_LINKS = {
     semestral: "https://invoice.infinitepay.io/plans/thasha_magulas/ANaUkabAIM"
   },
   gold: {
-    semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/3Kvy4qCYn"
+    semestral: "https://invoice.infinitepay.io/plans/thasha_magulas/Ae3brIQ8bN"
   }
 };
 
