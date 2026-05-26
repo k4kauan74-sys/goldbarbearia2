@@ -20,7 +20,7 @@
         "name": { "type": "string" },
         "email": { "type": "string" },
         "cpf": { "type": "string" },
-        "plan": { "type": "string", "enum": ["mensal", "trimestral", "semestral", null] },
+        "plan": { "type": "string", "enum": ["semestral", null] },
         "planType": { "type": "string", "enum": ["basico", "gold", null] },
         "subscriptionStatus": { "type": "string", "enum": ["ativa", "inativa", "pendente"] },
         "createdAt": { "type": "string", "format": "date-time" },
@@ -70,11 +70,11 @@
   },
   "firestore": {
     "/admin_roles/{adminUid}": {
-      "schema": { "$ref": "#/entities/AdminUser" },
+      "schema": { "$ref": "#/backend/entities/AdminUser" },
       "description": "Papéis administrativos."
     },
     "/clients/{uid}": {
-      "schema": { "$ref": "#/entities/ClientProfile" },
+      "schema": { "$ref": "#/backend/entities/ClientProfile" },
       "description": "Dados do cliente e assinatura."
     },
     "/professionals/{professionalId}": {

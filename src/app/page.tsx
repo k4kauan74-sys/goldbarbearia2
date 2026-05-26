@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { ArrowRight, Scissors, Check, Crown, Clock, ListOrdered, Calendar, Users, CheckCircle2 } from "lucide-react";
@@ -99,17 +100,17 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16 md:mb-24">
             <span className="text-primary uppercase text-[10px] font-black tracking-[0.5em] mb-4 block animate-in fade-in slide-in-from-bottom-4 duration-700">
-              Planos e preços
+              Assinatura Semestral
             </span>
             <h2 className="text-5xl md:text-8xl font-anton text-white uppercase tracking-tighter mb-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
-              Escolha o plano ideal para você
+              O visual perfeito o ano todo
             </h2>
             <div className="flex flex-wrap justify-center gap-6 md:gap-12 text-[10px] font-bold uppercase tracking-widest text-[#F5F5F5]/40 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-primary" /> Atendimento prioritário
               </div>
               <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-primary" /> Economia mensal garantida
+                <Check className="w-4 h-4 text-primary" /> Economia garantida
               </div>
             </div>
           </div>
@@ -121,7 +122,7 @@ export default function Home() {
               <div className="relative h-full glass border-primary/20 p-8 md:p-16 rounded-[3rem] flex flex-col items-start text-left shadow-[0_0_50px_rgba(212,175,55,0.05)]">
                 <div className="absolute top-8 right-8">
                   <span className="bg-primary text-black text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full">
-                    Mais Popular
+                    Semestral
                   </span>
                 </div>
                 
@@ -165,6 +166,11 @@ export default function Home() {
             {/* Plano Gold */}
             <div className="relative group animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
               <div className="relative h-full glass border-white/10 p-8 md:p-16 rounded-[3rem] flex flex-col items-start text-left hover:border-primary/20 transition-all duration-700">
+                <div className="absolute top-8 right-8">
+                  <span className="bg-[#D4AF37] text-black text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full">
+                    Elite Semestral
+                  </span>
+                </div>
                 <div className="mb-10">
                   <h3 className="text-4xl font-anton text-white uppercase tracking-tighter mb-3">Plano Gold</h3>
                   <p className="text-[#F5F5F5]/40 text-[11px] uppercase font-bold tracking-[0.2em] leading-relaxed max-w-[240px]">
@@ -211,7 +217,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Seção Regras Detalhadas (Nova seção dentro da Home) */}
+      {/* Seção Regras Detalhadas */}
       <section id="regras" className="relative py-24 md:py-40 bg-[#030303] overflow-hidden border-t border-white/5">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="container mx-auto px-4 max-w-5xl relative z-10">

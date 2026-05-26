@@ -3,55 +3,50 @@ import { NextRequest, NextResponse } from 'next/server';
 import { MercadoPagoConfig, PreApproval } from 'mercadopago';
 
 // Configuração do Mercado Pago
-// Access Token (Privado - Usado no Servidor)
-// APP_USR-2221276034207684-042717-ec1dc710f61e0ce62de9933e069ef4cb-784803379
 const client = new MercadoPagoConfig({ 
   accessToken: 'APP_USR-2221276034207684-042717-ec1dc710f61e0ce62de9933e069ef4cb-784803379' 
 });
 
-// Chave Pública (Identificador - APP_USR-f851c8dc-b925-4f8c-b8bc-0cba049c2f6a)
-
 export async function POST(req: NextRequest) {
   try {
-    const { email, plan, period, planType, coupon } = await req.json();
+    const { email, planType, coupon } = await req.json();
 
     if (!email) {
       return NextResponse.json({ error: "Email é obrigatório" }, { status: 400 });
     }
 
+    // Apenas planos semestrais agora
     const prices: any = {
-      basico: { mensal: 119.9, trimestral: 89.9, semestral: 69.9 },
-      gold: { mensal: 199.9, trimestral: 185.0, semestral: 145.0 }
+      basico: 69.9,
+      gold: 145.0
     };
 
-    const periodMonths: any = { mensal: 1, trimestral: 3, semestral: 6 };
-    
-    if (!prices[planType] || !prices[planType][period]) {
-      return NextResponse.json({ error: "Plano ou período inválido" }, { status: 400 });
+    if (!prices[planType]) {
+      return NextResponse.json({ error: "Plano inválido" }, { status: 400 });
     }
 
-    let amount = prices[planType][period];
+    let amount = prices[planType];
 
-    // Aplicação do desconto de 30% se o cupom for GOLD30 e o plano for semestral
-    if (coupon === "GOLD30" && period === "semestral") {
+    // Aplicação do desconto de 30% se o cupom for GOLD30
+    if (coupon === "GOLD30") {
       amount = Number((amount * 0.7).toFixed(2));
     }
 
     const preapproval = new PreApproval(client);
     
-    // Configuração da assinatura recorrente
+    // Configuração da assinatura recorrente semestral
     const body = {
       back_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`,
-      reason: `Assinatura Club Gold - ${planType.toUpperCase()} ${period.toUpperCase()}`,
+      reason: `Assinatura Club Gold - ${planType.toUpperCase()} SEMESTRAL`,
       auto_recurring: {
-        frequency: periodMonths[period],
+        frequency: 6,
         frequency_type: "months",
         transaction_amount: amount,
         currency_id: "BRL"
       },
       payer_email: email,
       status: "pending",
-      external_reference: `${email}_${planType}_${period}`
+      external_reference: `${email}_${planType}_semestral`
     };
 
     const response = await preapproval.create({ body });

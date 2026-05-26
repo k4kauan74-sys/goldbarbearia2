@@ -8,13 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
 import { Check, ChevronLeft, CreditCard, Tag, Sparkles, Percent, TrendingDown, Loader2, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -22,17 +15,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/firebase";
 
 type PlanType = 'basico' | 'gold';
-type PeriodType = 'mensal' | 'trimestral' | 'semestral';
+type PeriodType = 'semestral';
 
 const PRICES = {
   basico: {
-    mensal: 119.90,
-    trimestral: 89.90,
     semestral: 69.90
   },
   gold: {
-    mensal: 199.90,
-    trimestral: 185.00,
     semestral: 145.00
   }
 };
@@ -49,22 +38,16 @@ const INDIVIDUAL_COMPARISON = {
 };
 
 const PERIOD_MONTHS = {
-  mensal: 1,
-  trimestral: 3,
   semestral: 6
 };
 
 // Links de Pagamento Diretos Externos
 const DIRECT_LINKS = {
   basico: {
-    semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/2OzS7QTrD",
-    trimestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/7kcKDAIv5V",
-    mensal: "whatsapp"
+    semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/2OzS7QTrD"
   },
   gold: {
-    semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/3Kvy4qCYn",
-    trimestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/1I6UkzKFRD",
-    mensal: "whatsapp"
+    semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/3Kvy4qCYn"
   }
 };
 
@@ -75,7 +58,7 @@ function CheckoutContent() {
   const { user } = useUser();
   
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('basico');
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('semestral');
+  const [selectedPeriod] = useState<PeriodType>('semestral');
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -104,9 +87,7 @@ function CheckoutContent() {
       setAppliedCoupon(code);
       toast({
         title: "Cupom Aplicado!",
-        description: selectedPeriod === "semestral" 
-          ? "30% de desconto aplicado com sucesso." 
-          : "Cupom válido apenas para planos semestrais.",
+        description: "30% de desconto aplicado com sucesso.",
       });
     } else {
       toast({
@@ -137,13 +118,12 @@ function CheckoutContent() {
 
     const whatsappBase = "https://wa.me/554892465639";
     const planName = selectedPlan === 'basico' ? 'Básico' : 'Gold';
-    const periodName = selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1);
-    const message = `Olá! Gostaria de assinar o Plano ${planName} (${periodName}). Meu email é ${user.email}.`;
+    const message = `Olá! Gostaria de assinar o Plano ${planName} (Semestral). Meu email é ${user.email}.`;
     const whatsappLink = `${whatsappBase}?text=${encodeURIComponent(message)}`;
 
     const link = DIRECT_LINKS[selectedPlan][selectedPeriod];
 
-    if (link === "whatsapp" || appliedCoupon) {
+    if (appliedCoupon) {
       window.open(whatsappLink, '_blank');
       setIsProcessing(false);
       return;
@@ -198,44 +178,17 @@ function CheckoutContent() {
               </button>
             </div>
 
-            <div className="space-y-4">
-              <Label className="text-[10px] uppercase tracking-[0.3em] font-black text-white/60 ml-1">
-                Escolha o período
-              </Label>
-              <Select value={selectedPeriod} onValueChange={(v: PeriodType) => setSelectedPeriod(v)}>
-                <SelectTrigger className="h-20 bg-white/[0.02] border-white/5 rounded-3xl px-8 text-lg font-anton uppercase tracking-widest text-white focus:ring-primary/20">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#0A0A0A] border-white/10 rounded-2xl">
-                  <SelectItem value="mensal" className="py-4 text-white hover:bg-white/5 cursor-pointer">
-                    MENSAL — R$ {PRICES[selectedPlan].mensal.toFixed(2)}/MÊS
-                  </SelectItem>
-                  <SelectItem value="trimestral" className="py-4 text-white hover:bg-white/5 cursor-pointer">
-                    TRIMESTRAL — R$ {PRICES[selectedPlan].trimestral.toFixed(2)}/MÊS
-                  </SelectItem>
-                  <SelectItem value="semestral" className="py-4 text-white hover:bg-white/5 cursor-pointer">
-                    SEMESTRAL — R$ {PRICES[selectedPlan].semestral.toFixed(2)}/MÊS
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             <Card className="relative overflow-hidden bg-white/[0.02] border-white/5 p-8 rounded-[2.5rem] group">
               <div className="absolute top-0 right-0 p-4 opacity-10">
                 <Sparkles className="w-16 h-16 text-primary" />
               </div>
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="max-w-md">
-                  <p className="text-white text-lg font-anton uppercase tracking-tight leading-tight mb-2">
-                    💸 ECONOMIZE MAIS ESCOLHENDO PLANOS DE MAIOR DURAÇÃO E GARANTA O MELHOR CUSTO-BENEFÍCIO
-                  </p>
-                </div>
-                <Button 
-                  onClick={() => setSelectedPeriod('semestral')}
-                  className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-black transition-all rounded-full font-anton uppercase tracking-widest text-xs h-12 px-8"
-                >
-                  Aproveitar oferta
-                </Button>
+              <div className="relative z-10">
+                <p className="text-white text-lg font-anton uppercase tracking-tight leading-tight mb-2">
+                  PLANO SEMESTRAL SELECIONADO
+                </p>
+                <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">
+                  Melhor custo-benefício garantido para sua rotina de cuidados.
+                </p>
               </div>
             </Card>
           </div>
@@ -253,7 +206,7 @@ function CheckoutContent() {
                       {selectedPlan === 'basico' ? 'Plano Básico' : 'Plano Gold'}
                     </p>
                     <p className="text-[10px] text-white/40 uppercase font-bold tracking-[0.2em] mt-1">
-                      Duração: {PERIOD_MONTHS[selectedPeriod]} {PERIOD_MONTHS[selectedPeriod] === 1 ? 'mês' : 'meses'}
+                      Período: Semestral (6 meses)
                     </p>
                   </div>
                   <div className="text-right">
@@ -335,10 +288,10 @@ function CheckoutContent() {
                     <Loader2 className="animate-spin h-6 w-6" />
                   ) : (
                     <>
-                      {DIRECT_LINKS[selectedPlan][selectedPeriod] === "whatsapp" || appliedCoupon ? (
+                      {appliedCoupon ? (
                         <>Finalizar no WhatsApp <MessageCircle className="ml-2 w-5 h-5 group-hover:scale-125 transition-transform" /></>
                       ) : (
-                        <>Continuar <Sparkles className="ml-2 w-5 h-5 group-hover:scale-125 transition-transform" /></>
+                        <>Assinar Agora <Sparkles className="ml-2 w-5 h-5 group-hover:scale-125 transition-transform" /></>
                       )}
                     </>
                   )}
