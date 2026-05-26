@@ -44,7 +44,7 @@ const PERIOD_MONTHS = {
 // Links de Pagamento Diretos Externos
 const DIRECT_LINKS = {
   basico: {
-    semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/2OzS7QTrD"
+    semestral: "https://invoice.infinitepay.io/plans/thasha_magulas/ANaUkabAIM"
   },
   gold: {
     semestral: "https://invoice.infinitepay.io/plans/gold-barbearia-7/3Kvy4qCYn"
