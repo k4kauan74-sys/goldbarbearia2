@@ -4,8 +4,6 @@ import { Navbar } from "@/components/navbar";
 import { ArrowRight, Scissors, Check, Crown, Clock, ListOrdered, Calendar, Users, CheckCircle2 } from "lucide-react";
 
 export default function Home() {
-  const EXTERNAL_BOOKING_URL = "https://agendeonline.salonsoft.com.br/goldbarbearia";
-
   return (
     <div className="flex flex-col min-h-screen bg-background selection:bg-primary/30">
       <Navbar />
@@ -30,7 +28,7 @@ export default function Home() {
           
           <div className="flex flex-col items-center gap-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
             <div className="shiny-border">
-              <Link href={EXTERNAL_BOOKING_URL} target="_blank" className="shiny-border-content px-12 py-5 flex items-center gap-3 group">
+              <Link href="/agendar" className="shiny-border-content px-12 py-5 flex items-center gap-3 group">
                 <span className="font-bold uppercase tracking-[0.3em] text-xs text-white group-hover:text-primary transition-colors">Agendar Agora</span>
                 <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
               </Link>
