@@ -50,3 +50,4 @@ Como este projeto é editado no Firebase Studio, para refletir estas mudanças n
 
 ---
 Desenvolvido com foco em alta performance e design premium.
+# goldbarbearia-2
