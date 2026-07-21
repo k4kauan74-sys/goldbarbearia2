@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useFirestore } from "@/firebase";
+import { useFirestore, useAuth } from "@/firebase";
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
@@ -21,13 +22,24 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const firestore = useFirestore();
+  const auth = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Admin global bypass (Production should use Auth correctly, but keeping for prototype flow)
+      // 1. Tenta autenticação no Firebase Auth primeiro para garantir que request.auth exista nas rules
+      try {
+        await signInWithEmailAndPassword(auth, username.toLowerCase(), password);
+      } catch (authError) {
+        // Se falhar o auth real, mas for o admin hardcoded (para protótipo), tratamos abaixo
+        if (!(username.toLowerCase() === "admin@barber.com" && password === "admin123")) {
+          throw authError;
+        }
+      }
+
+      // 2. Admin global bypass (Lógica de sessão local para o dashboard)
       if (username.toLowerCase() === "admin@barber.com" && password === "admin123") {
         const adminUser = {
           id: 'admin',
@@ -40,7 +52,7 @@ export default function AdminLoginPage() {
         return;
       }
 
-      // Check Professionals in Firestore
+      // 3. Checa Profissionais no Firestore (Barbeiros)
       const profsRef = collection(firestore, "professionals");
       const q = query(profsRef, where("email", "==", username.toLowerCase()));
       const querySnapshot = await getDocs(q);
@@ -64,12 +76,16 @@ export default function AdminLoginPage() {
 
       toast({ 
         title: "Erro de Autenticação", 
-        description: "Usuário ou senha inválidos no banco de dados.", 
+        description: "Usuário ou senha inválidos.", 
         variant: "destructive" 
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast({ title: "Erro de Conexão", description: "Não foi possível conectar ao banco de dados.", variant: "destructive" });
+      toast({ 
+        title: "Erro de Acesso", 
+        description: error.message || "Não foi possível realizar o login.", 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
