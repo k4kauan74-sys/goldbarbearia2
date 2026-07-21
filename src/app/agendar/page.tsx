@@ -1,39 +1,39 @@
 
 "use client";
 
-import { useEffect } from "react";
 import { Navbar } from "@/components/navbar";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { BookingForm } from "@/components/booking-form";
 
 export default function AgendarPage() {
-  const EXTERNAL_BOOKING_URL = "https://agendeonline.salonsoft.com.br/goldbarbearia";
-
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-[#030303] flex flex-col pt-32 pb-20 relative overflow-hidden">
       <Navbar />
       
       {/* Background Decor */}
-      <div className="absolute -top-20 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/2 -right-20 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[160px] pointer-events-none opacity-20" />
       
-      <main className="container mx-auto px-4 text-center relative z-10 space-y-8">
-        <h1 className="text-5xl md:text-8xl font-anton text-white uppercase tracking-tighter">
-          QUASE <span className="text-shimmer">LÁ</span>
-        </h1>
-        <p className="text-white/40 text-lg md:text-xl font-medium max-w-lg mx-auto uppercase tracking-widest">
-          Você será redirecionado para nossa plataforma oficial de agendamentos.
-        </p>
-        
-        <div className="pt-8">
-          <Link href={EXTERNAL_BOOKING_URL} target="_blank">
-            <Button size="lg" className="h-20 px-12 bg-primary text-black font-anton text-xl uppercase tracking-widest rounded-full hover:scale-105 transition-transform">
-              Ir para Agendamento <ArrowRight className="ml-3 h-6 w-6" />
-            </Button>
-          </Link>
+      <main className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl md:text-8xl font-anton text-white uppercase tracking-tighter mb-4">
+            RESERVE SEU <span className="text-shimmer">MOMENTO</span>
+          </h1>
+          <p className="text-white/40 uppercase tracking-[0.4em] text-[10px] font-bold">
+            Sincronização em tempo real com nossos especialistas
+          </p>
         </div>
+
+        <BookingForm />
       </main>
+
+      {/* Footer Copy */}
+      <footer className="mt-20 py-10 border-t border-white/5">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-bold">
+            &copy; {new Date().getFullYear()} Gold Barbearia — Agendamento Seguro Cloud.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
