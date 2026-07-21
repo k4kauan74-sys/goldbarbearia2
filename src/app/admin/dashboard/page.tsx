@@ -108,7 +108,6 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     if (!firestore || !adminSession) return;
 
-    // Apenas inicia o listener uma vez
     if (initializedListener.current) return;
     initializedListener.current = true;
 
@@ -119,9 +118,6 @@ export default function AdminDashboardPage() {
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
           const apt = change.doc.data() as Appointment;
-          // Ignora se o agendamento for muito antigo (limite de 1 minuto da carga inicial)
-          // Na prática, snapshot inicial traz tudo como 'added', então usamos uma flag ou comparamos timestamp
-          // Para o protótipo, vamos considerar que se o dashboard já estava aberto e mudou algo, avisamos
           if (change.doc.metadata.hasPendingWrites === false) {
              toast({
                title: "Novo Agendamento!",
@@ -219,7 +215,6 @@ export default function AdminDashboardPage() {
       return;
     }
     
-    // Check double booking manually for safety before adding
     const isTaken = appointments.some(a => 
       a.professionalId === profIdToSave && 
       a.date === aptDate && 
@@ -332,7 +327,10 @@ export default function AdminDashboardPage() {
   };
 
   const handleSaveService = () => {
-    if (!srvName || !srvPrice || !srvDuration) return;
+    if (!srvName || !srvPrice || !srvDuration) {
+      toast({ title: "Erro", description: "Preencha os campos obrigatórios.", variant: "destructive" });
+      return;
+    }
     
     const data = { 
       name: srvName, price: Number(srvPrice), duration: Number(srvDuration), description: srvDescription 
@@ -346,11 +344,12 @@ export default function AdminDashboardPage() {
     
     setIsServiceDialogOpen(false);
     resetServiceForm();
-    toast({ title: "Sucesso", description: "Serviço atualizado." });
+    toast({ title: "Sucesso", description: "Serviço atualizado com sucesso." });
   };
 
   const deleteService = (id: string) => {
     deleteDocumentNonBlocking(doc(firestore, "services", id));
+    toast({ title: "Removido", description: "Serviço excluído." });
   };
 
   const resetServiceForm = () => {
@@ -448,7 +447,7 @@ export default function AdminDashboardPage() {
                <Dialog open={isProfDialogOpen} onOpenChange={setIsProfDialogOpen}>
                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-[#D4AF37] text-black font-anton uppercase rounded-full">{isAdmin ? <UserPlus className="h-3 w-3 mr-1" /> : <Edit2 className="h-3 w-3 mr-1" />} {isAdmin ? "Novo" : "Editar"}</Button></DialogTrigger>
                <DialogContent className="bg-[#0a0a0a] border-white/10 text-[#F5F5F5] w-[90%] max-h-[90vh] flex flex-col">
-                 <DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">{isAdmin ? "Especialista" : "Meu Perfil"}</DialogTitle></DialogHeader>
+                 <DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">{isAdmin ? "Especialista" : "Novo"}</DialogTitle></DialogHeader>
                  <ScrollArea className="flex-1 pr-2">
                    <div className="grid grid-cols-2 gap-3 py-2">
                      <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
@@ -495,6 +494,41 @@ export default function AdminDashboardPage() {
                  <Button onClick={handleSaveProfessional} className="w-full bg-[#D4AF37] text-black font-anton uppercase h-10 mt-4 shrink-0">Salvar</Button>
                </DialogContent>
              </Dialog>
+            )}
+            {viewMode === 'services' && isAdmin && (
+              <Dialog open={isServiceDialogOpen} onOpenChange={setIsServiceDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="h-8 text-[9px] bg-[#D4AF37] text-black font-anton uppercase rounded-full" onClick={resetServiceForm}>
+                    <Plus className="h-3 w-3 mr-1" /> Novo
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-[#0a0a0a] border-white/10 text-[#F5F5F5] w-[90%]">
+                  <DialogHeader>
+                    <DialogTitle className="font-anton uppercase text-[#F5F5F5]">
+                      {editingService ? "Editar Serviço" : "Novo Serviço"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="grid grid-cols-2 gap-3 py-2">
+                    <div className="space-y-1 col-span-2">
+                      <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nome do Serviço</Label>
+                      <Input value={srvName} onChange={e=>setSrvName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Preço (R$)</Label>
+                      <Input type="number" value={srvPrice} onChange={e=>setSrvPrice(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Duração (Min)</Label>
+                      <Input type="number" value={srvDuration} onChange={e=>setSrvDuration(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" />
+                    </div>
+                    <div className="space-y-1 col-span-2">
+                      <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Descrição</Label>
+                      <Input value={srvDescription} onChange={e=>setSrvDescription(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" />
+                    </div>
+                  </div>
+                  <Button onClick={handleSaveService} className="w-full bg-[#D4AF37] text-black font-anton uppercase h-10 mt-2">Salvar</Button>
+                </DialogContent>
+              </Dialog>
             )}
           </div>
         </div>
