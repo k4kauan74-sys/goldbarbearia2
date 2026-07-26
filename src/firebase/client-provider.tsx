@@ -11,19 +11,31 @@ interface FirebaseClientProviderProps {
 
 export function FirebaseClientProvider({ children }: FirebaseClientProviderProps) {
   const firebaseServices = useMemo(() => {
-    // Initialize Firebase on the client side, once per component mount.
     return initializeFirebase();
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
   useEffect(() => {
     const auth = firebaseServices.auth;
-    // Garante que todo visitante tenha uma identidade (anônima ou real)
-    // Isso permite que as regras de segurança do Firestore validem o acesso.
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (!user) {
         initiateAnonymousSignIn(auth);
       }
     });
+
+    // Registro do Service Worker para PWA e Push VAPID
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(
+          (registration) => {
+            console.log('SW registered: ', registration);
+          },
+          (registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          }
+        );
+      });
+    }
+
     return () => unsubscribe();
   }, [firebaseServices.auth]);
 
