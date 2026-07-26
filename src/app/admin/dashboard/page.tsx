@@ -17,11 +17,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
-  Bell
+  Bell,
+  BellOff
 } from "lucide-react";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { collection, doc, query, where, onSnapshot } from "firebase/firestore";
+import { collection, doc, query, onSnapshot, where } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +58,7 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const { user: firebaseUser, isUserLoading } = useUser();
   const initializedListener = useRef(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   // Dialog states
   const [isProfDialogOpen, setIsProfDialogOpen] = useState(false);
@@ -102,7 +104,22 @@ export default function AdminDashboardPage() {
     if (parsedUser.role === 'barber') {
       setSelectedProfFilter(parsedUser.id);
     }
+
+    // Check notification permission
+    if (typeof window !== 'undefined' && "Notification" in window) {
+      setNotificationsEnabled(Notification.permission === "granted");
+    }
   }, [router]);
+
+  const requestNotificationPermission = async () => {
+    if (typeof window !== 'undefined' && "Notification" in window) {
+      const permission = await Notification.requestPermission();
+      setNotificationsEnabled(permission === "granted");
+      if (permission === "granted") {
+        toast({ title: "Notificações Ativadas", description: "Você receberá alertas de novos agendamentos." });
+      }
+    }
+  };
 
   // Real-time Notification for new appointments
   useEffect(() => {
@@ -118,13 +135,23 @@ export default function AdminDashboardPage() {
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
           const apt = change.doc.data() as Appointment;
+          // Metadata check to avoid notifying the user who just created the doc locally
           if (change.doc.metadata.hasPendingWrites === false) {
+             // 1. Toast Notification
              toast({
                title: "Novo Agendamento!",
                description: `${apt.clientName} agendou para ${apt.date} às ${apt.time}`,
                variant: "default",
                className: "bg-primary text-black border-none"
              });
+
+             // 2. Push Notification (Browser Native)
+             if (Notification.permission === "granted") {
+               new Notification("GOLD BARBEARIA: Novo Agendamento", {
+                 body: `${apt.clientName} - ${apt.time}`,
+                 icon: "/favicon.ico"
+               });
+             }
           }
         }
       });
@@ -401,6 +428,14 @@ export default function AdminDashboardPage() {
           <span className="text-[#F5F5F5]">{adminSession.role === 'admin' ? ' ADMIN' : ' STAFF'}</span>
         </div>
         <div className="flex gap-1">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={requestNotificationPermission} 
+            className={cn("h-8 w-8", notificationsEnabled ? "text-emerald-500" : "text-white/20")}
+          >
+            {notificationsEnabled ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
+          </Button>
           <Button variant="ghost" size="icon" onClick={() => setViewMode('appointments')} className={cn("h-8 w-8", viewMode === 'appointments' && "text-[#D4AF37]")}><CalendarIcon className="h-4 w-4" /></Button>
           <Button variant="ghost" size="icon" onClick={() => setViewMode('professionals')} className={cn("h-8 w-8", viewMode === 'professionals' && "text-[#D4AF37]")}><Users className="h-4 w-4" /></Button>
           {isAdmin && (
