@@ -18,7 +18,8 @@ import {
   ChevronRight,
   Clock,
   Bell,
-  BellOff
+  BellOff,
+  Zap
 } from "lucide-react";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -47,6 +48,9 @@ import {
 
 type ViewMode = 'appointments' | 'professionals' | 'services' | 'finance';
 
+// Chave Pública VAPID
+const VAPID_PUBLIC_KEY = 'BFLc0T5pWz2R_7r8F3u7H3YpYfD8W-Nq3_k_R_z_w_L_z_E_Y_z_R_L_W_z_w_L_z_E_Y_z_R_L_W';
+
 export default function AdminDashboardPage() {
   const [adminSession, setAdminSession] = useState<AuthUser | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('appointments');
@@ -58,7 +62,7 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const { user: firebaseUser, isUserLoading } = useUser();
   const initializedListener = useRef(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isPushEnabled, setIsPushEnabled] = useState(false);
 
   // Dialog states
   const [isProfDialogOpen, setIsProfDialogOpen] = useState(false);
@@ -105,26 +109,73 @@ export default function AdminDashboardPage() {
       setSelectedProfFilter(parsedUser.id);
     }
 
-    // Check notification permission
-    if (typeof window !== 'undefined' && "Notification" in window) {
-      setNotificationsEnabled(Notification.permission === "granted");
+    // Verifica se o Service Worker já tem inscrição
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.pushManager.getSubscription().then(sub => {
+          setIsPushEnabled(!!sub);
+        });
+      });
     }
   }, [router]);
 
-  const requestNotificationPermission = async () => {
-    if (typeof window !== 'undefined' && "Notification" in window) {
-      const permission = await Notification.requestPermission();
-      setNotificationsEnabled(permission === "granted");
-      if (permission === "granted") {
-        toast({ title: "Notificações Ativadas", description: "Você receberá alertas de novos agendamentos." });
+  const urlBase64ToUint8Array = (base64String: string) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  };
+
+  const togglePushNotifications = async () => {
+    if (!('serviceWorker' in navigator) || !adminSession) {
+      toast({ title: "Erro", description: "Push não suportado neste navegador.", variant: "destructive" });
+      return;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      
+      if (isPushEnabled) {
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          await subscription.unsubscribe();
+          setIsPushEnabled(false);
+          toast({ title: "Notificações", description: "Alertas desativados." });
+        }
+      } else {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          toast({ title: "Permissão Negada", description: "Ative as notificações no navegador.", variant: "destructive" });
+          return;
+        }
+
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+
+        await fetch('/api/push/subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscription, userId: adminSession.id })
+        });
+
+        setIsPushEnabled(true);
+        toast({ title: "Push Ativado", description: "Você agora recebe alertas em tempo real." });
       }
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Erro no Push", description: "Não foi possível configurar o VAPID.", variant: "destructive" });
     }
   };
 
-  // Real-time Notification for new appointments
+  // Real-time listener para novos agendamentos (local toast)
   useEffect(() => {
     if (!firestore || !adminSession) return;
-
     if (initializedListener.current) return;
     initializedListener.current = true;
 
@@ -133,26 +184,13 @@ export default function AdminDashboardPage() {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
+        if (change.type === "added" && change.doc.metadata.hasPendingWrites === false) {
           const apt = change.doc.data() as Appointment;
-          // Metadata check to avoid notifying the user who just created the doc locally
-          if (change.doc.metadata.hasPendingWrites === false) {
-             // 1. Toast Notification
-             toast({
-               title: "Novo Agendamento!",
-               description: `${apt.clientName} agendou para ${apt.date} às ${apt.time}`,
-               variant: "default",
-               className: "bg-primary text-black border-none"
-             });
-
-             // 2. Push Notification (Browser Native)
-             if (Notification.permission === "granted") {
-               new Notification("GOLD BARBEARIA: Novo Agendamento", {
-                 body: `${apt.clientName} - ${apt.time}`,
-                 icon: "/favicon.ico"
-               });
-             }
-          }
+          toast({
+            title: "Novo Agendamento!",
+            description: `${apt.clientName} às ${apt.time}`,
+            className: "bg-primary text-black border-none"
+          });
         }
       });
     });
@@ -273,12 +311,10 @@ export default function AdminDashboardPage() {
     
     setIsAptDialogOpen(false);
     resetAptForm();
-    toast({ title: "Sucesso", description: "Agendamento sincronizado." });
   };
 
   const deleteAppointment = (id: string) => {
     deleteDocumentNonBlocking(doc(firestore, "appointments", id));
-    toast({ title: "Removido", description: "Agendamento excluído do sistema." });
   };
 
   const resetAptForm = () => {
@@ -320,23 +356,16 @@ export default function AdminDashboardPage() {
 
     if (editingProf) {
       updateDocumentNonBlocking(doc(firestore, "professionals", editingProf.id), data);
-      if (adminSession && editingProf.id === adminSession.id) {
-        const updatedUser = { ...adminSession, name: profName, email: profEmail };
-        setAdminSession(updatedUser);
-        localStorage.setItem("gold_user", JSON.stringify(updatedUser));
-      }
     } else {
       addDocumentNonBlocking(collection(firestore, "professionals"), data);
     }
     
     setIsProfDialogOpen(false);
     resetProfForm();
-    toast({ title: "Sucesso", description: "Perfil e expediente atualizados." });
   };
 
   const deleteProfessional = (id: string) => {
     deleteDocumentNonBlocking(doc(firestore, "professionals", id));
-    toast({ title: "Removido", description: "Profissional removido." });
   };
 
   const resetProfForm = () => {
@@ -354,29 +383,19 @@ export default function AdminDashboardPage() {
   };
 
   const handleSaveService = () => {
-    if (!srvName || !srvPrice || !srvDuration) {
-      toast({ title: "Erro", description: "Preencha os campos obrigatórios.", variant: "destructive" });
-      return;
-    }
-    
-    const data = { 
-      name: srvName, price: Number(srvPrice), duration: Number(srvDuration), description: srvDescription 
-    };
-
+    if (!srvName || !srvPrice || !srvDuration) return;
+    const data = { name: srvName, price: Number(srvPrice), duration: Number(srvDuration), description: srvDescription };
     if (editingService) {
       updateDocumentNonBlocking(doc(firestore, "services", editingService.id), data);
     } else {
       addDocumentNonBlocking(collection(firestore, "services"), data);
     }
-    
     setIsServiceDialogOpen(false);
     resetServiceForm();
-    toast({ title: "Sucesso", description: "Serviço atualizado com sucesso." });
   };
 
   const deleteService = (id: string) => {
     deleteDocumentNonBlocking(doc(firestore, "services", id));
-    toast({ title: "Removido", description: "Serviço excluído." });
   };
 
   const resetServiceForm = () => {
@@ -431,10 +450,10 @@ export default function AdminDashboardPage() {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={requestNotificationPermission} 
-            className={cn("h-8 w-8", notificationsEnabled ? "text-emerald-500" : "text-white/20")}
+            onClick={togglePushNotifications} 
+            className={cn("h-8 w-8 transition-colors", isPushEnabled ? "text-[#D4AF37]" : "text-white/20")}
           >
-            {notificationsEnabled ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
+            {isPushEnabled ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
           </Button>
           <Button variant="ghost" size="icon" onClick={() => setViewMode('appointments')} className={cn("h-8 w-8", viewMode === 'appointments' && "text-[#D4AF37]")}><CalendarIcon className="h-4 w-4" /></Button>
           <Button variant="ghost" size="icon" onClick={() => setViewMode('professionals')} className={cn("h-8 w-8", viewMode === 'professionals' && "text-[#D4AF37]")}><Users className="h-4 w-4" /></Button>
@@ -456,8 +475,10 @@ export default function AdminDashboardPage() {
               {viewMode === 'finance' && "CAIXA"}
             </h1>
             <div className="flex items-center gap-2 mt-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[7px] text-white/40 uppercase tracking-widest font-bold">Cloud Live Sync</span>
+              <span className={cn("w-1.5 h-1.5 rounded-full", isPushEnabled ? "bg-[#D4AF37] animate-pulse" : "bg-white/10")} />
+              <span className="text-[7px] text-white/40 uppercase tracking-widest font-bold">
+                {isPushEnabled ? "VAPID PUSH ACTIVE" : "PUSH SYNC STANDBY"}
+              </span>
             </div>
           </div>
           
@@ -487,15 +508,8 @@ export default function AdminDashboardPage() {
                    <div className="grid grid-cols-2 gap-3 py-2">
                      <div className="space-y-1 col-span-2 flex flex-col items-center mb-2">
                        <Label className="text-[8px] uppercase opacity-40 mb-2 text-[#F5F5F5]">Foto de Perfil</Label>
-                       <div 
-                         className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center"
-                         onClick={() => fileInputRef.current?.click()}
-                       >
-                         {profPhoto ? (
-                           <img src={profPhoto} className="w-full h-full object-cover" />
-                         ) : (
-                           <Upload className="h-4 w-4 opacity-20" />
-                         )}
+                       <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center" onClick={() => fileInputRef.current?.click()}>
+                         {profPhoto ? <img src={profPhoto} className="w-full h-full object-cover" /> : <Upload className="h-4 w-4 opacity-20" />}
                        </div>
                        <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} className="hidden" accept="image/*" />
                      </div>
@@ -508,18 +522,7 @@ export default function AdminDashboardPage() {
                        <ScrollArea className="h-48 border border-white/5 rounded-xl p-2 bg-white/[0.02]">
                          <div className="grid grid-cols-4 gap-2">
                            {TIME_SLOTS.map(slot => (
-                             <button
-                               key={slot}
-                               onClick={() => toggleWorkingHour(slot)}
-                               className={cn(
-                                 "py-1.5 rounded-lg text-[9px] font-anton border transition-all",
-                                 profWorkingHours.includes(slot) 
-                                   ? "bg-[#D4AF37] text-black border-[#D4AF37]" 
-                                   : "bg-transparent text-[#F5F5F5]/40 border-white/10"
-                               )}
-                             >
-                               {slot}
-                             </button>
+                             <button key={slot} onClick={() => toggleWorkingHour(slot)} className={cn("py-1.5 rounded-lg text-[9px] font-anton border transition-all", profWorkingHours.includes(slot) ? "bg-[#D4AF37] text-black border-[#D4AF37]" : "bg-transparent text-[#F5F5F5]/40 border-white/10")}>{slot}</button>
                            ))}
                          </div>
                        </ScrollArea>
@@ -532,34 +535,14 @@ export default function AdminDashboardPage() {
             )}
             {viewMode === 'services' && isAdmin && (
               <Dialog open={isServiceDialogOpen} onOpenChange={setIsServiceDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" className="h-8 text-[9px] bg-[#D4AF37] text-black font-anton uppercase rounded-full" onClick={resetServiceForm}>
-                    <Plus className="h-3 w-3 mr-1" /> Novo
-                  </Button>
-                </DialogTrigger>
+                <DialogTrigger asChild><Button size="sm" className="h-8 text-[9px] bg-[#D4AF37] text-black font-anton uppercase rounded-full" onClick={resetServiceForm}><Plus className="h-3 w-3 mr-1" /> Novo</Button></DialogTrigger>
                 <DialogContent className="bg-[#0a0a0a] border-white/10 text-[#F5F5F5] w-[90%]">
-                  <DialogHeader>
-                    <DialogTitle className="font-anton uppercase text-[#F5F5F5]">
-                      {editingService ? "Editar Serviço" : "Novo Serviço"}
-                    </DialogTitle>
-                  </DialogHeader>
+                  <DialogHeader><DialogTitle className="font-anton uppercase text-[#F5F5F5]">{editingService ? "Editar Serviço" : "Novo Serviço"}</DialogTitle></DialogHeader>
                   <div className="grid grid-cols-2 gap-3 py-2">
-                    <div className="space-y-1 col-span-2">
-                      <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nome do Serviço</Label>
-                      <Input value={srvName} onChange={e=>setSrvName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Preço (R$)</Label>
-                      <Input type="number" value={srvPrice} onChange={e=>setSrvPrice(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Duração (Min)</Label>
-                      <Input type="number" value={srvDuration} onChange={e=>setSrvDuration(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" />
-                    </div>
-                    <div className="space-y-1 col-span-2">
-                      <Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Descrição</Label>
-                      <Input value={srvDescription} onChange={e=>setSrvDescription(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" />
-                    </div>
+                    <div className="space-y-1 col-span-2"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Nome do Serviço</Label><Input value={srvName} onChange={e=>setSrvName(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Preço (R$)</Label><Input type="number" value={srvPrice} onChange={e=>setSrvPrice(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                    <div className="space-y-1"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Duração (Min)</Label><Input type="number" value={srvDuration} onChange={e=>setSrvDuration(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
+                    <div className="space-y-1 col-span-2"><Label className="text-[8px] uppercase opacity-40 text-[#F5F5F5]">Descrição</Label><Input value={srvDescription} onChange={e=>setSrvDescription(e.target.value)} className="h-8 text-xs bg-transparent border-white/10 text-[#F5F5F5]" /></div>
                   </div>
                   <Button onClick={handleSaveService} className="w-full bg-[#D4AF37] text-black font-anton uppercase h-10 mt-2">Salvar</Button>
                 </DialogContent>
@@ -668,9 +651,7 @@ export default function AdminDashboardPage() {
                     </div>
                     <div className="flex gap-1">
                       {(isAdmin || (adminSession && p.id === adminSession.id)) && (
-                        <Button variant="ghost" size="icon" onClick={() => openEditProf(p)} className="h-7 w-7 border border-white/5 text-[#F5F5F5]">
-                          <Edit2 className="h-3 w-3" />
-                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => openEditProf(p)} className="h-7 w-7 border border-white/5 text-[#F5F5F5]"><Edit2 className="h-3 w-3" /></Button>
                       )}
                       {isAdmin && (
                         <Button variant="ghost" size="icon" onClick={() => deleteProfessional(p.id)} className="h-7 w-7 border border-white/5 text-destructive"><Trash2 className="h-3 w-3" /></Button>
@@ -720,8 +701,8 @@ export default function AdminDashboardPage() {
 
       <footer className="h-10 border-t border-white/5 flex items-center justify-center px-4 bg-black">
         <div className="flex items-center gap-2">
-          <Bell className="h-3 w-3 text-emerald-500 animate-bounce" />
-          <span className="text-[7px] font-mono text-[#F5F5F5]/20 uppercase tracking-widest">Database Synced • Waiting for new bookings...</span>
+          <Zap className="h-3 w-3 text-[#D4AF37] animate-pulse" />
+          <span className="text-[7px] font-mono text-[#F5F5F5]/20 uppercase tracking-widest">VAPID Native Push Synchronized</span>
         </div>
       </footer>
     </div>

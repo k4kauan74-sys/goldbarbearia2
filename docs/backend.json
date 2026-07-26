@@ -63,6 +63,15 @@
         "status": { "type": "string" }
       },
       "required": ["id", "clientName", "clientId", "serviceId", "professionalId", "date", "time", "status"]
+    },
+    "PushSubscription": {
+      "title": "PushSubscription",
+      "type": "object",
+      "properties": {
+        "subscription": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["subscription"]
     }
   },
   "auth": {
@@ -88,6 +97,10 @@
     "/appointments/{appointmentId}": {
       "schema": { "$ref": "#/entities/Appointment" },
       "description": "Agendamentos realizados."
+    },
+    "/push_subscriptions/{userId}": {
+      "schema": { "$ref": "#/entities/PushSubscription" },
+      "description": "Inscrições para Web Push VAPID."
     }
   }
 }
