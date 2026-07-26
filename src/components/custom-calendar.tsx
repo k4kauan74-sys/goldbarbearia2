@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -28,7 +29,6 @@ export function CustomCalendar({ selectedDate, onSelect, disabledDays }: CustomC
     
     const days = [];
     
-    // Preencher dias do mês anterior para alinhar o grid
     const prevMonthLastDay = new Date(year, month, 0).getDate();
     for (let i = firstDayOfMonth - 1; i >= 0; i--) {
       days.push({
@@ -39,7 +39,6 @@ export function CustomCalendar({ selectedDate, onSelect, disabledDays }: CustomC
       });
     }
 
-    // Dias do mês atual
     for (let i = 1; i <= daysInMonth; i++) {
       days.push({
         day: i,
@@ -49,8 +48,7 @@ export function CustomCalendar({ selectedDate, onSelect, disabledDays }: CustomC
       });
     }
 
-    // Preencher dias do próximo mês para completar o grid de 6 linhas (opcional, mas mantém o layout fixo)
-    const totalSlots = 42; // 6 semanas
+    const totalSlots = 42;
     const nextMonthPadding = totalSlots - days.length;
     for (let i = 1; i <= nextMonthPadding; i++) {
       days.push({
@@ -95,38 +93,35 @@ export function CustomCalendar({ selectedDate, onSelect, disabledDays }: CustomC
 
   return (
     <div className="w-full">
-      {/* Header do Calendário */}
-      <div className="flex items-center justify-between mb-8">
-        <h3 className="font-anton text-2xl uppercase tracking-widest text-white">
-          {months[currentViewDate.getMonth()]} <span className="text-primary">{currentViewDate.getFullYear()}</span>
+      <div className="flex items-center justify-between mb-8 px-2">
+        <h3 className="font-anton text-xl uppercase tracking-widest text-white">
+          {months[currentViewDate.getMonth()]} <span className="text-[#D4AF37]">{currentViewDate.getFullYear()}</span>
         </h3>
-        <div className="flex gap-2">
+        <div className="flex gap-1">
           <button 
             onClick={() => changeMonth(-1)}
-            className="p-2 glass rounded-full hover:border-primary/50 transition-colors"
+            className="p-2 hover:text-[#D4AF37] transition-colors"
           >
-            <ChevronLeft className="w-4 h-4 text-white" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <button 
             onClick={() => changeMonth(1)}
-            className="p-2 glass rounded-full hover:border-primary/50 transition-colors"
+            className="p-2 hover:text-[#D4AF37] transition-colors"
           >
-            <ChevronRight className="w-4 h-4 text-white" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Dias da Semana */}
-      <div className="grid grid-cols-7 mb-4 border-b border-white/5 pb-2">
+      <div className="grid grid-cols-7 mb-4 opacity-20">
         {weekdays.map((wd) => (
-          <div key={wd} className="text-center text-[10px] font-mono font-bold text-neutral-500 tracking-tighter">
+          <div key={wd} className="text-center text-[8px] font-bold tracking-widest">
             {wd}
           </div>
         ))}
       </div>
 
-      {/* Grid de Dias */}
-      <div className="grid grid-cols-7 gap-1 md:gap-2">
+      <div className="grid grid-cols-7 gap-1">
         {calendarData.map((d, idx) => {
           const date = new Date(d.year, d.month, d.day);
           const isDisabled = disabledDays ? disabledDays(date) : false;
@@ -139,18 +134,15 @@ export function CustomCalendar({ selectedDate, onSelect, disabledDays }: CustomC
               disabled={isDisabled || !d.isCurrentMonth}
               onClick={() => handleDayClick(d)}
               className={cn(
-                "relative aspect-square flex items-center justify-center rounded-xl text-xs font-mono transition-all duration-300",
-                !d.isCurrentMonth && "opacity-10 pointer-events-none",
-                d.isCurrentMonth && !selected && !isDisabled && "hover:bg-white/5 hover:border-white/10 border border-transparent",
-                selected && "bg-primary text-black border-primary shadow-[0_0_20px_rgba(251,191,36,0.4)] z-10 font-bold",
-                current && !selected && "border-primary/30 text-primary",
-                isDisabled && d.isCurrentMonth && "opacity-20 cursor-not-allowed line-through"
+                "relative aspect-square flex items-center justify-center rounded-xl text-[10px] font-anton transition-all duration-300",
+                !d.isCurrentMonth && "opacity-0 pointer-events-none",
+                d.isCurrentMonth && !selected && !isDisabled && "hover:bg-white/5",
+                selected && "bg-[#D4AF37] text-black font-bold",
+                current && !selected && "text-[#D4AF37] border border-[#D4AF37]/20",
+                isDisabled && d.isCurrentMonth && "opacity-10 cursor-not-allowed"
               )}
             >
               {d.day}
-              {current && !selected && (
-                <div className="absolute bottom-1 w-1 h-1 rounded-full bg-primary" />
-              )}
             </button>
           );
         })}
