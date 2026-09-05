@@ -22,7 +22,7 @@ export function Navbar() {
           <Link href="/#regras" className="text-neutral-400 hover:text-white transition-colors whitespace-nowrap">Regras</Link>
         </div>
 
-        <Link href="/agendar" className="shrink-0">
+        <Link href="https://navalhago.app/gold-barbearia" target="_blank" className="shrink-0">
           <button className="bg-white text-black px-3 md:px-6 py-2 rounded-full font-bold uppercase tracking-widest text-[8px] md:text-[10px] hover:bg-neutral-200 transition-all active:scale-95 shadow-lg">
             Agendar
           </button>
