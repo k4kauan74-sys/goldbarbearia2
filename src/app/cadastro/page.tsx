@@ -9,7 +9,7 @@ import { useAuth, useFirestore } from "@/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card";
 import { formatCPF } from "@/lib/cpf-utils";
 import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/components/navbar";
@@ -20,6 +20,7 @@ export default function CadastroPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   
@@ -46,6 +47,7 @@ export default function CadastroPage() {
         name,
         email: email.toLowerCase(),
         cpf,
+        birthDate,
         plan: null,
         planType: null,
         subscriptionStatus: "inativa",
@@ -63,7 +65,7 @@ export default function CadastroPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030303] flex flex-col pt-32 pb-20 relative overflow-hidden">
+    <div className="min-h-screen bg-[#030303] flex flex-col pt-32 pb-20 relative overflow-hidden" suppressHydrationWarning>
       <Navbar />
 
       <div className="absolute top-32 left-8 z-20 hidden md:block">
@@ -99,6 +101,10 @@ export default function CadastroPage() {
               <div className="space-y-1">
                 <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-white/60 ml-1">CPF</Label>
                 <Input value={cpf} onChange={e => setCpf(formatCPF(e.target.value))} maxLength={14} className="bg-transparent border-white/10 border-b border-t-0 border-x-0 rounded-none py-5 text-sm text-white focus-visible:ring-0 focus-visible:border-[#D4AF37]" required />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-white/60 ml-1">Data de Nascimento</Label>
+                <Input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} className="bg-transparent border-white/10 border-b border-t-0 border-x-0 rounded-none py-5 text-sm text-white focus-visible:ring-0 focus-visible:border-[#D4AF37]" required />
               </div>
               <div className="space-y-1">
                 <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-white/60 ml-1">Senha</Label>

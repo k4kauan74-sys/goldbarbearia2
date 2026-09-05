@@ -4,12 +4,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useAuth, useFirestore } from "@/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { useAuth } from "@/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/components/navbar";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react";
@@ -22,7 +21,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   
   const auth = useAuth();
-  const firestore = useFirestore();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -31,7 +29,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Autenticação padrão de cliente
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
     } catch (error: any) {
@@ -42,7 +39,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030303] flex flex-col pt-32 pb-20 relative overflow-hidden">
+    <div className="min-h-screen bg-[#030303] flex flex-col pt-32 pb-20 relative overflow-hidden" suppressHydrationWarning>
       <Navbar />
       
       <div className="absolute top-32 left-8 z-20 hidden md:block">

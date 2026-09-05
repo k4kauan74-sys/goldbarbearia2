@@ -1,12 +1,12 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { doc } from "firebase/firestore";
 import { useUser, useFirestore, useDoc } from "@/firebase";
 import { Navbar } from "@/components/navbar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -31,7 +31,7 @@ export default function DashboardPage() {
 
   if (isUserLoading || isProfileLoading) {
     return (
-      <div className="min-h-screen bg-[#030303] flex items-center justify-center text-[#D4AF37] font-anton text-2xl animate-pulse">
+      <div className="min-h-screen bg-[#030303] flex items-center justify-center text-[#D4AF37] font-anton text-2xl animate-pulse" suppressHydrationWarning>
         CARREGANDO CLOUD SYNC...
       </div>
     );
@@ -42,7 +42,7 @@ export default function DashboardPage() {
   const isActive = profile.subscriptionStatus === "ativa";
 
   return (
-    <div className="min-h-screen bg-[#030303] flex flex-col pt-32 pb-20">
+    <div className="min-h-screen bg-[#030303] flex flex-col pt-32 pb-20" suppressHydrationWarning>
       <Navbar />
       
       <main className="container mx-auto px-4 max-w-4xl space-y-8">
@@ -85,7 +85,7 @@ export default function DashboardPage() {
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-white/5 pb-4">
                 <span className="text-[10px] text-white/40 uppercase tracking-widest">Plano Atual</span>
-                <span className="font-anton text-white uppercase">{profile.planType ? `Gold ${profile.plan}` : (profile.plan ? `Básico ${profile.plan}` : "Nenhum")}</span>
+                <span className="font-anton text-white uppercase">{profile.planType ? `Gold ${profile.plan || 'Semestral'}` : (profile.plan ? `Básico ${profile.plan}` : "Nenhum")}</span>
               </div>
               <div className="flex justify-between items-center border-b border-white/5 pb-4">
                 <span className="text-[10px] text-white/40 uppercase tracking-widest">Vencimento</span>
@@ -104,19 +104,19 @@ export default function DashboardPage() {
 
           {/* Atalhos Rápidos */}
           <div className="grid grid-cols-2 gap-4">
-            <Card className={cn(
-              "bg-[#0A0A0A] border-white/5 p-6 rounded-[2rem] flex flex-col items-center justify-center gap-3 transition-all",
-              isActive ? "opacity-100 hover:border-[#D4AF37]/40 cursor-pointer" : "opacity-30 cursor-not-allowed"
-            )}>
-              <div className="bg-white/5 p-4 rounded-full">
-                <Scissors className="w-6 h-6 text-[#D4AF37]" />
-              </div>
-              <span className="text-[9px] font-anton text-white uppercase tracking-widest">Novo Corte</span>
-            </Card>
+            <Link href="https://navalhago.app/gold-barbearia" target="_blank" className="contents">
+              <Card className={cn(
+                "bg-[#0A0A0A] border-white/5 p-6 rounded-[2rem] flex flex-col items-center justify-center gap-3 transition-all hover:border-[#D4AF37]/40 cursor-pointer"
+              )}>
+                <div className="bg-white/5 p-4 rounded-full">
+                  <Scissors className="w-6 h-6 text-[#D4AF37]" />
+                </div>
+                <span className="text-[9px] font-anton text-white uppercase tracking-widest">Novo Corte</span>
+              </Card>
+            </Link>
             
             <Card className={cn(
-              "bg-[#0A0A0A] border-white/5 p-6 rounded-[2rem] flex flex-col items-center justify-center gap-3 transition-all",
-              isActive ? "opacity-100 hover:border-[#D4AF37]/40 cursor-pointer" : "opacity-30 cursor-not-allowed"
+              "bg-[#0A0A0A] border-white/5 p-6 rounded-[2rem] flex flex-col items-center justify-center gap-3 transition-all opacity-30 cursor-not-allowed"
             )}>
               <div className="bg-white/5 p-4 rounded-full">
                 <Calendar className="w-6 h-6 text-[#D4AF37]" />
