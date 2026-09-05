@@ -31,41 +31,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Login Admin Bypass
-      if (email.toLowerCase() === "admin@barber.com" && password === "admin123") {
-        const adminUser = {
-          id: 'admin',
-          name: 'Administrador',
-          email: email,
-          role: 'admin'
-        };
-        localStorage.setItem("gold_user", JSON.stringify(adminUser));
-        router.push("/admin/dashboard");
-        return;
-      }
-
-      // Check Professionals (Staff)
-      const profsRef = collection(firestore, "professionals");
-      const q = query(profsRef, where("email", "==", email.toLowerCase()));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const profDoc = querySnapshot.docs[0];
-        const profData = profDoc.data();
-        if (profData.password === password) {
-          const barberUser = {
-            id: profDoc.id,
-            name: profData.name,
-            email: email,
-            role: 'barber'
-          };
-          localStorage.setItem("gold_user", JSON.stringify(barberUser));
-          router.push("/admin/dashboard");
-          return;
-        }
-      }
-
-      // Default Client Auth
+      // Autenticação padrão de cliente
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
     } catch (error: any) {

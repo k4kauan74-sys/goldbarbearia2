@@ -1,7 +1,7 @@
 
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
-import { ArrowRight, Scissors, Check, Crown, Clock, ListOrdered, Calendar, Users, CheckCircle2, Lock } from "lucide-react";
+import { ArrowRight, Scissors, Check, Crown, Clock, ListOrdered, Calendar, Users, CheckCircle2 } from "lucide-react";
 
 export default function Home() {
   return (
@@ -347,9 +347,6 @@ export default function Home() {
             <div className="flex flex-col md:flex-row gap-12 text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-500">
               <Link href="/" className="hover:text-white transition-colors">Início</Link>
               <Link href="#regras" className="hover:text-white transition-colors">Regras dos Planos</Link>
-              <Link href="/admin/login" className="hover:text-primary transition-colors flex items-center gap-2">
-                <Lock className="w-3 h-3" /> Painel Administrativo
-              </Link>
               <Link href="https://www.instagram.com/goldbarbearia_/" target="_blank" className="hover:text-white transition-colors">Instagram</Link>
             </div>
 

@@ -1,16 +1,6 @@
 
 {
   "entities": {
-    "AdminUser": {
-      "title": "AdminUser",
-      "type": "object",
-      "description": "Usuário administrativo.",
-      "properties": {
-        "id": { "type": "string" },
-        "username": { "type": "string" }
-      },
-      "required": ["id", "username"]
-    },
     "ClientProfile": {
       "title": "ClientProfile",
       "type": "object",
@@ -20,6 +10,7 @@
         "name": { "type": "string" },
         "email": { "type": "string" },
         "cpf": { "type": "string" },
+        "birthDate": { "type": "string", "format": "date" },
         "plan": { "type": "string", "enum": ["semestral", null] },
         "planType": { "type": "string", "enum": ["basico", "gold", null] },
         "subscriptionStatus": { "type": "string", "enum": ["ativa", "inativa", "pendente"] },
@@ -34,8 +25,12 @@
       "properties": {
         "id": { "type": "string" },
         "name": { "type": "string" },
+        "email": { "type": "string" },
         "specialty": { "type": "string" },
-        "isActive": { "type": "boolean" }
+        "isActive": { "type": "boolean" },
+        "commission": { "type": "number" },
+        "serviceCommissions": { "type": "object" },
+        "workingHours": { "type": "array", "items": { "type": "string" } }
       },
       "required": ["id", "name", "specialty", "isActive"]
     },
@@ -45,7 +40,8 @@
       "properties": {
         "id": { "type": "string" },
         "name": { "type": "string" },
-        "price": { "type": "number" }
+        "price": { "type": "number" },
+        "duration": { "type": "number" }
       },
       "required": ["id", "name", "price"]
     },
@@ -63,25 +59,12 @@
         "status": { "type": "string" }
       },
       "required": ["id", "clientName", "clientId", "serviceId", "professionalId", "date", "time", "status"]
-    },
-    "PushSubscription": {
-      "title": "PushSubscription",
-      "type": "object",
-      "properties": {
-        "subscription": { "type": "object" },
-        "updatedAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["subscription"]
     }
   },
   "auth": {
     "providers": ["password", "anonymous"]
   },
   "firestore": {
-    "/admin_roles/{adminUid}": {
-      "schema": { "$ref": "#/backend/entities/AdminUser" },
-      "description": "Papéis administrativos."
-    },
     "/clients/{uid}": {
       "schema": { "$ref": "#/backend/entities/ClientProfile" },
       "description": "Dados do cliente e assinatura."
@@ -97,10 +80,6 @@
     "/appointments/{appointmentId}": {
       "schema": { "$ref": "#/entities/Appointment" },
       "description": "Agendamentos realizados."
-    },
-    "/push_subscriptions/{userId}": {
-      "schema": { "$ref": "#/entities/PushSubscription" },
-      "description": "Inscrições para Web Push VAPID."
     }
   }
 }
