@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { MessageCircle, Instagram, Lock } from "lucide-react";
+import { MessageCircle, Instagram } from "lucide-react";
 
 export function Navbar() {
   return (
@@ -20,9 +20,6 @@ export function Navbar() {
         <div className="flex items-center gap-3 md:gap-6 font-medium uppercase tracking-[0.15em] text-[8px] md:text-[10px] mx-2">
           <Link href="/" className="text-neutral-400 hover:text-white transition-colors whitespace-nowrap">Início</Link>
           <Link href="/#regras" className="text-neutral-400 hover:text-white transition-colors whitespace-nowrap">Regras</Link>
-          <Link href="/admin/login" className="text-neutral-600 hover:text-primary transition-colors whitespace-nowrap flex items-center gap-1">
-            <Lock className="h-2 w-2" /> Staff
-          </Link>
         </div>
 
         <Link href="/agendar" className="shrink-0">
