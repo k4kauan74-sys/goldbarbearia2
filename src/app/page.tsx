@@ -1,11 +1,20 @@
 
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { ArrowRight, Scissors, Check, Crown, Clock, ListOrdered, Calendar, Users, CheckCircle2 } from "lucide-react";
 
 export default function Home() {
+  const [year, setYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-screen bg-background selection:bg-primary/30">
+    <div className="flex flex-col min-h-screen bg-background selection:bg-primary/30" suppressHydrationWarning>
       <Navbar />
       
       {/* Hero Section Inicial */}
@@ -92,7 +101,6 @@ export default function Home() {
 
       {/* Seção de Planos */}
       <section id="planos" className="relative py-24 md:py-40 bg-[#030303] overflow-hidden">
-        {/* Background Decorative */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[160px] pointer-events-none" />
 
         <div className="container mx-auto px-4 relative z-10">
@@ -227,7 +235,6 @@ export default function Home() {
           </div>
 
           <div className="grid gap-16 md:gap-32">
-            {/* Plano Básico */}
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
               <div className="flex items-center gap-4 border-b border-white/10 pb-6">
                 <div className="bg-white/5 p-4 rounded-2xl">
@@ -279,7 +286,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Plano Gold */}
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
               <div className="flex items-center gap-4 border-b border-white/10 pb-6">
                 <div className="bg-primary/10 p-4 rounded-2xl">
@@ -355,6 +361,13 @@ export default function Home() {
               <span className="text-[9px] font-mono text-emerald-500 uppercase tracking-widest">All Systems Operational</span>
             </div>
           </div>
+          {year && (
+            <div className="text-center mt-12">
+              <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-bold">
+                &copy; {year} Gold Barbearia — Todos os direitos reservados.
+              </p>
+            </div>
+          )}
         </div>
       </footer>
     </div>
