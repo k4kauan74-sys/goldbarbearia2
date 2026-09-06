@@ -4,24 +4,42 @@ import webpush from 'web-push';
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
+// Garante que o Firebase Admin seja inicializado apenas uma vez
 if (!getApps().length) {
-  initializeApp();
+  try {
+    initializeApp();
+  } catch (error) {
+    // Em ambiente de build ou se as credenciais estiverem faltando, 
+    // evitamos que o erro quebre o deploy.
+  }
 }
 
 const db = getFirestore();
 
-// CHAVES VAPID (Para produção, use variáveis de ambiente)
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || 'BFLc0T5pWz2R_7r8F3u7H3YpYfD8W-Nq3_k_R_z_w_L_z_E_Y_z_R_L_W_z_w_L_z_E_Y_z_R_L_W';
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || 'C5yR_L_W_z_w_L_z_E_Y_z_R_L_W_z_w_L_z_E_Y';
+// CHAVES VAPID vindas do ambiente
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
 
-webpush.setVapidDetails(
-  'mailto:contato@goldbarbearia.com.br',
-  VAPID_PUBLIC_KEY,
-  VAPID_PRIVATE_KEY
-);
+// Só configuramos o web-push se as chaves existirem e forem válidas
+// Isso evita o erro "Vapid public key should be 65 bytes long" durante o build
+if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+  try {
+    webpush.setVapidDetails(
+      'mailto:contato@goldbarbearia.com.br',
+      VAPID_PUBLIC_KEY,
+      VAPID_PRIVATE_KEY
+    );
+  } catch (error) {
+    console.error('Erro ao configurar VAPID details:', error);
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
+    if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+      return NextResponse.json({ error: 'Serviço de notificações não configurado (VAPID keys faltando)' }, { status: 503 });
+    }
+
     const { title, body } = await req.json();
 
     const snapshot = await db.collection('push_subscriptions').get();
