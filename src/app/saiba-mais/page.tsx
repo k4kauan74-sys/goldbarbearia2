@@ -16,6 +16,7 @@ import {
   Users
 } from "lucide-react";
 import Link from "next/link";
+import { PLANS } from "@/lib/plans";
 
 export default function SaibaMaisPage() {
   return (
@@ -59,35 +60,28 @@ export default function SaibaMaisPage() {
             <div className="grid md:grid-cols-2 gap-10 items-start">
               <div className="space-y-6">
                 <p className="text-white/60 text-lg leading-relaxed">
-                  O Plano Básico foi criado para quem deseja manter o visual sempre em dia com praticidade e economia. 
-                  Ideal para o homem moderno que busca agilidade sem abrir mão da qualidade Gold.
+                  {PLANS.basico.rulesDescription}
                 </p>
                 <div className="bg-white/[0.02] border border-white/5 p-8 rounded-[2rem] space-y-4">
                   <div className="flex items-start gap-4">
                     <Clock className="w-5 h-5 text-primary shrink-0 mt-1" />
                     <div>
                       <p className="font-anton text-white uppercase tracking-widest text-sm mb-1">Funcionamento</p>
-                      <p className="text-white/40 text-xs">Atendimento exclusivo por ordem de chegada de terça e quarta-feira.</p>
+                      <p className="text-white/40 text-xs">{PLANS.basico.scheduleRule}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
                     <ListOrdered className="w-5 h-5 text-primary shrink-0 mt-1" />
                     <div>
                       <p className="font-anton text-white uppercase tracking-widest text-sm mb-1">Limite de Uso</p>
-                      <p className="text-white/40 text-xs">É permitido apenas 1 serviço por dia por cliente cadastrado no plano.</p>
+                      <p className="text-white/40 text-xs">{PLANS.basico.usageLimitRule}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
-                {[
-                  "Cortes ilimitados",
-                  "Atendimento de terça e quarta",
-                  "Somente corte de cabelo",
-                  "Ordem de chegada",
-                  "Limite de 1 serviço por dia"
-                ].map((item, idx) => (
+                {PLANS.basico.rulesSummary.map((item, idx) => (
                   <div key={idx} className="flex items-center gap-4 p-5 glass rounded-2xl border-white/5">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                     <span className="font-anton text-white uppercase tracking-widest text-xs">{item}</span>
@@ -111,37 +105,28 @@ export default function SaibaMaisPage() {
             <div className="grid md:grid-cols-2 gap-10 items-start">
               <div className="space-y-6">
                 <p className="text-white/60 text-lg leading-relaxed">
-                  O Plano Gold foi desenvolvido para clientes que desejam uma experiência mais completa e com maior comodidade. 
-                  A elite do cuidado masculino com benefícios exclusivos.
+                  {PLANS.gold.rulesDescription}
                 </p>
                 <div className="bg-primary/5 border border-primary/10 p-8 rounded-[2rem] space-y-4 shadow-[0_0_40px_rgba(212,175,55,0.05)]">
                   <div className="flex items-start gap-4">
                     <Calendar className="w-5 h-5 text-primary shrink-0 mt-1" />
                     <div>
                       <p className="font-anton text-white uppercase tracking-widest text-sm mb-1">Agendamento</p>
-                      <p className="text-white/40 text-xs">Escolha entre agendar seu horário previamente ou ser atendido por ordem de chegada.</p>
+                      <p className="text-white/40 text-xs">{PLANS.gold.scheduleRule}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
                     <Users className="w-5 h-5 text-primary shrink-0 mt-1" />
                     <div>
                       <p className="font-anton text-white uppercase tracking-widest text-sm mb-1">Prioridade</p>
-                      <p className="text-white/40 text-xs">Atendimento prioritário de terça, quarta e quinta-feira para todos os serviços.</p>
+                      <p className="text-white/40 text-xs">{PLANS.gold.priorityRule}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
-                {[
-                  "Cortes ilimitados",
-                  "Atendimento de terça, quarta e quinta",
-                  "Cabelo, barba e sobrancelha",
-                  "Atendimento prioritário",
-                  "Pode agendar horário",
-                  "Ordem de chegada disponível",
-                  "Limite de 1 serviço por dia"
-                ].map((item, idx) => (
+                {PLANS.gold.rulesSummary.map((item, idx) => (
                   <div key={idx} className="flex items-center gap-4 p-5 glass border-primary/20 rounded-2xl">
                     <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
                     <span className="font-anton text-white uppercase tracking-widest text-xs">{item}</span>
@@ -169,7 +154,7 @@ export default function SaibaMaisPage() {
       <footer className="mt-20 py-10 border-t border-white/5">
         <div className="container mx-auto px-4 text-center">
           <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-bold">
-            &copy; {new Date().getFullYear()} Gold Barbearia — Todos os direitos reservados.
+            © 2026 Gold Barbearia — Todos os direitos reservados.
           </p>
         </div>
       </footer>

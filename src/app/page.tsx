@@ -1,17 +1,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { ArrowRight, Scissors, Check, Crown, Clock, ListOrdered, Calendar, Users, CheckCircle2 } from "lucide-react";
+import { PLANS } from "@/lib/plans";
 
 export default function Home() {
-  const [year, setYear] = useState<number | null>(null);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-background selection:bg-primary/30" suppressHydrationWarning>
@@ -100,10 +95,10 @@ export default function Home() {
       </section>
 
       {/* Seção de Planos */}
-      <section id="planos" className="relative py-24 md:py-40 bg-[#030303] overflow-hidden">
+      <section id="planos" className="relative py-24 md:py-40 bg-[#030303] overflow-hidden" suppressHydrationWarning>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[160px] pointer-events-none" />
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-10" suppressHydrationWarning>
           <div className="text-center mb-16 md:mb-24">
             <span className="text-primary uppercase text-[10px] font-black tracking-[0.5em] mb-4 block animate-in fade-in slide-in-from-bottom-4 duration-700">
               Assinatura Semestral
@@ -121,42 +116,35 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-stretch max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-stretch max-w-6xl mx-auto" suppressHydrationWarning>
             {/* Plano Básico */}
             <div className="relative group animate-in fade-in slide-in-from-left-8 duration-1000">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 to-primary/10 rounded-[3rem] blur opacity-20 group-hover:opacity-40 transition duration-1000" />
               <div className="relative h-full glass border-primary/20 p-8 md:p-16 rounded-[3rem] flex flex-col items-start text-left shadow-[0_0_50px_rgba(212,175,55,0.05)]">
                 <div className="absolute top-8 right-8">
                   <span className="bg-primary text-black text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full">
-                    Semestral
+                    {PLANS.basico.badge}
                   </span>
                 </div>
                 
                 <div className="mb-10">
-                  <h3 className="text-4xl font-anton text-white uppercase tracking-tighter mb-3">Plano Básico</h3>
+                  <h3 className="text-4xl font-anton text-white uppercase tracking-tighter mb-3">{PLANS.basico.name}</h3>
                   <p className="text-[#F5F5F5]/40 text-[11px] uppercase font-bold tracking-[0.2em] leading-relaxed max-w-[240px]">
-                    Perfeito para manter o visual em dia com praticidade
+                    {PLANS.basico.description}
                   </p>
                 </div>
 
-                <div className="mb-12 flex items-baseline gap-2">
-                  <span className="text-5xl md:text-7xl font-anton text-primary">R$ 69,90</span>
+                <div className="mb-12 flex items-baseline gap-2" suppressHydrationWarning>
+                  <span className="text-5xl md:text-7xl font-anton text-primary" suppressHydrationWarning>{PLANS.basico.priceFormatted}</span>
                   <span className="text-[#F5F5F5]/20 text-[12px] uppercase font-black tracking-widest">/mês</span>
                 </div>
 
                 <div className="space-y-6 mb-16 flex-1 w-full">
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Cortes ilimitados
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Terça e quarta
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Corte de cabelo
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Atendimento ágil
-                  </div>
+                  {PLANS.basico.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                      <Check className="w-5 h-5 text-primary shrink-0" /> {feature}
+                    </div>
+                  ))}
                 </div>
 
                 <div className="w-full mt-auto pt-8 border-t border-white/5">
@@ -174,40 +162,27 @@ export default function Home() {
               <div className="relative h-full glass border-white/10 p-8 md:p-16 rounded-[3rem] flex flex-col items-start text-left hover:border-primary/20 transition-all duration-700">
                 <div className="absolute top-8 right-8">
                   <span className="bg-[#D4AF37] text-black text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full">
-                    Elite Semestral
+                    {PLANS.gold.badge}
                   </span>
                 </div>
                 <div className="mb-10">
-                  <h3 className="text-4xl font-anton text-white uppercase tracking-tighter mb-3">Plano Gold</h3>
+                  <h3 className="text-4xl font-anton text-white uppercase tracking-tighter mb-3">{PLANS.gold.name}</h3>
                   <p className="text-[#F5F5F5]/40 text-[11px] uppercase font-bold tracking-[0.2em] leading-relaxed max-w-[240px]">
-                    Experiência completa para quem quer sempre estar impecável
+                    {PLANS.gold.description}
                   </p>
                 </div>
 
-                <div className="mb-12 flex items-baseline gap-2">
-                  <span className="text-5xl md:text-7xl font-anton text-white">R$ 145,00</span>
+                <div className="mb-12 flex items-baseline gap-2" suppressHydrationWarning>
+                  <span className="text-5xl md:text-7xl font-anton text-white" suppressHydrationWarning>{PLANS.gold.priceFormatted}</span>
                   <span className="text-[#F5F5F5]/20 text-[12px] uppercase font-black tracking-widest">/mês</span>
                 </div>
 
                 <div className="space-y-6 mb-16 flex-1 w-full overflow-y-auto max-h-[300px] custom-scrollbar">
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Cortes ilimitados
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Terça, quarta e quinta
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Barba
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Sobrancelha
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Atendimento prioritário
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Desconto em produtos
-                  </div>
+                  {PLANS.gold.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
+                      <Check className="w-5 h-5 text-primary shrink-0" /> {feature}
+                    </div>
+                  ))}
                 </div>
 
                 <div className="w-full mt-auto pt-8 border-t border-white/5">
@@ -224,7 +199,7 @@ export default function Home() {
       </section>
 
       {/* Seção Regras Detalhadas */}
-      <section id="regras" className="relative py-24 md:py-40 bg-[#030303] overflow-hidden border-t border-white/5">
+      <section id="regras" className="relative py-24 md:py-40 bg-[#030303] overflow-hidden border-t border-white/5" suppressHydrationWarning>
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="container mx-auto px-4 max-w-5xl relative z-10">
           <div className="text-center mb-16 md:mb-24">
@@ -248,35 +223,28 @@ export default function Home() {
               <div className="grid md:grid-cols-2 gap-10 items-start">
                 <div className="space-y-6">
                   <p className="text-white/60 text-lg leading-relaxed">
-                    O Plano Básico foi criado para quem deseja manter o visual sempre em dia com praticidade e economia. 
-                    Ideal para o homem moderno que busca agilidade sem abrir mão da qualidade Gold.
+                    {PLANS.basico.rulesDescription}
                   </p>
                   <div className="bg-white/[0.02] border border-white/5 p-8 rounded-[2rem] space-y-4">
                     <div className="flex items-start gap-4">
                       <Clock className="w-5 h-5 text-primary shrink-0 mt-1" />
                       <div>
                         <p className="font-anton text-white uppercase tracking-widest text-sm mb-1">Funcionamento</p>
-                        <p className="text-white/40 text-xs">Atendimento exclusivo por ordem de chegada de terça e quarta-feira.</p>
+                        <p className="text-white/40 text-xs">{PLANS.basico.scheduleRule}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-4">
                       <ListOrdered className="w-5 h-5 text-primary shrink-0 mt-1" />
                       <div>
                         <p className="font-anton text-white uppercase tracking-widest text-sm mb-1">Limite de Uso</p>
-                        <p className="text-white/40 text-xs">É permitido apenas 1 serviço por dia por cliente cadastrado no plano.</p>
+                        <p className="text-white/40 text-xs">{PLANS.basico.usageLimitRule}</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  {[
-                    "Cortes ilimitados",
-                    "Atendimento de terça e quarta",
-                    "Somente corte de cabelo",
-                    "Ordem de chegada",
-                    "Limite de 1 serviço por dia"
-                  ].map((item, idx) => (
+                  {PLANS.basico.rulesSummary.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-4 p-5 glass rounded-2xl border-white/5">
                       <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                       <span className="font-anton text-white uppercase tracking-widest text-xs">{item}</span>
@@ -299,37 +267,28 @@ export default function Home() {
               <div className="grid md:grid-cols-2 gap-10 items-start">
                 <div className="space-y-6">
                   <p className="text-white/60 text-lg leading-relaxed">
-                    O Plano Gold foi desenvolvido para clientes que desejam uma experiência mais completa e com maior comodidade. 
-                    A elite do cuidado masculino com benefícios exclusivos.
+                    {PLANS.gold.rulesDescription}
                   </p>
                   <div className="bg-primary/5 border border-primary/10 p-8 rounded-[2rem] space-y-4 shadow-[0_0_40px_rgba(212,175,55,0.05)]">
                     <div className="flex items-start gap-4">
                       <Calendar className="w-5 h-5 text-primary shrink-0 mt-1" />
                       <div>
                         <p className="font-anton text-white uppercase tracking-widest text-sm mb-1">Agendamento</p>
-                        <p className="text-white/40 text-xs">Escolha entre agendar seu horário previamente ou ser atendido por ordem de chegada.</p>
+                        <p className="text-white/40 text-xs">{PLANS.gold.scheduleRule}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-4">
                       <Users className="w-5 h-5 text-primary shrink-0 mt-1" />
                       <div>
                         <p className="font-anton text-white uppercase tracking-widest text-sm mb-1">Prioridade</p>
-                        <p className="text-white/40 text-xs">Atendimento prioritário de terça, quarta e quinta-feira para todos os serviços.</p>
+                        <p className="text-white/40 text-xs">{PLANS.gold.priorityRule}</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  {[
-                    "Cortes ilimitados",
-                    "Atendimento de terça, quarta e quinta",
-                    "Cabelo, barba e sobrancelha",
-                    "Atendimento prioritário",
-                    "Pode agendar horário",
-                    "Ordem de chegada disponível",
-                    "Limite de 1 serviço por dia"
-                  ].map((item, idx) => (
+                  {PLANS.gold.rulesSummary.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-4 p-5 glass border-primary/20 rounded-2xl">
                       <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
                       <span className="font-anton text-white uppercase tracking-widest text-xs">{item}</span>
@@ -361,13 +320,11 @@ export default function Home() {
               <span className="text-[9px] font-mono text-emerald-500 uppercase tracking-widest">All Systems Operational</span>
             </div>
           </div>
-          {year && (
-            <div className="text-center mt-12">
-              <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-bold">
-                &copy; {year} Gold Barbearia — Todos os direitos reservados.
-              </p>
-            </div>
-          )}
+          <div className="text-center mt-12">
+            <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-bold">
+              © 2026 Gold Barbearia — Todos os direitos reservados.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

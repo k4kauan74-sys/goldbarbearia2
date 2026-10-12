@@ -13,41 +13,36 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/firebase";
+import { PLANS, PlanId } from "@/lib/plans";
 
-type PlanType = 'basico' | 'gold';
+type PlanType = PlanId;
 type PeriodType = 'semestral';
 
 const PRICES = {
   basico: {
-    semestral: 69.90
+    semestral: PLANS.basico.monthlyPrice
   },
   gold: {
-    semestral: 145.00
+    semestral: PLANS.gold.monthlyPrice
   }
 };
 
 const INDIVIDUAL_COMPARISON = {
-  basico: {
-    value: 180.00,
-    description: "4 CORTES AVULSOS"
-  },
-  gold: {
-    value: 360.00,
-    description: "4 COMBOS COMPLETOS AVULSOS"
-  }
+  basico: PLANS.basico.individualComparison,
+  gold: PLANS.gold.individualComparison
 };
 
 const PERIOD_MONTHS = {
-  semestral: 6
+  semestral: PLANS.basico.periodMonths
 };
 
 // Links de Pagamento Diretos Externos
 const DIRECT_LINKS = {
   basico: {
-    semestral: "https://invoice.infinitepay.io/plans/thasha_magulas/ANaUkabAIM"
+    semestral: PLANS.basico.directPaymentLink
   },
   gold: {
-    semestral: "https://invoice.infinitepay.io/plans/thasha_magulas/Ae3brIQ8bN"
+    semestral: PLANS.gold.directPaymentLink
   }
 };
 
