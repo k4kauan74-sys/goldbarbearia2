@@ -1,0 +1,6 @@
+{
+  "name": "Gold Barbearia",
+  "description": "Plataforma de assinatura e agendamento para a barbearia mais premium da cidade. Estilo, elegância e precisão.",
+  "permissions": [],
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

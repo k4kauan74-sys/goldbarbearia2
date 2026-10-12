@@ -4,7 +4,7 @@ import { MercadoPagoConfig, PreApproval } from 'mercadopago';
 
 // Configuração do Mercado Pago
 const client = new MercadoPagoConfig({ 
-  accessToken: 'APP_USR-2221276034207684-042717-ec1dc710f61e0ce62de9933e069ef4cb-784803379' 
+  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN || 'APP_USR-2221276034207684-042717-ec1dc710f61e0ce62de9933e069ef4cb-784803379' 
 });
 
 export async function POST(req: NextRequest) {

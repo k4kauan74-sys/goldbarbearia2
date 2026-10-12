@@ -149,7 +149,7 @@ export default function Home() {
                     <Check className="w-5 h-5 text-primary shrink-0" /> Cortes ilimitados
                   </div>
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Segunda a quarta
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Terça e quarta
                   </div>
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
                     <Check className="w-5 h-5 text-primary shrink-0" /> Corte de cabelo
@@ -194,7 +194,7 @@ export default function Home() {
                     <Check className="w-5 h-5 text-primary shrink-0" /> Cortes ilimitados
                   </div>
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
-                    <Check className="w-5 h-5 text-primary shrink-0" /> Segunda a quinta
+                    <Check className="w-5 h-5 text-primary shrink-0" /> Terça, quarta e quinta
                   </div>
                   <div className="flex items-center gap-4 text-[11px] text-[#F5F5F5]/80 uppercase font-bold tracking-[0.2em] border-b border-white/5 pb-5">
                     <Check className="w-5 h-5 text-primary shrink-0" /> Barba
@@ -256,7 +256,7 @@ export default function Home() {
                       <Clock className="w-5 h-5 text-primary shrink-0 mt-1" />
                       <div>
                         <p className="font-anton text-white uppercase tracking-widest text-sm mb-1">Funcionamento</p>
-                        <p className="text-white/40 text-xs">Atendimento exclusivo por ordem de chegada de segunda a quarta-feira.</p>
+                        <p className="text-white/40 text-xs">Atendimento exclusivo por ordem de chegada de terça e quarta-feira.</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-4">
@@ -272,7 +272,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 gap-4">
                   {[
                     "Cortes ilimitados",
-                    "Atendimento de segunda a quarta",
+                    "Atendimento de terça e quarta",
                     "Somente corte de cabelo",
                     "Ordem de chegada",
                     "Limite de 1 serviço por dia"
@@ -314,7 +314,7 @@ export default function Home() {
                       <Users className="w-5 h-5 text-primary shrink-0 mt-1" />
                       <div>
                         <p className="font-anton text-white uppercase tracking-widest text-sm mb-1">Prioridade</p>
-                        <p className="text-white/40 text-xs">Atendimento prioritário de segunda a quinta-feira para todos os serviços.</p>
+                        <p className="text-white/40 text-xs">Atendimento prioritário de terça, quarta e quinta-feira para todos os serviços.</p>
                       </div>
                     </div>
                   </div>
@@ -323,7 +323,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 gap-4">
                   {[
                     "Cortes ilimitados",
-                    "Atendimento de segunda a quinta",
+                    "Atendimento de terça, quarta e quinta",
                     "Cabelo, barba e sobrancelha",
                     "Atendimento prioritário",
                     "Pode agendar horário",
